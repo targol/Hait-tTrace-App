@@ -34,3 +34,13 @@ web/dist/
 !public/javaneh-app.apk
 *.idsig
 debug.keystore.base64
+
+# Signing keys and certificates
+*.jks
+*.pem
+*.key
+*.crt
+*.der
+keystore/
+debug.key
+debug.crt

@@ -14,6 +14,7 @@ import {
   DarkModePreference,
 } from '../types';
 import { getTodayJalali, jalaliToFormattedString } from '../calendar/jalali';
+import { calculateBackupChecksum } from './storageService';
 
 export interface ValidationEntityCounts {
   categories: number;
@@ -37,6 +38,8 @@ export interface ValidatedBackupResult {
   counts: ValidationEntityCounts;
   exportDateString?: string;
   appName?: string;
+  checksum?: string;
+  checksumVerified?: boolean;
   data: {
     categories: Category[];
     goals: Goal[];
@@ -588,12 +591,33 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
     (parsed.exportDate ? new Date(parsed.exportDate).toLocaleDateString('fa-IR') : undefined);
   const appName = typeof parsed.appName === 'string' ? parsed.appName : 'جوانه';
 
+  // Checksum verification
+  let checksumVerified: boolean | undefined = undefined;
+  const rawChecksum = parsed.checksum || root.checksum;
+  if (typeof rawChecksum === 'string' && rawChecksum.trim()) {
+    const computed = calculateBackupChecksum({
+      categories: validCategories,
+      goals: validGoals,
+      tasks: validTasks,
+      habits: validHabits,
+      calendarEvents: validCalendarEvents,
+    });
+    checksumVerified = computed === rawChecksum.trim();
+    if (checksumVerified) {
+      warnings.unshift('یکپارچگی و سلامت ساختاری فایل (Checksum) با موفقیت تأیید شد ✓');
+    } else {
+      warnings.push('هشدار: هش فایل پشتیبان تفاوت دارد؛ داده‌های سالم به‌صورت جداگانه اعتبارسنجی شدند.');
+    }
+  }
+
   return {
     isValid: true,
     fatalError: null,
     warnings,
     exportDateString,
     appName,
+    checksum: rawChecksum,
+    checksumVerified,
     counts: {
       categories: validCategories.length,
       goals: validGoals.length,

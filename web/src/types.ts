@@ -191,6 +191,7 @@ export interface AppBackupData {
   userProfile?: UserProfile;
   reminderSettings?: ReminderSettings;
   appPreferences?: AppPreferences;
+  checksum?: string;
   counts?: {
     categories: number;
     goals: number;

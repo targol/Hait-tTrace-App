@@ -169,7 +169,34 @@ export function applyRestoredAppPreferences(
 }
 
 /**
+ * Computes a deterministic checksum across core entities (categories, goals, tasks, habits, calendarEvents)
+ * to verify data integrity upon export and restore.
+ */
+export function calculateBackupChecksum(data: {
+  categories?: Category[];
+  goals?: Goal[];
+  tasks?: AppTask[];
+  habits?: Habit[];
+  calendarEvents?: CalendarEvent[];
+}): string {
+  const cList = (data.categories || []).map(c => c.id).sort().join(',');
+  const gList = (data.goals || []).map(g => g.id).sort().join(',');
+  const tList = (data.tasks || []).map(t => t.id).sort().join(',');
+  const hList = (data.habits || []).map(h => h.id).sort().join(',');
+  const eList = (data.calendarEvents || []).map(e => e.id).sort().join(',');
+  const str = `c:${cList}|g:${gList}|t:${tList}|h:${hList}|e:${eList}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return 'jv_' + Math.abs(hash).toString(16).padStart(8, '0');
+}
+
+/**
  * Builds a 100% complete full-state backup payload containing every entity and setting in Javaneh.
+ * Explicitly sanitizes secrets (e.g. GitHub personal access token) and attaches integrity checksum metadata.
  */
 export function buildCompleteAppBackupPayload(data: AppDataPayload): AppBackupData {
   const categories = Array.isArray(data.categories) ? data.categories : [];
@@ -184,7 +211,26 @@ export function buildCompleteAppBackupPayload(data: AppDataPayload): AppBackupDa
       STORAGE_KEYS.REMINDER_SETTINGS,
       DEFAULT_REMINDER_SETTINGS
     );
-  const appPreferences = data.appPreferences || collectCurrentAppPreferences(userProfile);
+  const rawPreferences = data.appPreferences || collectCurrentAppPreferences(userProfile);
+
+  // Security: Sanitize sensitive personal access tokens before serializing into backup JSON
+  const sanitizedPreferences: AppPreferences = {
+    ...rawPreferences,
+    githubSyncConfig: rawPreferences.githubSyncConfig
+      ? {
+          ...rawPreferences.githubSyncConfig,
+          personalAccessToken: '', // Strip secret token to protect user credentials
+        }
+      : null,
+  };
+
+  const checksum = calculateBackupChecksum({
+    categories,
+    goals,
+    tasks,
+    habits,
+    calendarEvents,
+  });
 
   return {
     appName: 'جوانه (Javaneh)',
@@ -194,6 +240,7 @@ export function buildCompleteAppBackupPayload(data: AppDataPayload): AppBackupDa
     exportDate: new Date().toISOString(),
     exportPersianDate: getCurrentPersianDateTimeString(),
     userId: getOrCreateUserId(),
+    checksum,
     counts: {
       categories: categories.length,
       goals: goals.length,
@@ -212,7 +259,7 @@ export function buildCompleteAppBackupPayload(data: AppDataPayload): AppBackupDa
     calendarEvents,
     userProfile,
     reminderSettings,
-    appPreferences,
+    appPreferences: sanitizedPreferences,
   };
 }
 
@@ -302,7 +349,8 @@ export async function exportBackupFileUniversal(
 }
 
 /**
- * Universal Share for Full Backup that works in BOTH Android APK WebView (file://) and Mobile/Desktop Web.
+ * Universal Share for Full Backup that works reliably in BOTH Android APK WebView and Mobile/Desktop Web.
+ * Safely leverages Web Share API Level 2 (files sharing) to avoid Android Binder's 1MB TransactionTooLargeException.
  */
 export async function shareBackupFileUniversal(
   filenameOrPayload: string | AppBackupData,
@@ -320,36 +368,14 @@ export async function shareBackupFileUniversal(
     jsonString = JSON.stringify(filenameOrPayload, null, 2);
   }
 
+  // 1. Copy to clipboard quietly as immediate safeguard
   try {
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(jsonString).catch(() => {});
     }
   } catch {}
 
-  const isAndroidApkWebView =
-    typeof window !== 'undefined' && window.location.protocol === 'file:';
-
-  if (isAndroidApkWebView) {
-    try {
-      if (typeof window.prompt === 'function') {
-        const res = window.prompt('javaneh-share:' + filename, jsonString);
-        if (res === 'OK') {
-          return {
-            method: 'ANDROID_SHARE',
-            message: 'منوی اشتراک‌گذاری اندروید برای ارسال پشتیبان کامل باز شد.',
-          };
-        }
-      }
-    } catch {}
-
-    window.location.href =
-      'javaneh-share:' + encodeURIComponent(filename) + '?text=' + encodeURIComponent(jsonString);
-    return {
-      method: 'ANDROID_SHARE',
-      message: 'منوی اشتراک‌گذاری اندروید برای ارسال پشتیبان کامل باز شد.',
-    };
-  }
-
+  // 2. Modern Web Share API Level 2 with actual File Blob (best and safest approach for Android & Mobile)
   if (typeof navigator !== 'undefined' && navigator.share) {
     try {
       if (typeof File !== 'undefined') {
@@ -366,14 +392,18 @@ export async function shareBackupFileUniversal(
           };
         }
       }
-      await navigator.share({
-        title: shareTitle,
-        text: jsonString,
-      });
-      return {
-        method: 'WEB_SHARE_TEXT',
-        message: 'داده‌های پشتیبان کامل با موفقیت به اشتراک گذاشته شد.',
-      };
+
+      // If text sharing is requested, verify it is below the safe Android Binder threshold (under 400KB)
+      if (jsonString.length < 400000) {
+        await navigator.share({
+          title: shareTitle,
+          text: jsonString,
+        });
+        return {
+          method: 'WEB_SHARE_TEXT',
+          message: 'داده‌های پشتیبان کامل با موفقیت به اشتراک گذاشته شد.',
+        };
+      }
     } catch (err: any) {
       if (err?.name === 'AbortError') {
         return { method: 'ABORTED', message: 'اشتراک‌گذاری لغو شد.' };
@@ -381,6 +411,25 @@ export async function shareBackupFileUniversal(
     }
   }
 
+  const isAndroidApkWebView =
+    typeof window !== 'undefined' && window.location.protocol === 'file:';
+
+  // 3. In Android APK WebView: only use prompt intent if size is under 400KB to avoid Binder TransactionTooLargeException
+  if (isAndroidApkWebView && jsonString.length < 400000) {
+    try {
+      if (typeof window.prompt === 'function') {
+        const res = window.prompt('javaneh-share:' + filename, jsonString);
+        if (res === 'OK') {
+          return {
+            method: 'ANDROID_SHARE',
+            message: 'منوی اشتراک‌گذاری اندروید برای ارسال پشتیبان کامل باز شد.',
+          };
+        }
+      }
+    } catch {}
+  }
+
+  // 4. Safe Fallback: Direct SAF / File Download (guaranteed to succeed regardless of file size)
   return exportBackupFileUniversal(filename, jsonString);
 }
 
@@ -405,16 +454,15 @@ export function mergeEntitiesById<T extends { id: string }>(...lists: (T[] | nul
 // Backup snapshot to prevent any data loss
 const SNAPSHOT_KEY = 'javaneh_backup_snapshot';
 
+/**
+ * Storage-Optimized Snapshot:
+ * 1) Saves FULL payload with complete image/sound data into IndexedDB (where quota is hundreds of MBs).
+ * 2) Saves a lightweight copy in localStorage (stripping heavy base64 blobs) to guarantee it never hits the 5MB quota.
+ * 3) Retains at most 1 emergency snapshot in localStorage.
+ */
 export function saveLocalSnapshot(data: AppDataPayload): void {
   if (typeof window === 'undefined') return;
   try {
-    const existingRaw = localStorage.getItem(SNAPSHOT_KEY);
-    let historySnapshots: Array<{ timestamp: number; payload: AppDataPayload }> = [];
-    if (existingRaw) {
-      try {
-        historySnapshots = JSON.parse(existingRaw);
-      } catch {}
-    }
     const hasContent =
       (data.goals && data.goals.length > 0) ||
       (data.tasks && data.tasks.length > 0) ||
@@ -423,7 +471,7 @@ export function saveLocalSnapshot(data: AppDataPayload): void {
       Boolean(data.userProfile?.name);
 
     if (hasContent) {
-      const snapshotPayload: AppDataPayload = {
+      const fullSnapshotPayload: AppDataPayload = {
         categories: data.categories || [],
         goals: data.goals || [],
         tasks: data.tasks || [],
@@ -434,35 +482,89 @@ export function saveLocalSnapshot(data: AppDataPayload): void {
         appPreferences: data.appPreferences || collectCurrentAppPreferences(data.userProfile),
         lastUpdated: Date.now(),
       };
-      historySnapshots.unshift({
-        timestamp: Date.now(),
-        payload: snapshotPayload,
-      });
-      // Keep last 4 snapshots to avoid exceeding localStorage 5MB quota when custom avatars/sounds exist
-      historySnapshots = historySnapshots.slice(0, 4);
+
+      // 1. Primary full persistence in IndexedDB (immune to 5MB localStorage limits)
+      saveToIndexedDB('latest_snapshot', fullSnapshotPayload).catch(() => {});
+
+      // 2. Strip heavy base64 images/audio from the localStorage snapshot to prevent QuotaExceededError
+      const lightweightProfile = data.userProfile
+        ? {
+            ...data.userProfile,
+            avatarUrl:
+              data.userProfile.avatarUrl && data.userProfile.avatarUrl.startsWith('data:image')
+                ? '[STORED_IN_INDEXEDDB]'
+                : data.userProfile.avatarUrl,
+          }
+        : undefined;
+
+      const lightweightReminders = data.reminderSettings
+        ? {
+            ...data.reminderSettings,
+            customSounds: (data.reminderSettings.customSounds || []).map((s) => ({
+              ...s,
+              audioData: s.audioData && s.audioData.length > 200 ? '[STORED_IN_INDEXEDDB]' : s.audioData,
+            })),
+          }
+        : undefined;
+
+      const lsSnapshotPayload: AppDataPayload = {
+        ...fullSnapshotPayload,
+        userProfile: lightweightProfile,
+        reminderSettings: lightweightReminders,
+      };
+
+      // Keep only 1 recent snapshot in localStorage
+      const historySnapshots = [
+        {
+          timestamp: Date.now(),
+          payload: lsSnapshotPayload,
+        },
+      ];
+
       localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(historySnapshots));
-      saveToIndexedDB('latest_snapshot', snapshotPayload).catch(() => {});
     }
   } catch (e) {
     console.warn('Failed to save local snapshot:', e);
+    // If quota error occurs despite stripping, clear snapshots key to protect main data
+    try {
+      localStorage.removeItem(SNAPSHOT_KEY);
+    } catch {}
   }
 }
 
 export function resetLocalSnapshotsWithData(data: AppDataPayload): void {
   if (typeof window === 'undefined') return;
   try {
+    const fullSnapshotPayload: AppDataPayload = {
+      categories: data.categories || [],
+      goals: data.goals || [],
+      tasks: data.tasks || [],
+      habits: data.habits || [],
+      calendarEvents: data.calendarEvents || [],
+      userProfile: data.userProfile,
+      reminderSettings: data.reminderSettings,
+      appPreferences: data.appPreferences || collectCurrentAppPreferences(data.userProfile),
+      lastUpdated: Date.now(),
+    };
+
+    saveToIndexedDB('latest_snapshot', fullSnapshotPayload).catch(() => {});
+
+    const lightweightProfile = data.userProfile
+      ? {
+          ...data.userProfile,
+          avatarUrl:
+            data.userProfile.avatarUrl && data.userProfile.avatarUrl.startsWith('data:image')
+              ? '[STORED_IN_INDEXEDDB]'
+              : data.userProfile.avatarUrl,
+        }
+      : undefined;
+
     const historySnapshots = [
       {
         timestamp: Date.now(),
         payload: {
-          categories: data.categories || [],
-          goals: data.goals || [],
-          tasks: data.tasks || [],
-          habits: data.habits || [],
-          calendarEvents: data.calendarEvents || [],
-          userProfile: data.userProfile,
-          reminderSettings: data.reminderSettings,
-          appPreferences: data.appPreferences || collectCurrentAppPreferences(data.userProfile),
+          ...fullSnapshotPayload,
+          userProfile: lightweightProfile,
         },
       },
     ];

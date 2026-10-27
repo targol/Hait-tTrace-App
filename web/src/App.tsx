@@ -39,6 +39,7 @@ import {
   DEFAULT_USER_PROFILE, 
   DEFAULT_REMINDER_SETTINGS,
   saveLocalSnapshot,
+  resetLocalSnapshotsWithData,
   triggerServerSync,
   saveServerDataImmediate,
   fetchServerData,
@@ -1221,7 +1222,11 @@ export const App: React.FC = () => {
       userProfile: nextUserProfile,
       reminderSettings: nextReminderSettings,
     };
-    saveLocalSnapshot(fullBundle);
+    if (isReplace) {
+      resetLocalSnapshotsWithData(fullBundle);
+    } else {
+      saveLocalSnapshot(fullBundle);
+    }
     saveServerDataImmediate(fullBundle);
   }, [categories, goals, tasks, habits, calendarEvents, userProfile, reminderSettings]);
 

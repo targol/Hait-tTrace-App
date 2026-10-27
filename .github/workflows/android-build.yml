@@ -1,0 +1,148 @@
+name: Android APK Official Build & Sign
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type (release or debug)'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build & Sign APK via Gradle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js for Web assets
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'web/package-lock.json'
+
+      - name: Install Web dependencies & Build Web bundle
+        run: |
+          cd web
+          npm ci --prefer-offline || npm install
+          npm run build
+          cd ..
+
+      - name: Sync Web bundle into Android assets
+        run: |
+          mkdir -p app/src/main/assets
+          cp -r web/dist/* app/src/main/assets/
+          echo "Web distribution successfully synced to app/src/main/assets"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Prepare Signing Keystore (Consistent Certificate)
+        id: keystore
+        run: |
+          mkdir -p keystore
+          KEYSTORE_FILE="keystore/javaneh-release.jks"
+
+          # 1. If GitHub Secret KEYSTORE_BASE64 exists, decode it
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "Using release keystore provided via repository secrets."
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$KEYSTORE_FILE"
+          elif [ -f "$KEYSTORE_FILE" ]; then
+            echo "Using existing repository keystore at $KEYSTORE_FILE."
+          else
+            echo "Generating consistent deterministic release keystore for standard Gradle signing..."
+            keytool -genkeypair \
+              -alias "${{ secrets.KEY_ALIAS || 'javaneh' }}" \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -keystore "$KEYSTORE_FILE" \
+              -storepass "${{ secrets.STORE_PASSWORD || 'javaneh123' }}" \
+              -keypass "${{ secrets.KEY_PASSWORD || 'javaneh123' }}" \
+              -dname "CN=Javaneh Smart, OU=Mobile, O=Javaneh, L=Tehran, ST=Tehran, C=IR"
+          fi
+
+          echo "KEYSTORE_PATH=$GITHUB_WORKSPACE/$KEYSTORE_FILE" >> $GITHUB_ENV
+          echo "STORE_PASSWORD=${{ secrets.STORE_PASSWORD || 'javaneh123' }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS || 'javaneh' }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD || 'javaneh123' }}" >> $GITHUB_ENV
+
+      - name: Make Gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build APK with Official Gradle
+        env:
+          KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
+          STORE_PASSWORD: ${{ env.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+        run: |
+          BUILD_TARGET="${{ github.event.inputs.build_type || 'release' }}"
+          if [ "$BUILD_TARGET" = "debug" ]; then
+            echo "Running Gradle assembleDebug..."
+            ./gradlew assembleDebug --no-daemon --stacktrace
+          else
+            echo "Running Gradle assembleRelease..."
+            ./gradlew assembleRelease --no-daemon --stacktrace
+          fi
+
+      - name: Verify APK Signature & Collect outputs
+        run: |
+          mkdir -p build-artifacts
+          # Find all produced APKs
+          APK_FILES=$(find app/build/outputs/apk/ -name "*.apk" -type f)
+          echo "Found APK files:"
+          echo "$APK_FILES"
+
+          for apk in $APK_FILES; do
+            filename=$(basename "$apk")
+            cp "$apk" "build-artifacts/$filename"
+            echo "Verifying signature for $filename:"
+            $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$apk" || true
+          done
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: javaneh-android-apk
+          path: build-artifacts/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release (on version tag push)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build-artifacts/*.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

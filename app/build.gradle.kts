@@ -17,8 +17,8 @@ android {
     applicationId = "com.javaneh.smart"
     minSdk = 21
     targetSdk = 33
-    versionCode = 230
-    versionName = "2.3.0"
+    versionCode = 240
+    versionName = "2.4.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

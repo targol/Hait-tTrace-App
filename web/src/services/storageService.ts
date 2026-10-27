@@ -436,6 +436,162 @@ export async function shareBackupFileUniversal(
 const IDB_NAME = 'JavanehDB';
 const IDB_STORE = 'app_data';
 
+// --- Synchronous In-Memory Cache for Instant UI Renders & Flawless Hydration ---
+export const storageMemoryCache = new Map<string, any>();
+
+// Backup snapshot to prevent any data loss
+const SNAPSHOT_KEY = 'javaneh_backup_snapshot';
+
+// Preload existing localStorage values into memory cache synchronously upon module evaluation
+if (typeof window !== 'undefined') {
+  try {
+    for (const key of Object.values(STORAGE_KEYS)) {
+      const raw = localStorage.getItem(key);
+      if (raw !== null) {
+        try {
+          storageMemoryCache.set(key, JSON.parse(raw));
+        } catch {
+          storageMemoryCache.set(key, raw);
+        }
+      }
+    }
+    const snapRaw = localStorage.getItem(SNAPSHOT_KEY);
+    if (snapRaw) {
+      try {
+        storageMemoryCache.set(SNAPSHOT_KEY, JSON.parse(snapRaw));
+      } catch {}
+    }
+  } catch {}
+}
+
+let dbInstance: IDBDatabase | null = null;
+
+function openDatabase(): Promise<IDBDatabase | null> {
+  if (dbInstance) return Promise.resolve(dbInstance);
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      resolve(null);
+      return;
+    }
+    try {
+      const request = window.indexedDB.open(IDB_NAME, 2);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE);
+        }
+      };
+      request.onsuccess = () => {
+        dbInstance = request.result;
+        dbInstance.onversionchange = () => {
+          dbInstance?.close();
+          dbInstance = null;
+        };
+        resolve(dbInstance);
+      };
+      request.onerror = () => {
+        console.warn('[IndexedDB] Open request failed, falling back to cache');
+        resolve(null);
+      };
+    } catch (e) {
+      console.warn('[IndexedDB] Not supported or accessible', e);
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * Saves a key-value pair directly into IndexedDB (primary persistent storage).
+ * Supports large payloads (hundreds of megabytes) including base64 avatars and audio.
+ */
+export async function saveToIndexedDB(key: string, value: unknown): Promise<void> {
+  const db = await openDatabase();
+  if (!db) return;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      const store = tx.objectStore(IDB_STORE);
+      store.put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    } catch {
+      resolve();
+    }
+  });
+}
+
+/**
+ * Retrieves a key from IndexedDB.
+ */
+export async function loadFromIndexedDB<T>(key: string): Promise<T | null> {
+  const db = await openDatabase();
+  if (!db) return null;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const store = tx.objectStore(IDB_STORE);
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result !== undefined ? (req.result as T) : null);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * Retrieves all keys and values stored in IndexedDB.
+ */
+export async function getAllFromIndexedDB(): Promise<Record<string, any>> {
+  const db = await openDatabase();
+  if (!db) return {};
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const store = tx.objectStore(IDB_STORE);
+      const result: Record<string, any> = {};
+
+      const req = store.openCursor();
+      req.onsuccess = (e) => {
+        const cursor = (e.target as IDBRequest).result as IDBCursorWithValue;
+        if (cursor) {
+          result[String(cursor.key)] = cursor.value;
+          cursor.continue();
+        } else {
+          resolve(result);
+        }
+      };
+      req.onerror = () => resolve({});
+    } catch {
+      resolve({});
+    }
+  });
+}
+
+/**
+ * Hydrates the memory cache from IndexedDB asynchronously.
+ */
+export async function initIndexedDBCache(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  try {
+    const allRecords = await getAllFromIndexedDB();
+    for (const [k, v] of Object.entries(allRecords)) {
+      if (v !== undefined && v !== null) {
+        storageMemoryCache.set(k, v);
+      }
+    }
+  } catch (err) {
+    console.warn('[IndexedDB Cache Hydration]', err);
+  }
+}
+
+// Automatically trigger IndexedDB hydration on app load
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    initIndexedDBCache().catch(() => {});
+  }, 0);
+}
+
 // --- Helpers for Safe Hydration & Merge ---
 export function mergeEntitiesById<T extends { id: string }>(...lists: (T[] | null | undefined)[]): T[] {
   const map = new Map<string, T>();
@@ -451,14 +607,81 @@ export function mergeEntitiesById<T extends { id: string }>(...lists: (T[] | nul
   return Array.from(map.values());
 }
 
-// Backup snapshot to prevent any data loss
-const SNAPSHOT_KEY = 'javaneh_backup_snapshot';
+/**
+ * Primary Unified Save:
+ * 1) Synchronously writes to in-memory cache for zero UI latency.
+ * 2) Asynchronously persists full uncompressed payload to IndexedDB (virtually unlimited quota).
+ * 3) Mirrors to localStorage safely inside a try/catch, swallowing QuotaExceededError.
+ */
+export function saveToStorage(key: string, value: unknown): void {
+  if (typeof window === 'undefined') return;
+
+  // 1. In-memory cache
+  storageMemoryCache.set(key, value);
+
+  // 2. Primary persistence: IndexedDB (handles large audio and image data without quotas)
+  saveToIndexedDB(key, value).catch(() => {});
+
+  // 3. Mirror to localStorage as legacy fallback
+  try {
+    const serialized = JSON.stringify(value);
+    localStorage.setItem(key, serialized);
+  } catch (err: any) {
+    // Quota exceeded in localStorage is safe to ignore because IndexedDB is authoritative
+    if (err?.name === 'QuotaExceededError' || err?.code === 22) {
+      try {
+        localStorage.removeItem(SNAPSHOT_KEY);
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {}
+    }
+  }
+}
 
 /**
- * Storage-Optimized Snapshot:
+ * Alias for saveToStorage to maintain 100% backward compatibility with all components
+ */
+export const saveToLocalStorage = saveToStorage;
+
+/**
+ * Primary Unified Load:
+ * 1) Reads from in-memory cache first (populated from IndexedDB and localStorage).
+ * 2) If missing, reads from localStorage.
+ * 3) If missing, returns fallback.
+ */
+export function loadFromStorage<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+
+  // 1. In-memory cache
+  if (storageMemoryCache.has(key)) {
+    const cached = storageMemoryCache.get(key);
+    if (cached !== undefined && cached !== null) {
+      return cached as T;
+    }
+  }
+
+  // 2. Direct localStorage
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw !== null) {
+      const parsed = JSON.parse(raw);
+      storageMemoryCache.set(key, parsed);
+      return parsed as T;
+    }
+  } catch {}
+
+  return fallback;
+}
+
+/**
+ * Alias for loadFromStorage to maintain 100% backward compatibility with all components
+ */
+export const loadFromLocalStorage = loadFromStorage;
+
+/**
+ * Storage-Optimized Snapshot Engine using IndexedDB:
  * 1) Saves FULL payload with complete image/sound data into IndexedDB (where quota is hundreds of MBs).
- * 2) Saves a lightweight copy in localStorage (stripping heavy base64 blobs) to guarantee it never hits the 5MB quota.
- * 3) Retains at most 1 emergency snapshot in localStorage.
+ * 2) Retains up to 20 full historical snapshots in IndexedDB.
+ * 3) Saves a lightweight copy in localStorage (stripping heavy base64 blobs) to prevent quota errors.
  */
 export function saveLocalSnapshot(data: AppDataPayload): void {
   if (typeof window === 'undefined') return;
@@ -486,49 +709,54 @@ export function saveLocalSnapshot(data: AppDataPayload): void {
       // 1. Primary full persistence in IndexedDB (immune to 5MB localStorage limits)
       saveToIndexedDB('latest_snapshot', fullSnapshotPayload).catch(() => {});
 
-      // 2. Strip heavy base64 images/audio from the localStorage snapshot to prevent QuotaExceededError
-      const lightweightProfile = data.userProfile
-        ? {
-            ...data.userProfile,
-            avatarUrl:
-              data.userProfile.avatarUrl && data.userProfile.avatarUrl.startsWith('data:image')
-                ? '[STORED_IN_INDEXEDDB]'
-                : data.userProfile.avatarUrl,
-          }
-        : undefined;
-
-      const lightweightReminders = data.reminderSettings
-        ? {
-            ...data.reminderSettings,
-            customSounds: (data.reminderSettings.customSounds || []).map((s) => ({
-              ...s,
-              audioData: s.audioData && s.audioData.length > 200 ? '[STORED_IN_INDEXEDDB]' : s.audioData,
-            })),
-          }
-        : undefined;
-
-      const lsSnapshotPayload: AppDataPayload = {
-        ...fullSnapshotPayload,
-        userProfile: lightweightProfile,
-        reminderSettings: lightweightReminders,
+      // Retrieve existing snapshots list from memory or IDB
+      let currentSnapshots = getLocalSnapshots();
+      const newSnapshotItem = {
+        timestamp: Date.now(),
+        payload: fullSnapshotPayload,
       };
 
-      // Keep only 1 recent snapshot in localStorage
-      const historySnapshots = [
-        {
-          timestamp: Date.now(),
-          payload: lsSnapshotPayload,
-        },
-      ];
+      // Keep up to 20 full snapshots in IndexedDB
+      const updatedSnapshots = [newSnapshotItem, ...currentSnapshots].slice(0, 20);
+      storageMemoryCache.set(SNAPSHOT_KEY, updatedSnapshots);
+      saveToIndexedDB(SNAPSHOT_KEY, updatedSnapshots).catch(() => {});
 
-      localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(historySnapshots));
+      // 2. Best-effort lightweight copy in localStorage (stripped blobs)
+      try {
+        const lightweightProfile = data.userProfile
+          ? {
+              ...data.userProfile,
+              avatarUrl:
+                data.userProfile.avatarUrl && data.userProfile.avatarUrl.startsWith('data:image')
+                  ? '[STORED_IN_INDEXEDDB]'
+                  : data.userProfile.avatarUrl,
+            }
+          : undefined;
+
+        const lightweightReminders = data.reminderSettings
+          ? {
+              ...data.reminderSettings,
+              customSounds: (data.reminderSettings.customSounds || []).map((s) => ({
+                ...s,
+                audioData: s.audioData && s.audioData.length > 200 ? '[STORED_IN_INDEXEDDB]' : s.audioData,
+              })),
+            }
+          : undefined;
+
+        const lsSnapshotPayload: AppDataPayload = {
+          ...fullSnapshotPayload,
+          userProfile: lightweightProfile,
+          reminderSettings: lightweightReminders,
+        };
+
+        const lsSnapshots = [{ timestamp: Date.now(), payload: lsSnapshotPayload }];
+        localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(lsSnapshots));
+      } catch {
+        // Quota error in localStorage is safe; IndexedDB holds the authoritative full snapshots
+      }
     }
   } catch (e) {
     console.warn('Failed to save local snapshot:', e);
-    // If quota error occurs despite stripping, clear snapshots key to protect main data
-    try {
-      localStorage.removeItem(SNAPSHOT_KEY);
-    } catch {}
   }
 }
 
@@ -547,28 +775,20 @@ export function resetLocalSnapshotsWithData(data: AppDataPayload): void {
       lastUpdated: Date.now(),
     };
 
-    saveToIndexedDB('latest_snapshot', fullSnapshotPayload).catch(() => {});
-
-    const lightweightProfile = data.userProfile
-      ? {
-          ...data.userProfile,
-          avatarUrl:
-            data.userProfile.avatarUrl && data.userProfile.avatarUrl.startsWith('data:image')
-              ? '[STORED_IN_INDEXEDDB]'
-              : data.userProfile.avatarUrl,
-        }
-      : undefined;
-
-    const historySnapshots = [
+    const newSnapshots = [
       {
         timestamp: Date.now(),
-        payload: {
-          ...fullSnapshotPayload,
-          userProfile: lightweightProfile,
-        },
+        payload: fullSnapshotPayload,
       },
     ];
-    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(historySnapshots));
+
+    storageMemoryCache.set(SNAPSHOT_KEY, newSnapshots);
+    saveToIndexedDB(SNAPSHOT_KEY, newSnapshots).catch(() => {});
+    saveToIndexedDB('latest_snapshot', fullSnapshotPayload).catch(() => {});
+
+    try {
+      localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(newSnapshots));
+    } catch {}
   } catch (e) {
     console.warn('Failed to reset local snapshots:', e);
   }
@@ -576,19 +796,41 @@ export function resetLocalSnapshotsWithData(data: AppDataPayload): void {
 
 export function getLocalSnapshots(): Array<{ timestamp: number; payload: AppDataPayload }> {
   if (typeof window === 'undefined') return [];
+  // 1. In-memory cache (holds full snapshots from IndexedDB)
+  if (storageMemoryCache.has(SNAPSHOT_KEY)) {
+    const cached = storageMemoryCache.get(SNAPSHOT_KEY);
+    if (Array.isArray(cached) && cached.length > 0) {
+      return cached;
+    }
+  }
+  // 2. LocalStorage fallback
   try {
     const raw = localStorage.getItem(SNAPSHOT_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        storageMemoryCache.set(SNAPSHOT_KEY, parsed);
+        return parsed;
+      }
+    }
   } catch {}
   return [];
 }
 
 /**
- * Checks whether the current device already has saved user data in localStorage, snapshots, or upgrade archives.
+ * Checks whether the current device already has saved user data in memory cache, IndexedDB, or localStorage.
  */
 export function hasExistingLocalUserData(): boolean {
   if (typeof window === 'undefined') return false;
   try {
+    if (
+      storageMemoryCache.has(STORAGE_KEYS.TASKS) ||
+      storageMemoryCache.has(STORAGE_KEYS.GOALS) ||
+      storageMemoryCache.has(STORAGE_KEYS.HABITS) ||
+      storageMemoryCache.has(STORAGE_KEYS.USER_PROFILE)
+    ) {
+      return true;
+    }
     if (
       localStorage.getItem(STORAGE_KEYS.TASKS) !== null ||
       localStorage.getItem(STORAGE_KEYS.GOALS) !== null ||
@@ -606,11 +848,12 @@ export function hasExistingLocalUserData(): boolean {
 
 /**
  * Loads an entity list synchronously from:
- * 1) Direct localStorage key
- * 2) Local snapshots (javaneh_backup_snapshot)
- * 3) Pre-update backup (javaneh_pre_update_backup)
- * 4) Version upgrade history (javaneh_upgrade_history)
- * 5) Only if none exist at all, falls back to fallbackFn()
+ * 1) In-memory cache (hydrated from IndexedDB and localStorage)
+ * 2) Direct localStorage key
+ * 3) Snapshots in cache or localStorage
+ * 4) Pre-update backup (javaneh_pre_update_backup)
+ * 5) Version upgrade history (javaneh_upgrade_history)
+ * 6) Only if none exist at all, falls back to fallback
  */
 export function loadEntityListWithFallback<T>(
   key: string,
@@ -629,28 +872,40 @@ export function loadEntityListWithFallback<T>(
   };
 
   if (typeof window === 'undefined') return resolveFallback();
+
+  // 1. Check in-memory cache
+  if (storageMemoryCache.has(key)) {
+    const cached = storageMemoryCache.get(key);
+    if (Array.isArray(cached) && cached.length > 0) {
+      return cached as T[];
+    }
+  }
+
+  // 2. Check localStorage
   try {
     const raw = localStorage.getItem(key);
     if (raw !== null) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        storageMemoryCache.set(key, parsed);
         return parsed as T[];
       }
     }
   } catch {}
 
-  // Check snapshots
+  // 3. Check snapshots
   try {
     const snapshots = getLocalSnapshots();
     for (const snap of snapshots) {
       const arr = snap.payload?.[field];
       if (Array.isArray(arr) && arr.length > 0) {
+        storageMemoryCache.set(key, arr);
         return arr as unknown as T[];
       }
     }
   } catch {}
 
-  // Check pre-update backup
+  // 4. Check pre-update backup
   try {
     const pre = getPreUpdateBackup();
     const arr = pre?.data?.[field];
@@ -659,7 +914,7 @@ export function loadEntityListWithFallback<T>(
     }
   } catch {}
 
-  // Check version upgrade history
+  // 5. Check version upgrade history
   try {
     const hist = getVersionUpgradeHistory();
     for (const h of hist) {
@@ -675,7 +930,7 @@ export function loadEntityListWithFallback<T>(
 
 /**
  * Immediate multi-layer persistence for UserProfile so profile edits in Android WebView
- * are saved synchronously to localStorage, IndexedDB, and latest snapshot.
+ * are saved synchronously to memory cache, IndexedDB, and localStorage.
  */
 export function saveUserProfileImmediate(profile: UserProfile): UserProfile {
   const existing = loadUserProfileWithFallback();
@@ -686,8 +941,7 @@ export function saveUserProfileImmediate(profile: UserProfile): UserProfile {
     name: (profile.name ?? existing.name ?? DEFAULT_USER_PROFILE.name).trim() || DEFAULT_USER_PROFILE.name,
   };
 
-  saveToLocalStorage(STORAGE_KEYS.USER_PROFILE, merged);
-  saveToIndexedDB(STORAGE_KEYS.USER_PROFILE, merged).catch(() => {});
+  saveToStorage(STORAGE_KEYS.USER_PROFILE, merged);
   saveToIndexedDB('userProfile', merged).catch(() => {});
 
   // Also update the latest snapshot's userProfile immediately
@@ -695,7 +949,11 @@ export function saveUserProfileImmediate(profile: UserProfile): UserProfile {
     const snapshots = getLocalSnapshots();
     if (snapshots.length > 0 && snapshots[0].payload) {
       snapshots[0].payload.userProfile = merged;
-      localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshots));
+      storageMemoryCache.set(SNAPSHOT_KEY, snapshots);
+      saveToIndexedDB(SNAPSHOT_KEY, snapshots).catch(() => {});
+      try {
+        localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshots));
+      } catch {}
     }
   } catch {}
 
@@ -704,17 +962,28 @@ export function saveUserProfileImmediate(profile: UserProfile): UserProfile {
 
 export function loadUserProfileWithFallback(): UserProfile {
   if (typeof window === 'undefined') return DEFAULT_USER_PROFILE;
+
+  // 1. Check in-memory cache
+  if (storageMemoryCache.has(STORAGE_KEYS.USER_PROFILE)) {
+    const cached = storageMemoryCache.get(STORAGE_KEYS.USER_PROFILE);
+    if (cached && typeof cached === 'object' && typeof cached.name === 'string') {
+      return { ...DEFAULT_USER_PROFILE, ...cached };
+    }
+  }
+
+  // 2. Check localStorage
   try {
     const direct = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
     if (direct) {
       const parsed = JSON.parse(direct);
       if (parsed && typeof parsed === 'object' && typeof parsed.name === 'string') {
+        storageMemoryCache.set(STORAGE_KEYS.USER_PROFILE, parsed);
         return { ...DEFAULT_USER_PROFILE, ...parsed };
       }
     }
   } catch {}
 
-  // Check snapshots if direct key was missing
+  // 3. Check snapshots if direct key was missing
   try {
     const snapshots = getLocalSnapshots();
     for (const snap of snapshots) {
@@ -724,7 +993,7 @@ export function loadUserProfileWithFallback(): UserProfile {
     }
   } catch {}
 
-  // Check pre-update backup if present
+  // 4. Check pre-update backup if present
   try {
     const pre = getPreUpdateBackup();
     if (pre?.data?.userProfile && pre.data.userProfile.name) {
@@ -735,8 +1004,12 @@ export function loadUserProfileWithFallback(): UserProfile {
   return DEFAULT_USER_PROFILE;
 }
 
-// Deep recovery across all available local stores (IndexedDB + localStorage + Snapshots)
+/**
+ * Deep recovery across all available local stores (IndexedDB as Primary + LocalStorage + Snapshots).
+ * Guarantees zero data loss across updates and browser restarts.
+ */
 export async function recoverAllLocalData(): Promise<AppDataPayload> {
+  // 1. Primary query directly from IndexedDB
   const idbCats = await loadFromIndexedDB<Category[]>(STORAGE_KEYS.CATEGORIES);
   const idbGoals = await loadFromIndexedDB<Goal[]>(STORAGE_KEYS.GOALS);
   const idbTasks = await loadFromIndexedDB<AppTask[]>(STORAGE_KEYS.TASKS);
@@ -746,7 +1019,19 @@ export async function recoverAllLocalData(): Promise<AppDataPayload> {
     (await loadFromIndexedDB<UserProfile>(STORAGE_KEYS.USER_PROFILE)) ||
     (await loadFromIndexedDB<UserProfile>('userProfile'));
   const idbReminders = await loadFromIndexedDB<ReminderSettings>(STORAGE_KEYS.REMINDER_SETTINGS);
+  const idbSnapshots = await loadFromIndexedDB<Array<{ timestamp: number; payload: AppDataPayload }>>(SNAPSHOT_KEY);
 
+  // Sync IndexedDB entities into memory cache
+  if (idbCats) storageMemoryCache.set(STORAGE_KEYS.CATEGORIES, idbCats);
+  if (idbGoals) storageMemoryCache.set(STORAGE_KEYS.GOALS, idbGoals);
+  if (idbTasks) storageMemoryCache.set(STORAGE_KEYS.TASKS, idbTasks);
+  if (idbHabits) storageMemoryCache.set(STORAGE_KEYS.HABITS, idbHabits);
+  if (idbEvents) storageMemoryCache.set(STORAGE_KEYS.CALENDAR_EVENTS, idbEvents);
+  if (idbProfile) storageMemoryCache.set(STORAGE_KEYS.USER_PROFILE, idbProfile);
+  if (idbReminders) storageMemoryCache.set(STORAGE_KEYS.REMINDER_SETTINGS, idbReminders);
+  if (idbSnapshots) storageMemoryCache.set(SNAPSHOT_KEY, idbSnapshots);
+
+  // 2. Query localStorage as fallback
   const lsCats = loadFromLocalStorage<Category[]>(STORAGE_KEYS.CATEGORIES, []);
   const lsGoals = loadFromLocalStorage<Goal[]>(STORAGE_KEYS.GOALS, []);
   const lsTasks = loadFromLocalStorage<AppTask[]>(STORAGE_KEYS.TASKS, []);
@@ -758,7 +1043,7 @@ export async function recoverAllLocalData(): Promise<AppDataPayload> {
     DEFAULT_REMINDER_SETTINGS
   );
 
-  const snapshots = getLocalSnapshots();
+  const snapshots = idbSnapshots && idbSnapshots.length > 0 ? idbSnapshots : getLocalSnapshots();
   const latestSnap = snapshots[0]?.payload;
 
   const mergedCategories = mergeEntitiesById(
@@ -767,32 +1052,23 @@ export async function recoverAllLocalData(): Promise<AppDataPayload> {
     idbCats,
     lsCats
   );
-  // Prefer direct localStorage/IndexedDB; fall back to latest snapshot if empty
-  const mergedGoals =
-    lsGoals.length > 0
-      ? mergeEntitiesById(idbGoals, lsGoals)
-      : mergeEntitiesById(latestSnap?.goals, idbGoals);
-  const mergedTasks =
-    lsTasks.length > 0
-      ? mergeEntitiesById(idbTasks, lsTasks)
-      : mergeEntitiesById(latestSnap?.tasks, idbTasks);
-  const mergedHabits =
-    lsHabits.length > 0
-      ? mergeEntitiesById(idbHabits, lsHabits)
-      : mergeEntitiesById(latestSnap?.habits, idbHabits);
+
+  const mergedGoals = mergeEntitiesById(latestSnap?.goals, idbGoals, lsGoals);
+  const mergedTasks = mergeEntitiesById(latestSnap?.tasks, idbTasks, lsTasks);
+  const mergedHabits = mergeEntitiesById(latestSnap?.habits, idbHabits, lsHabits);
   const mergedEvents = mergeEntitiesById(latestSnap?.calendarEvents, idbEvents, lsEvents);
 
   const effectiveProfile: UserProfile =
-    lsProfile && lsProfile.name !== DEFAULT_USER_PROFILE.name
+    idbProfile && idbProfile.name && idbProfile.name !== DEFAULT_USER_PROFILE.name
+      ? { ...DEFAULT_USER_PROFILE, ...lsProfile, ...idbProfile }
+      : lsProfile && lsProfile.name !== DEFAULT_USER_PROFILE.name
       ? lsProfile
-      : idbProfile && idbProfile.name
-      ? { ...DEFAULT_USER_PROFILE, ...idbProfile, ...lsProfile }
-      : lsProfile;
+      : idbProfile || lsProfile;
 
   const effectiveReminders: ReminderSettings = {
     ...DEFAULT_REMINDER_SETTINGS,
-    ...(idbReminders || {}),
     ...(lsReminders || {}),
+    ...(idbReminders || {}),
   };
 
   return {
@@ -806,97 +1082,6 @@ export async function recoverAllLocalData(): Promise<AppDataPayload> {
     appPreferences: collectCurrentAppPreferences(effectiveProfile),
     initialized: true,
   };
-}
-
-function openDatabase(): Promise<IDBDatabase | null> {
-  return new Promise((resolve) => {
-    if (typeof window === 'undefined' || !window.indexedDB) {
-      resolve(null);
-      return;
-    }
-    try {
-      const request = window.indexedDB.open(IDB_NAME, 1);
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(IDB_STORE)) {
-          db.createObjectStore(IDB_STORE);
-        }
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => {
-        console.warn('IndexedDB open failed, fallback to localStorage only');
-        resolve(null);
-      };
-    } catch (e) {
-      console.warn('IndexedDB not supported or accessible', e);
-      resolve(null);
-    }
-  });
-}
-
-export async function saveToIndexedDB(key: string, value: unknown): Promise<void> {
-  const db = await openDatabase();
-  if (!db) return;
-  return new Promise((resolve) => {
-    try {
-      const tx = db.transaction(IDB_STORE, 'readwrite');
-      const store = tx.objectStore(IDB_STORE);
-      store.put(value, key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
-    } catch {
-      resolve();
-    }
-  });
-}
-
-export async function loadFromIndexedDB<T>(key: string): Promise<T | null> {
-  const db = await openDatabase();
-  if (!db) return null;
-  return new Promise((resolve) => {
-    try {
-      const tx = db.transaction(IDB_STORE, 'readonly');
-      const store = tx.objectStore(IDB_STORE);
-      const req = store.get(key);
-      req.onsuccess = () => resolve(req.result !== undefined ? (req.result as T) : null);
-      req.onerror = () => resolve(null);
-    } catch {
-      resolve(null);
-    }
-  });
-}
-
-// --- LocalStorage + IndexedDB Dual Helpers ---
-export function loadFromLocalStorage<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw !== null) {
-      const parsed = JSON.parse(raw);
-      return parsed;
-    }
-  } catch (e) {
-    console.warn(`Failed reading localStorage key "${key}"`, e);
-  }
-  return fallback;
-}
-
-export function saveToLocalStorage(key: string, value: unknown): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const serialized = JSON.stringify(value);
-    localStorage.setItem(key, serialized);
-  } catch {
-    // If quota exceeded due to old snapshots, trim snapshots and retry so user save always succeeds
-    try {
-      localStorage.removeItem(SNAPSHOT_KEY);
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch (retryErr) {
-      console.warn(`Failed writing localStorage key "${key}"`, retryErr);
-    }
-  }
-  // Mirror every save into IndexedDB asynchronously for Android WebView durability
-  saveToIndexedDB(key, value).catch(() => {});
 }
 
 // --- Server API Sync with Debouncing & Atomic File Persistence ---

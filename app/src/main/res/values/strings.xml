@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">جوانه (رشد هدف و عادت)</string>
+    <string name="widget_name">ویجت پیشرفت امروز و تسک‌های فوری</string>
+    <string name="widget_description">نمایش درصد پیشرفت روزانه و تسک‌های اولویت‌دار و فوری روی صفحه اصلی بدون باز کردن برنامه</string>
+    <string name="widget_today_label">امروز جوانه</string>
+    <string name="widget_urgent_tasks_header">تسک‌های فوری و اولویت‌دار</string>
+    <string name="widget_no_urgent_tasks">تمام تسک‌های فوری انجام شده‌اند 🌱</string>
+    <string name="widget_refresh_label">به‌روزرسانی</string>
+</resources>

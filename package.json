@@ -1,0 +1,29 @@
+{
+  "name": "javaneh-app",
+  "private": true,
+  "version": "1.0.1",
+  "type": "module",
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "dev": "npm --prefix web run dev -- --host 0.0.0.0 --port 3000",
+    "start": "node web/server.cjs",
+    "build": "npm --prefix web run build && rm -rf dist && cp -r web/dist dist && bash scripts/build-real-apk.sh",
+    "lint": "npm --prefix web run build"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.1.0",
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}

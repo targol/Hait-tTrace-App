@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <group
+        android:scaleX="0.75"
+        android:scaleY="0.75"
+        android:pivotX="256"
+        android:pivotY="256">
+        <!-- Stem -->
+        <path
+            android:pathData="M256,380 L256,220"
+            android:strokeWidth="24"
+            android:strokeColor="#FAF9F6"
+            android:strokeLineCap="round"/>
+        <!-- Left Sprout Leaf -->
+        <path
+            android:pathData="M256,280 C210,240 160,270 180,320 C200,350 240,330 256,295 Z"
+            android:fillColor="#C8E6C9"/>
+        <!-- Right Sprout Leaf -->
+        <path
+            android:pathData="M256,240 C300,200 350,220 330,270 C310,300 270,285 256,250 Z"
+            android:fillColor="#A5D6A7"/>
+        <!-- Golden Blossom / Bud -->
+        <path
+            android:pathData="M256,182 A18,18 0 1 0 256,218 A18,18 0 1 0 256,182 Z"
+            android:fillColor="#FFE082"/>
+    </group>
+</vector>

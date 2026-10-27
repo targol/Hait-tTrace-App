@@ -1,0 +1,8 @@
+{
+  "name": "Remix جوانه - مدیریت اهداف سالانه وعادت‌ها ",
+  "description": "اپلیکیشن مدیریتاهداف سالانه با استفاه از شکست زمانی و تعریف تسک‌ها، عادت‌ها، بر پایه تقویم شمسی",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -69,7 +69,10 @@ import {
   getTaskEffectiveReminderTime,
   isNotificationSupported,
   getNotificationPermission,
-  calculateSnoozeTime
+  calculateSnoozeTime,
+  calculateSnoozeTarget,
+  checkTaskReminderDueState,
+  checkCalendarEventDueState
 } from './services/reminderService';
 import { APP_VERSION_INFO } from './version';
 
@@ -210,6 +213,7 @@ export const App: React.FC = () => {
   // Reminder alert popup (supports both Tasks and Calendar Events)
   const [activeAlertTask, setActiveAlertTask] = useState<AppTask | null>(null);
   const [activeAlertCalendarEvent, setActiveAlertCalendarEvent] = useState<CalendarEvent | null>(null);
+  const [activeAlertRepeatNotice, setActiveAlertRepeatNotice] = useState<string | null>(null);
   const notifiedTasksRef = useRef<Set<string>>(new Set());
 
   // --- Initial Data Hydration: Restore personal user data from IndexedDB/snapshot/server if local state is incomplete ---
@@ -444,136 +448,164 @@ export const App: React.FC = () => {
       const currentHours = now.getHours().toString().padStart(2, '0');
       const currentMinutes = now.getMinutes().toString().padStart(2, '0');
       const currentTimeStr = `${currentHours}:${currentMinutes}`;
+      const dayOfWeek = getDayOfWeek(today);
 
-      // 1. Check tasks scheduled for today or without date that match current time
+      const autoReNotifyMax = reminderSettings.autoReNotifyCount ?? 2;
+      const autoReNotifyInterval =
+        reminderSettings.autoReNotifyIntervalMinutes ||
+        reminderSettings.snoozeIntervalMinutes ||
+        10;
+
+      // 1. Check tasks (initial, user snooze, and auto re-notify)
       tasks.forEach((task) => {
-        if (task.isCompleted || task.isArchived) return;
-        if (task.dueDate && task.dueDate !== todayStr) return;
+        const dueCheck = checkTaskReminderDueState(task, todayStr, currentTimeStr, dayOfWeek);
+        if (!dueCheck.isDue || !dueCheck.uniqueKey) return;
 
-        const rawRemTime = getTaskEffectiveReminderTime(task);
-        const effectiveReminderTime = normalizeTimeHHMM(rawRemTime);
-        if (!effectiveReminderTime) return;
+        if (notifiedTasksRef.current.has(dueCheck.uniqueKey)) return;
+        notifiedTasksRef.current.add(dueCheck.uniqueKey);
 
-        const taskKey = `${task.id}_${todayStr}_${effectiveReminderTime}_${task.snoozeCount || 0}`;
-        if (notifiedTasksRef.current.has(taskKey)) return;
-
-        if (effectiveReminderTime === currentTimeStr) {
-          notifiedTasksRef.current.add(taskKey);
-
-          // Play sound with correct signature: (soundId, customSounds, volume, loopAlarm)
-          if (reminderSettings.soundEnabled) {
-            try {
-              playAlarmSound(
-                task.customAlarmSound || reminderSettings.selectedSoundId || 'birds-chirp',
-                reminderSettings.customSounds || [],
-                reminderSettings.volume ?? 0.8,
-                true
-              );
-            } catch (err) {
-              console.warn('Alarm sound play error:', err);
-            }
+        // Play sound with correct signature: (soundId, customSounds, volume, loopAlarm)
+        if (reminderSettings.soundEnabled) {
+          try {
+            playAlarmSound(
+              task.customAlarmSound || reminderSettings.selectedSoundId || 'birds-chirp',
+              reminderSettings.customSounds || [],
+              reminderSettings.volume ?? 0.8,
+              true
+            );
+          } catch (err) {
+            console.warn('Alarm sound play error:', err);
           }
+        }
 
-          // Trigger native notification
-          sendBrowserNotification(`یادآور جوانه: ${task.title}`, {
-            body: task.notes || 'زمان رسیدگی به این برنامه فرا رسیده است.',
-            tag: task.id,
-            onClick: () => {
-              setActiveTab('TASKS');
-            }
-          });
+        // Set repeat notice badge
+        let repeatNotice: string | null = null;
+        if (dueCheck.reason === 'AUTO_RENOTIFY') {
+          repeatNotice = `تکرار خودکار (${toPersianDigits(dueCheck.repeatCount)} از ${toPersianDigits(autoReNotifyMax)})`;
+        } else if (dueCheck.reason === 'USER_SNOOZE') {
+          repeatNotice = `یادآوری مجدد (${toPersianDigits(dueCheck.repeatCount)})`;
+        }
+        setActiveAlertRepeatNotice(repeatNotice);
 
-          // Show in-app alert modal
-          setActiveAlertTask(task);
+        // Trigger native notification
+        const notifPrefix =
+          dueCheck.reason === 'AUTO_RENOTIFY'
+            ? `🔔 تکرار خودکار یادآور: `
+            : dueCheck.reason === 'USER_SNOOZE'
+            ? `⏰ یادآوری مجدد: `
+            : `یادآور جوانه: `;
+        sendBrowserNotification(`${notifPrefix}${task.title}`, {
+          body: task.notes || 'زمان رسیدگی به این برنامه فرا رسیده است.',
+          tag: `task-${task.id}-${dueCheck.uniqueKey}`,
+          onClick: () => {
+            setActiveTab('TASKS');
+          },
+        });
+
+        // Show in-app alert modal
+        setActiveAlertTask(task);
+        setActiveAlertCalendarEvent(null);
+
+        // Schedule next automatic re-notification if not yet reached autoReNotifyMax
+        const currentCount = dueCheck.repeatCount || 0;
+        if (autoReNotifyMax > 0 && currentCount < autoReNotifyMax) {
+          const nextTarget = calculateSnoozeTarget(autoReNotifyInterval);
+          setTasks((prev) =>
+            prev.map((t) =>
+              t.id === task.id
+                ? {
+                    ...t,
+                    autoReNotifyCount: currentCount + 1,
+                    nextAutoReNotifyAt: nextTarget.time,
+                    nextAutoReNotifyDate: nextTarget.jalaliDate,
+                  }
+                : t
+            )
+          );
         }
       });
 
-      // 2. Check calendar events with multi-day (up to 3) and multi-time (up to 3) reminders
+      // 2. Check calendar events (initial, user snooze, and auto re-notify)
       calendarEvents.forEach((ev) => {
-        if (ev.hasReminder === false) return;
+        const dueCheck = checkCalendarEventDueState(ev, todayStr, currentTimeStr);
+        if (!dueCheck.isDue || !dueCheck.uniqueKey) return;
 
-        const daysToNotify = (ev.reminderDays && ev.reminderDays.length > 0)
-          ? ev.reminderDays
-          : [0];
+        if (notifiedTasksRef.current.has(dueCheck.uniqueKey)) return;
+        notifiedTasksRef.current.add(dueCheck.uniqueKey);
 
-        // Collect all configured reminder times AND the event's own time so both trigger the alarm
-        const rawTimes = new Set<string>();
-        if (ev.reminderTimes && ev.reminderTimes.length > 0) {
-          ev.reminderTimes.forEach(t => {
-            const norm = normalizeTimeHHMM(t);
-            if (norm) rawTimes.add(norm);
-          });
+        // Play sound with correct signature: (soundId, customSounds, volume, loopAlarm)
+        if (reminderSettings.soundEnabled) {
+          try {
+            playAlarmSound(
+              reminderSettings.selectedSoundId || 'birds-chirp',
+              reminderSettings.customSounds || [],
+              reminderSettings.volume ?? 0.8,
+              true
+            );
+          } catch (err) {
+            console.warn('Alarm sound play error:', err);
+          }
         }
-        if (ev.time) {
-          const normEvTime = normalizeTimeHHMM(ev.time);
-          if (normEvTime) rawTimes.add(normEvTime);
+
+        // Set repeat notice badge
+        let repeatNotice: string | null = null;
+        if (dueCheck.reason === 'AUTO_RENOTIFY') {
+          repeatNotice = `تکرار خودکار (${toPersianDigits(dueCheck.repeatCount)} از ${toPersianDigits(autoReNotifyMax)})`;
+        } else if (dueCheck.reason === 'USER_SNOOZE') {
+          repeatNotice = `یادآوری مجدد (${toPersianDigits(dueCheck.repeatCount)})`;
         }
-        if (rawTimes.size === 0) {
-          rawTimes.add('09:00');
-        }
-        const timesToNotify = Array.from(rawTimes);
+        setActiveAlertRepeatNotice(repeatNotice);
 
-        const evParts = ev.date.split('/').map(p => parseInt(toLatinDigits(p), 10));
-        if (evParts.length !== 3 || isNaN(evParts[0])) return;
-        const evJDate = { year: evParts[0], month: evParts[1], day: evParts[2] };
+        // Trigger native notification
+        const typeLabels: Record<string, string> = {
+          BIRTHDAY: '🎂 یادآور تولد',
+          MEETING: '👥 یادآور جلسه / قرار کاری',
+          REMINDER: '🔔 یادآوری تقویم',
+          OCCASION: '💐 مناسبت شخصی',
+          ANNIVERSARY: '🎉 سالگرد',
+          OTHER: '📌 یادآور تقویم',
+        };
+        const label = typeLabels[ev.type] || '📅 رویداد تقویم';
+        const dayLabel =
+          dueCheck.dayOffset === 0 ? 'امروز' : `${toPersianDigits(dueCheck.dayOffset || 0)} روز قبل`;
+        const notifPrefix =
+          dueCheck.reason === 'AUTO_RENOTIFY'
+            ? `🔔 تکرار خودکار: `
+            : dueCheck.reason === 'USER_SNOOZE'
+            ? `⏰ یادآوری مجدد: `
+            : '';
 
-        daysToNotify.forEach(dayOffset => {
-          // target date for reminder
-          const remJDate = addDaysJalali(evJDate, -dayOffset);
-          const remDateStr = jalaliToFormattedString(remJDate);
-
-          const dateMatches = ev.repeatYearly 
-            ? remDateStr.slice(5) === todayStr.slice(5)
-            : remDateStr === todayStr;
-
-          if (!dateMatches) return;
-
-          timesToNotify.forEach(timeStr => {
-            if (!timeStr) return;
-            const evKey = `calev_${ev.id}_${todayStr}_day${dayOffset}_${timeStr}`;
-            if (notifiedTasksRef.current.has(evKey)) return;
-
-            if (currentTimeStr === timeStr) {
-              notifiedTasksRef.current.add(evKey);
-
-              // Play sound with correct signature: (soundId, customSounds, volume, loopAlarm)
-              if (reminderSettings.soundEnabled) {
-                try {
-                  playAlarmSound(
-                    reminderSettings.selectedSoundId || 'birds-chirp',
-                    reminderSettings.customSounds || [],
-                    reminderSettings.volume ?? 0.8,
-                    true
-                  );
-                } catch (err) {
-                  console.warn('Alarm sound play error:', err);
-                }
-              }
-
-              // Trigger native notification
-              const typeLabels: Record<string, string> = {
-                BIRTHDAY: '🎂 یادآور تولد',
-                MEETING: '👥 یادآور جلسه / قرار کاری',
-                REMINDER: '🔔 یادآوری تقویم',
-                OCCASION: '💐 مناسبت شخصی',
-                ANNIVERSARY: '🎉 سالگرد',
-                OTHER: '📌 یادآور تقویم',
-              };
-              const label = typeLabels[ev.type] || '📅 رویداد تقویم';
-              const dayLabel = dayOffset === 0 ? 'امروز' : `${toPersianDigits(dayOffset)} روز قبل`;
-              sendBrowserNotification(`${label} (${dayLabel}): ${ev.title}`, {
-                body: `${ev.time ? `ساعت رویداد: ${toPersianDigits(ev.time)}` : ''}\n${ev.description || 'زمان یادآوری این رویداد در تقویم فرا رسیده است.'}`.trim(),
-                tag: `calev-${ev.id}-${dayOffset}`,
-                onClick: () => {
-                  setActiveTab('CALENDAR');
-                }
-              });
-
-              // Show in-app alarm modal for calendar event!
-              setActiveAlertCalendarEvent(ev);
-            }
-          });
+        sendBrowserNotification(`${notifPrefix}${label} (${dayLabel}): ${ev.title}`, {
+          body: `${ev.time ? `ساعت رویداد: ${toPersianDigits(ev.time)}` : ''}\n${
+            ev.description || 'زمان یادآوری این رویداد در تقویم فرا رسیده است.'
+          }`.trim(),
+          tag: `calev-${ev.id}-${dueCheck.uniqueKey}`,
+          onClick: () => {
+            setActiveTab('CALENDAR');
+          },
         });
+
+        // Show in-app alarm modal for calendar event!
+        setActiveAlertCalendarEvent(ev);
+        setActiveAlertTask(null);
+
+        // Schedule next automatic re-notification if not yet reached autoReNotifyMax
+        const currentCount = dueCheck.repeatCount || 0;
+        if (autoReNotifyMax > 0 && currentCount < autoReNotifyMax) {
+          const nextTarget = calculateSnoozeTarget(autoReNotifyInterval);
+          setCalendarEvents((prev) =>
+            prev.map((e) =>
+              e.id === ev.id
+                ? {
+                    ...e,
+                    autoReNotifyCount: currentCount + 1,
+                    nextAutoReNotifyAt: nextTarget.time,
+                    nextAutoReNotifyDate: nextTarget.jalaliDate,
+                  }
+                : e
+            )
+          );
+        }
       });
     };
 
@@ -1689,42 +1721,99 @@ export const App: React.FC = () => {
         soundTitle={reminderSettings.selectedSoundId}
         reminderSettings={reminderSettings}
         holidayNotice={isDateHoliday(today)?.title}
+        repeatNotice={activeAlertRepeatNotice}
         onDismiss={() => {
           stopAllAlarmSounds();
           setActiveAlertTask(null);
           setActiveAlertCalendarEvent(null);
+          setActiveAlertRepeatNotice(null);
         }}
         onComplete={(tId) => {
           stopAllAlarmSounds();
           handleToggleTask(tId);
+          setTasks(prev => prev.map(t => t.id === tId ? {
+            ...t,
+            nextSnoozeAt: null,
+            nextSnoozeDate: null,
+            nextAutoReNotifyAt: null,
+            nextAutoReNotifyDate: null,
+            snoozeCount: 0,
+            autoReNotifyCount: 0,
+          } : t));
           setActiveAlertTask(null);
+          setActiveAlertCalendarEvent(null);
+          setActiveAlertRepeatNotice(null);
+        }}
+        onViewCalendarEvent={(ev) => {
+          stopAllAlarmSounds();
+          setCalendarEvents(prev => prev.map(e => e.id === ev.id ? {
+            ...e,
+            nextSnoozeAt: null,
+            nextSnoozeDate: null,
+            nextAutoReNotifyAt: null,
+            nextAutoReNotifyDate: null,
+            snoozeCount: 0,
+            autoReNotifyCount: 0,
+          } : e));
+          setActiveAlertCalendarEvent(null);
+          setActiveAlertTask(null);
+          setActiveAlertRepeatNotice(null);
+          setActiveTab('CALENDAR');
         }}
         onSnooze={(id, mins) => {
           stopAllAlarmSounds();
-          const nextSnoozeAt = calculateSnoozeTime(mins);
+          const target = calculateSnoozeTarget(mins);
 
-          if (activeAlertTask && activeAlertTask.id === id) {
-            setTasks(prev => prev.map(t => t.id === id ? {
-              ...t,
-              nextSnoozeAt,
-              snoozeCount: (t.snoozeCount || 0) + 1,
-            } : t));
-            setActiveAlertTask(null);
-          } else if (activeAlertCalendarEvent && activeAlertCalendarEvent.id === id) {
+          if (activeAlertCalendarEvent && activeAlertCalendarEvent.id === id) {
             setCalendarEvents(prev => prev.map(ev => {
               if (ev.id !== id) return ev;
-              const existingTimes = Array.isArray(ev.reminderTimes) ? ev.reminderTimes : [];
-              const updatedTimes = existingTimes.includes(nextSnoozeAt)
-                ? existingTimes
-                : [nextSnoozeAt, ...existingTimes].slice(0, 3);
               return {
                 ...ev,
                 hasReminder: true,
-                reminderTimes: updatedTimes,
+                nextSnoozeAt: target.time,
+                nextSnoozeDate: target.jalaliDate,
+                snoozeCount: (ev.snoozeCount || 0) + 1,
+                nextAutoReNotifyAt: null,
+                nextAutoReNotifyDate: null,
+                autoReNotifyCount: 0,
               };
             }));
             setActiveAlertCalendarEvent(null);
+          } else {
+            setTasks(prev => prev.map(t => {
+              if (t.id !== id) return t;
+              return {
+                ...t,
+                nextSnoozeAt: target.time,
+                nextSnoozeDate: target.jalaliDate,
+                snoozeCount: (t.snoozeCount || 0) + 1,
+                nextAutoReNotifyAt: null,
+                nextAutoReNotifyDate: null,
+                autoReNotifyCount: 0,
+              };
+            }));
+            setActiveAlertTask(null);
           }
+          setActiveAlertRepeatNotice(null);
+        }}
+        onSnoozeCalendarEvent={(id, mins) => {
+          stopAllAlarmSounds();
+          const target = calculateSnoozeTarget(mins);
+          setCalendarEvents(prev => prev.map(ev => {
+            if (ev.id !== id) return ev;
+            return {
+              ...ev,
+              hasReminder: true,
+              nextSnoozeAt: target.time,
+              nextSnoozeDate: target.jalaliDate,
+              snoozeCount: (ev.snoozeCount || 0) + 1,
+              nextAutoReNotifyAt: null,
+              nextAutoReNotifyDate: null,
+              autoReNotifyCount: 0,
+            };
+          }));
+          setActiveAlertCalendarEvent(null);
+          setActiveAlertRepeatNotice(null);
         }}
       />
 

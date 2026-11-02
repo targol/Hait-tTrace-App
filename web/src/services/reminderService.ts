@@ -1,5 +1,6 @@
 import { AppTask, ReminderSettings, AlarmSoundItem, CalendarEvent } from '../types';
 import { playAlarmSound } from './soundService';
+import { gregorianToJalali, jalaliToFormattedString, toLatinDigits, addDaysJalali } from '../calendar/jalali';
 
 export function isNotificationSupported(): boolean {
   return typeof window !== 'undefined' && 'Notification' in window;
@@ -98,43 +99,87 @@ export function getTaskEffectiveReminderTime(task: AppTask): string | null {
 }
 
 /**
- * Calculates a new HH:mm time string given minutes from right now
+ * Calculates a new HH:mm time string and target Jalali date given minutes from right now
  */
-export function calculateSnoozeTime(minutesFromNow: number): string {
+export function calculateSnoozeTarget(minutesFromNow: number): { time: string; jalaliDate: string } {
   const now = new Date();
   now.setMinutes(now.getMinutes() + minutesFromNow);
   const hours = String(now.getHours()).padStart(2, '0');
   const mins = String(now.getMinutes()).padStart(2, '0');
-  return `${hours}:${mins}`;
+  const jDate = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  return {
+    time: `${hours}:${mins}`,
+    jalaliDate: jalaliToFormattedString(jDate),
+  };
 }
 
 /**
- * Determines if a task reminder is due right now
+ * Calculates a new HH:mm time string given minutes from right now (legacy helper)
  */
-export function isTaskReminderDue(
+export function calculateSnoozeTime(minutesFromNow: number): string {
+  return calculateSnoozeTarget(minutesFromNow).time;
+}
+
+export type TaskReminderDueReason = 'INITIAL' | 'USER_SNOOZE' | 'AUTO_RENOTIFY';
+
+export interface ReminderDueCheckResult {
+  isDue: boolean;
+  reason?: TaskReminderDueReason;
+  effectiveTime?: string;
+  repeatCount?: number;
+  uniqueKey?: string;
+}
+
+/**
+ * Checks if a task is due for an alarm right now (handles initial, manual snooze, and auto re-notify)
+ */
+export function checkTaskReminderDueState(
   task: AppTask,
-  currentJalaliDate: string, // e.g. "1405/01/01"
-  currentTimeHHMM: string,   // e.g. "10:30"
-  currentDayOfWeek: number   // 0=Saturday .. 6=Friday
-): boolean {
-  if (task.isCompleted) return false;
-
-  const isReminderActive = task.reminderEnabled || task.isImportant;
-  if (!isReminderActive) return false;
-
-  const targetTime = getTaskEffectiveReminderTime(task);
-  if (!targetTime) return false;
-
-  // If this is an active smart snooze due today, check the time directly
-  if (task.nextSnoozeAt) {
-    if (task.nextSnoozeAt === currentTimeHHMM) {
-      const slotKey = `${currentJalaliDate} ${currentTimeHHMM}`;
-      return task.lastNotifiedAt !== slotKey;
-    }
-    return false;
+  currentJalaliDate: string,
+  currentTimeHHMM: string,
+  currentDayOfWeek: number
+): ReminderDueCheckResult {
+  if (task.isCompleted || task.isArchived) {
+    return { isDue: false };
   }
 
-  // Standard checks: date matching
+  // 1. Check User-Initiated Repeat (Manual Snooze)
+  if (task.nextSnoozeAt) {
+    const isSnoozeToday = !task.nextSnoozeDate || task.nextSnoozeDate === currentJalaliDate;
+    if (isSnoozeToday && task.nextSnoozeAt === currentTimeHHMM) {
+      const repCount = task.snoozeCount || 1;
+      return {
+        isDue: true,
+        reason: 'USER_SNOOZE',
+        effectiveTime: task.nextSnoozeAt,
+        repeatCount: repCount,
+        uniqueKey: `task_${task.id}_snooze_${repCount}_${currentJalaliDate}_${task.nextSnoozeAt}`,
+      };
+    }
+    // If nextSnoozeAt is scheduled for the future, don't trigger regular reminder early
+    return { isDue: false };
+  }
+
+  // 2. Check Automatic Repetition (Auto Re-Notify if user ignored previous alarm)
+  if (task.nextAutoReNotifyAt) {
+    const isAutoToday = !task.nextAutoReNotifyDate || task.nextAutoReNotifyDate === currentJalaliDate;
+    if (isAutoToday && task.nextAutoReNotifyAt === currentTimeHHMM) {
+      const repCount = task.autoReNotifyCount || 1;
+      return {
+        isDue: true,
+        reason: 'AUTO_RENOTIFY',
+        effectiveTime: task.nextAutoReNotifyAt,
+        repeatCount: repCount,
+        uniqueKey: `task_${task.id}_autorepeat_${repCount}_${currentJalaliDate}_${task.nextAutoReNotifyAt}`,
+      };
+    }
+  }
+
+  // 3. Check Initial Scheduled Reminder
+  const isReminderActive = task.reminderEnabled || task.isImportant;
+  if (!isReminderActive) return { isDue: false };
+
+  // Date matching
   let dateMatches = false;
   if (task.reminderDate) {
     dateMatches = task.reminderDate === currentJalaliDate;
@@ -145,22 +190,34 @@ export function isTaskReminderDue(
   } else if (task.repeatType === 'WEEKLY') {
     dateMatches = Array.isArray(task.repeatDaysOfWeek) && task.repeatDaysOfWeek.includes(currentDayOfWeek);
   } else {
-    // Undated tasks don't fire without an explicit reminderDate
-    return false;
+    // If no explicit date is set, task with time or reminderTime matches today
+    dateMatches = Boolean(task.time || task.reminderTime);
   }
 
-  if (!dateMatches) return false;
+  if (!dateMatches) return { isDue: false };
 
-  // Check time matching
-  if (targetTime !== currentTimeHHMM) return false;
+  const targetTime = getTaskEffectiveReminderTime(task);
+  if (!targetTime || targetTime !== currentTimeHHMM) return { isDue: false };
 
-  // Check if already notified for this exact date & time slot
-  const slotKey = `${currentJalaliDate} ${currentTimeHHMM}`;
-  if (task.lastNotifiedAt === slotKey) {
-    return false;
-  }
+  return {
+    isDue: true,
+    reason: 'INITIAL',
+    effectiveTime: targetTime,
+    repeatCount: 0,
+    uniqueKey: `task_${task.id}_init_${currentJalaliDate}_${targetTime}`,
+  };
+}
 
-  return true;
+/**
+ * Legacy compatibility checker for tasks
+ */
+export function isTaskReminderDue(
+  task: AppTask,
+  currentJalaliDate: string,
+  currentTimeHHMM: string,
+  currentDayOfWeek: number
+): boolean {
+  return checkTaskReminderDueState(task, currentJalaliDate, currentTimeHHMM, currentDayOfWeek).isDue;
 }
 
 /**
@@ -256,36 +313,119 @@ export function triggerReminderAlarm(
   return stopAudio;
 }
 
+export interface CalendarEventDueResult {
+  isDue: boolean;
+  reason?: TaskReminderDueReason;
+  effectiveTime?: string;
+  repeatCount?: number;
+  dayOffset?: number;
+  uniqueKey?: string;
+}
+
 /**
- * Checks if a calendar event reminder is due right now
+ * Checks if a calendar event is due for an alarm right now (handles initial, manual snooze, and auto re-notify)
+ */
+export function checkCalendarEventDueState(
+  event: CalendarEvent,
+  currentJalaliDate: string,
+  currentTimeHHMM: string
+): CalendarEventDueResult {
+  if (event.hasReminder === false) {
+    return { isDue: false };
+  }
+
+  // 1. Check User-Initiated Repeat (Manual Snooze)
+  if (event.nextSnoozeAt) {
+    const isSnoozeToday = !event.nextSnoozeDate || event.nextSnoozeDate === currentJalaliDate;
+    if (isSnoozeToday && event.nextSnoozeAt === currentTimeHHMM) {
+      const repCount = event.snoozeCount || 1;
+      return {
+        isDue: true,
+        reason: 'USER_SNOOZE',
+        effectiveTime: event.nextSnoozeAt,
+        repeatCount: repCount,
+        dayOffset: 0,
+        uniqueKey: `calev_${event.id}_snooze_${repCount}_${currentJalaliDate}_${event.nextSnoozeAt}`,
+      };
+    }
+    // If nextSnoozeAt is scheduled for the future, don't trigger regular reminder early
+    return { isDue: false };
+  }
+
+  // 2. Check Automatic Repetition (Auto Re-Notify if user ignored previous alarm)
+  if (event.nextAutoReNotifyAt) {
+    const isAutoToday = !event.nextAutoReNotifyDate || event.nextAutoReNotifyDate === currentJalaliDate;
+    if (isAutoToday && event.nextAutoReNotifyAt === currentTimeHHMM) {
+      const repCount = event.autoReNotifyCount || 1;
+      return {
+        isDue: true,
+        reason: 'AUTO_RENOTIFY',
+        effectiveTime: event.nextAutoReNotifyAt,
+        repeatCount: repCount,
+        dayOffset: 0,
+        uniqueKey: `calev_${event.id}_autorepeat_${repCount}_${currentJalaliDate}_${event.nextAutoReNotifyAt}`,
+      };
+    }
+  }
+
+  // 3. Check Initial Scheduled Reminder
+  const daysToNotify = event.reminderDays && event.reminderDays.length > 0 ? event.reminderDays : [0];
+  const rawTimes = new Set<string>();
+  if (event.reminderTimes && event.reminderTimes.length > 0) {
+    event.reminderTimes.forEach((t) => {
+      const norm = t?.trim();
+      if (norm) rawTimes.add(norm);
+    });
+  }
+  if (event.time) {
+    const norm = event.time.trim();
+    if (norm) rawTimes.add(norm);
+  }
+  if (rawTimes.size === 0) {
+    rawTimes.add('09:00');
+  }
+  const timesToNotify = Array.from(rawTimes);
+
+  const evParts = event.date.split('/').map((p) => parseInt(toLatinDigits(p), 10));
+  if (evParts.length !== 3 || isNaN(evParts[0])) return { isDue: false };
+  const evJDate = { year: evParts[0], month: evParts[1], day: evParts[2] };
+
+  for (const dayOffset of daysToNotify) {
+    const remJDate = addDaysJalali(evJDate, -dayOffset);
+    const remDateStr = jalaliToFormattedString(remJDate);
+
+    const dateMatches = event.repeatYearly
+      ? remDateStr.slice(5) === currentJalaliDate.slice(5)
+      : remDateStr === currentJalaliDate;
+
+    if (!dateMatches) continue;
+
+    for (const timeStr of timesToNotify) {
+      if (timeStr === currentTimeHHMM) {
+        return {
+          isDue: true,
+          reason: 'INITIAL',
+          effectiveTime: timeStr,
+          repeatCount: 0,
+          dayOffset,
+          uniqueKey: `calev_${event.id}_init_${currentJalaliDate}_day${dayOffset}_${timeStr}`,
+        };
+      }
+    }
+  }
+
+  return { isDue: false };
+}
+
+/**
+ * Legacy compatibility checker for calendar events
  */
 export function isCalendarEventDue(
   event: CalendarEvent,
-  currentJalaliDate: string, // e.g. "1405/07/28"
-  currentTimeHHMM: string     // e.g. "10:30"
+  currentJalaliDate: string,
+  currentTimeHHMM: string
 ): boolean {
-  if (!event.hasReminder) return false;
-
-  // Date match check
-  let dateMatches = false;
-  if (event.repeatYearly) {
-    // For yearly repeating events (like birthdays), match MM/DD
-    const eventMMDD = event.date.slice(5);
-    const currentMMDD = currentJalaliDate.slice(5);
-    dateMatches = eventMMDD === currentMMDD;
-  } else {
-    dateMatches = event.date === currentJalaliDate;
-  }
-
-  if (!dateMatches) return false;
-
-  // Time match check
-  let targetTime = '09:00'; // default morning reminder if no specific time
-  if (event.time) {
-    targetTime = subtractMinutesFromHHMM(event.time, event.reminderMinutesBefore || 0);
-  }
-
-  return currentTimeHHMM === targetTime;
+  return checkCalendarEventDueState(event, currentJalaliDate, currentTimeHHMM).isDue;
 }
 
 /**

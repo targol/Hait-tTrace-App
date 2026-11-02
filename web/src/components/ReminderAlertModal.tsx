@@ -12,6 +12,7 @@ interface Props {
   soundTitle?: string;
   reminderSettings?: ReminderSettings;
   holidayNotice?: string | null;
+  repeatNotice?: string | null;
   onDismiss: () => void;
   onComplete: (taskId: string) => void;
   onSnooze: (taskId: string, minutes: number) => void;
@@ -36,6 +37,7 @@ export const ReminderAlertModal: React.FC<Props> = ({
   soundTitle = 'serenity',
   reminderSettings,
   holidayNotice,
+  repeatNotice,
   onDismiss,
   onComplete,
   onSnooze,
@@ -93,13 +95,21 @@ export const ReminderAlertModal: React.FC<Props> = ({
               <Bell className="w-6 h-6 text-yellow-300 fill-yellow-300" />
             </div>
             <div>
-              <span className="text-[11px] font-bold text-emerald-100 bg-white/15 px-2.5 py-0.5 rounded-full inline-block mb-1">
-                {isEventMode
-                  ? `${eventMeta?.icon} ${eventMeta?.label}`
-                  : holidayNotice
-                  ? '🗓️ اطلاع‌رسانی تسک در روز تعطیل'
-                  : '🔔 یادآور و آلارم جوانه'}
-              </span>
+              <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                <span className="text-[11px] font-bold text-emerald-100 bg-white/15 px-2.5 py-0.5 rounded-full inline-block">
+                  {isEventMode
+                    ? `${eventMeta?.icon} ${eventMeta?.label}`
+                    : holidayNotice
+                    ? '🗓️ اطلاع‌رسانی تسک در روز تعطیل'
+                    : '🔔 یادآور و آلارم جوانه'}
+                </span>
+                {repeatNotice && (
+                  <span className="text-[11px] font-extrabold text-amber-200 bg-amber-950/40 border border-amber-300/40 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                    <RotateCcw className="w-3 h-3 text-amber-300" />
+                    <span>{repeatNotice}</span>
+                  </span>
+                )}
+              </div>
               <h3 className="text-base sm:text-lg font-black tracking-tight text-white">
                 {isEventMode
                   ? 'زمان یادآور رویداد تقویم فرا رسید!'
@@ -239,12 +249,15 @@ export const ReminderAlertModal: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    if (isEventMode && calendarEvent && onSnoozeCalendarEvent) {
-                      onSnoozeCalendarEvent(calendarEvent.id, defaultInterval);
+                    if (isEventMode && calendarEvent) {
+                      if (onSnoozeCalendarEvent) {
+                        onSnoozeCalendarEvent(calendarEvent.id, defaultInterval);
+                      } else {
+                        onSnooze(calendarEvent.id, defaultInterval);
+                      }
                     } else if (task) {
                       onSnooze(task.id, defaultInterval);
                     }
-                    onDismiss();
                   }}
                   className="py-2.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-xs"
                 >
@@ -273,12 +286,15 @@ export const ReminderAlertModal: React.FC<Props> = ({
                       key={mins}
                       type="button"
                       onClick={() => {
-                        if (isEventMode && calendarEvent && onSnoozeCalendarEvent) {
-                          onSnoozeCalendarEvent(calendarEvent.id, mins);
+                        if (isEventMode && calendarEvent) {
+                          if (onSnoozeCalendarEvent) {
+                            onSnoozeCalendarEvent(calendarEvent.id, mins);
+                          } else {
+                            onSnooze(calendarEvent.id, mins);
+                          }
                         } else if (task) {
                           onSnooze(task.id, mins);
                         }
-                        onDismiss();
                       }}
                       className="px-2.5 py-1 bg-white hover:bg-amber-500 hover:text-white text-amber-900 border border-amber-200 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs"
                     >

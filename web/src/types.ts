@@ -77,6 +77,10 @@ export interface AppTask {
   lastNotifiedAt?: string | null; // آخرین زمان ارسال اعلان برای جلوگیری از تکرار
   snoozeCount?: number; // تعداد دفعات تعویق یا یادآوری مجدد
   nextSnoozeAt?: string | null; // زمان یادآوری هوشمند بعدی HH:mm
+  nextSnoozeDate?: string | null; // تاریخ یادآوری هوشمند بعدی (برای پشتیبانی از عبور از نیمه‌شب)
+  autoReNotifyCount?: number; // دفعات تکرار خودکار انجام شده
+  nextAutoReNotifyAt?: string | null; // زمان تکرار خودکار بعدی HH:mm
+  nextAutoReNotifyDate?: string | null; // تاریخ تکرار خودکار بعدی
   repeatType: TaskRepeatType;
   repeatDaysOfWeek: number[]; // 0: Saturday .. 6: Friday
   monthOfYear?: number | null; // 1 to 12 (فروردین تا اسفند) یا خالی (همه ماه‌ها)
@@ -224,6 +228,12 @@ export interface CalendarEvent {
   reminderTimes?: string[]; // ساعت‌های دقیق ارسال یادآور (تا ۳ ساعت مشخص: مثلا ['09:00', '14:30', '20:00'])
   repeatYearly?: boolean; // تکرار سالانه (مناسب برای تولدها و سالگردها)
   notified?: boolean; // آیا اعلان آن ارسال شده است
+  nextSnoozeAt?: string | null; // زمان یادآوری هوشمند بعدی HH:mm
+  nextSnoozeDate?: string | null; // تاریخ یادآوری هوشمند بعدی
+  snoozeCount?: number; // تعداد دفعات تعویق دستی
+  autoReNotifyCount?: number; // دفعات تکرار خودکار انجام شده
+  nextAutoReNotifyAt?: string | null; // زمان تکرار خودکار بعدی HH:mm
+  nextAutoReNotifyDate?: string | null; // تاریخ تکرار خودکار بعدی
   createdAt: string;
 }
 

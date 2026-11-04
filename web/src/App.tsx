@@ -1,3 +1,4 @@
+import { isNativeApp } from './utils/platform';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { 
   AppTask, 
@@ -162,7 +163,7 @@ export const App: React.FC = () => {
   );
   const [isStandalone, setIsStandalone] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
-    if (window.location.protocol === 'file:') return true; // already running inside the APK
+    if (isNativeApp()) return true; // already running inside the APK
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone === true

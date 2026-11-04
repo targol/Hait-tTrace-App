@@ -1,148 +1,99 @@
-name: Android APK Official Build & Sign
+name: Android APK (Capacitor)
 
 on:
   push:
-    branches: [ main, master ]
-    tags:
-      - 'v*'
+    branches: [ main, master, 'feat/**', 'fix/**' ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build Type (release or debug)'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - release
-          - debug
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build-apk:
-    name: Build & Sign APK via Gradle
     runs-on: ubuntu-latest
-
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 1
+          node-version: 22
+          cache: npm
 
-      - name: Setup Node.js for Web assets
-        uses: actions/setup-node@v4
+      - uses: actions/setup-java@v4
         with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: 'web/package-lock.json'
+          distribution: temurin
+          java-version: 21
 
-      - name: Install Web dependencies & Build Web bundle
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build web app
+        run: npm --prefix web run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Read version
+        id: ver
         run: |
-          cd web
-          npm ci --prefer-offline || npm install
-          npm run build
-          cd ..
+          NAME=$(grep -m1 "currentVersion:" web/src/version.ts | sed -E "s/.*'([^']+)'.*/\1/")
+          CODE=$(grep -m1 "currentVersionCode:" web/src/version.ts | sed -E 's/[^0-9]*([0-9]+).*/\1/')
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Version $NAME ($CODE)"
 
-      - name: Sync Web bundle into Android assets
-        run: |
-          mkdir -p app/src/main/assets
-          cp -r web/dist/* app/src/main/assets/
-          echo "Web distribution successfully synced to app/src/main/assets"
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Gradle cache
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Prepare Signing Keystore (Consistent Certificate)
-        id: keystore
-        run: |
-          mkdir -p keystore
-          KEYSTORE_FILE="keystore/javaneh-release.jks"
-
-          # 1. If GitHub Secret KEYSTORE_BASE64 exists, decode it
-          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
-            echo "Using release keystore provided via repository secrets."
-            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$KEYSTORE_FILE"
-          elif [ -f "$KEYSTORE_FILE" ]; then
-            echo "Using existing repository keystore at $KEYSTORE_FILE."
-          else
-            echo "Generating consistent deterministic release keystore for standard Gradle signing..."
-            keytool -genkeypair \
-              -alias "${{ secrets.KEY_ALIAS || 'javaneh' }}" \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000 \
-              -keystore "$KEYSTORE_FILE" \
-              -storepass "${{ secrets.STORE_PASSWORD || 'javaneh123' }}" \
-              -keypass "${{ secrets.KEY_PASSWORD || 'javaneh123' }}" \
-              -dname "CN=Javaneh Smart, OU=Mobile, O=Javaneh, L=Tehran, ST=Tehran, C=IR"
-          fi
-
-          echo "KEYSTORE_PATH=$GITHUB_WORKSPACE/$KEYSTORE_FILE" >> $GITHUB_ENV
-          echo "STORE_PASSWORD=${{ secrets.STORE_PASSWORD || 'javaneh123' }}" >> $GITHUB_ENV
-          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS || 'javaneh' }}" >> $GITHUB_ENV
-          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD || 'javaneh123' }}" >> $GITHUB_ENV
-
-      - name: Make Gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build APK with Official Gradle
+      - name: Prepare signing key
+        id: sign
         env:
-          KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
-          STORE_PASSWORD: ${{ env.STORE_PASSWORD }}
-          KEY_ALIAS: ${{ env.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          BUILD_TARGET="${{ github.event.inputs.build_type || 'release' }}"
-          if [ "$BUILD_TARGET" = "debug" ]; then
-            echo "Running Gradle assembleDebug..."
-            ./gradlew assembleDebug --no-daemon --stacktrace
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ] && [ -n "$KEY_PASSWORD" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+            echo "task=assembleRelease" >> "$GITHUB_OUTPUT"
+            echo "out=release/app-release.apk" >> "$GITHUB_OUTPUT"
           else
-            echo "Running Gradle assembleRelease..."
-            ./gradlew assembleRelease --no-daemon --stacktrace
+            echo "::warning::Signing secrets not set - building DEBUG APK. Its signature differs from the release key, so updating over a release install requires uninstall. See docs/ANDROID_BUILD.md"
+            echo "task=assembleDebug" >> "$GITHUB_OUTPUT"
+            echo "out=debug/app-debug.apk" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Verify APK Signature & Collect outputs
+      - name: Build APK
+        working-directory: android
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          mkdir -p build-artifacts
-          # Find all produced APKs
-          APK_FILES=$(find app/build/outputs/apk/ -name "*.apk" -type f)
-          echo "Found APK files:"
-          echo "$APK_FILES"
+          chmod +x gradlew
+          ./gradlew ${{ steps.sign.outputs.task }} --no-daemon \
+            -PappVersionCode=${{ steps.ver.outputs.code }} \
+            -PappVersionName=${{ steps.ver.outputs.name }}
 
-          for apk in $APK_FILES; do
-            filename=$(basename "$apk")
-            cp "$apk" "build-artifacts/$filename"
-            echo "Verifying signature for $filename:"
-            $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$apk" || true
-          done
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          cp "android/app/build/outputs/apk/${{ steps.sign.outputs.out }}" out/Javaneh-${{ steps.ver.outputs.name }}.apk
+          ls -l out
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: javaneh-android-apk
-          path: build-artifacts/*.apk
-          retention-days: 30
+          name: Javaneh-APK
+          path: out/*.apk
 
-      - name: Create GitHub Release (on version tag push)
+      - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: build-artifacts/*.apk
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: out/*.apk

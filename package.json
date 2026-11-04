@@ -9,8 +9,9 @@
   "scripts": {
     "dev": "npm --prefix web run dev -- --host 0.0.0.0 --port 3000",
     "start": "node web/server.cjs",
-    "build": "npm --prefix web run build && rm -rf dist && cp -r web/dist dist && bash scripts/build-real-apk.sh",
-    "lint": "npm --prefix web run build"
+    "build": "npm --prefix web run build && rm -rf dist && cp -r web/dist dist",
+    "lint": "npm --prefix web run build",
+    "cap:sync": "npm --prefix web run build && npx cap sync android"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -20,6 +21,8 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
     "@vitejs/plugin-react": "^4.3.4",
     "tailwindcss": "^4.0.0",
     "typescript": "~5.7.2",

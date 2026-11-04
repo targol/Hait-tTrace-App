@@ -1,3 +1,4 @@
+import { isNativeApp, isCapacitorNative } from '../utils/platform';
 import {
   AppTask,
   Category,
@@ -263,6 +264,18 @@ export function buildCompleteAppBackupPayload(data: AppDataPayload): AppBackupDa
   };
 }
 
+async function shareViaCapacitor(filename: string, json: string, title: string): Promise<void> {
+  const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+  const { Share } = await import('@capacitor/share');
+  const written = await Filesystem.writeFile({
+    path: filename,
+    data: json,
+    directory: Directory.Cache,
+    encoding: Encoding.UTF8,
+  });
+  await Share.share({ title, dialogTitle: title, url: written.uri });
+}
+
 /**
  * Universal Export/Save for Full Backup that works in BOTH Android APK WebView (file://) and Web/Windows.
  */
@@ -296,10 +309,25 @@ export async function exportBackupFileUniversal(
     }
   } catch {}
 
+  // Capacitor native app: write file to cache and open the system share sheet (save / send anywhere)
+  if (isCapacitorNative()) {
+    try {
+      await shareViaCapacitor(filename, jsonString, 'پشتیبان کامل برنامه جوانه');
+      return {
+        method: 'ANDROID_NATIVE',
+        message: 'منوی ذخیره/اشتراک‌گذاری باز شد؛ «ذخیره در فایل‌ها» یا برنامه دلخواه را انتخاب کنید.',
+      };
+    } catch (err: any) {
+      if (/cancel/i.test(String(err?.message || err))) {
+        return { method: 'ANDROID_NATIVE', message: 'ذخیره لغو شد (نسخه‌ای در کلیپ‌بورد کپی شده است).' };
+      }
+    }
+  }
+
   const isAndroidApkWebView =
     typeof window !== 'undefined' && window.location.protocol === 'file:';
 
-  // 3. In Android APK WebView: invoke native SAF CREATE_DOCUMENT dialog via AppChromeClient.onJsPrompt or AppWebViewClient
+  // 3. In legacy Android APK WebView: invoke native SAF CREATE_DOCUMENT dialog via AppChromeClient.onJsPrompt or AppWebViewClient
   if (isAndroidApkWebView) {
     const androidBridge = (window as any).AndroidBridge;
     if (androidBridge && typeof androidBridge.saveFile === 'function') {
@@ -374,6 +402,17 @@ export async function shareBackupFileUniversal(
       navigator.clipboard.writeText(jsonString).catch(() => {});
     }
   } catch {}
+
+  if (isCapacitorNative()) {
+    try {
+      await shareViaCapacitor(filename, jsonString, shareTitle);
+      return { method: 'ANDROID_SHARE', message: 'منوی اشتراک‌گذاری برای پشتیبان کامل باز شد.' };
+    } catch (err: any) {
+      if (/cancel/i.test(String(err?.message || err))) {
+        return { method: 'ABORTED', message: 'اشتراک‌گذاری لغو شد.' };
+      }
+    }
+  }
 
   // 2. Modern Web Share API Level 2 with actual File Blob (best and safest approach for Android & Mobile)
   if (typeof navigator !== 'undefined' && navigator.share) {
@@ -1107,7 +1146,7 @@ function computeDataSignature(data: AppDataPayload): string {
 // Immediate flush to disk persistence outside /public or /dist
 export async function saveServerDataImmediate(data: AppDataPayload): Promise<boolean> {
   // Skip network call in file:// Android APK WebView
-  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+  if (typeof window !== 'undefined' && isNativeApp()) {
     return false;
   }
 
@@ -1242,7 +1281,7 @@ export function startPeriodicPersistence(
 
 // Fetch from server API with fast timeout for resilient real-world hydration
 export async function fetchServerData(): Promise<AppDataPayload | null> {
-  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+  if (typeof window !== 'undefined' && isNativeApp()) {
     return null;
   }
   try {
@@ -1283,7 +1322,7 @@ export async function fetchServerData(): Promise<AppDataPayload | null> {
 export async function fetchServerSnapshots(): Promise<
   Array<{ filename: string; timestamp: number; size: number }>
 > {
-  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+  if (typeof window !== 'undefined' && isNativeApp()) {
     return [];
   }
   try {

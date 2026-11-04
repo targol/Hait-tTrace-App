@@ -81,19 +81,34 @@ jobs:
             -PappVersionCode=${{ steps.ver.outputs.code }} \
             -PappVersionName=${{ steps.ver.outputs.name }}
 
+      - name: Build AAB for Google Play (signed builds only)
+        if: steps.sign.outputs.task == 'assembleRelease'
+        working-directory: android
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew bundleRelease --no-daemon \
+            -PappVersionCode=${{ steps.ver.outputs.code }} \
+            -PappVersionName=${{ steps.ver.outputs.name }}
+
       - name: Collect APK
         run: |
           mkdir -p out
+          if [ -f android/app/build/outputs/bundle/release/app-release.aab ]; then
+            cp android/app/build/outputs/bundle/release/app-release.aab out/Javaneh-${{ steps.ver.outputs.name }}.aab
+          fi
           cp "android/app/build/outputs/apk/${{ steps.sign.outputs.out }}" out/Javaneh-${{ steps.ver.outputs.name }}.apk
           ls -l out
 
       - uses: actions/upload-artifact@v4
         with:
           name: Javaneh-APK
-          path: out/*.apk
+          path: out/*
 
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: out/*.apk
+          files: out/*

@@ -514,7 +514,7 @@ export const GardenVisual: React.FC<Props> = ({
   }, [habits, timeScope, currentDayOfWeek]);
 
   return (
-    <div className={`bg-gradient-to-b from-emerald-50/40 via-white to-emerald-50/30 rounded-2xl border border-emerald-100/90 p-4 sm:p-5 shadow-2xs space-y-4 ${className}`}>
+    <div className={`bg-gradient-to-b from-emerald-50/40 via-white to-emerald-50/30 rounded-2xl border border-emerald-100/90 p-3 sm:p-5 shadow-2xs space-y-3 sm:space-y-4 ${className}`}>
       {/* Header: Title and Time Scope Tabs (امروز / این هفته / این ماه / فصل‌ها / یک سال) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-emerald-100/60 pb-3">
         <div className="flex items-center gap-2.5">
@@ -544,11 +544,11 @@ export const GardenVisual: React.FC<Props> = ({
         </div>
 
         {/* Time Scope Segmented Control */}
-        <div className="flex items-center bg-gray-100/90 p-1 rounded-xl text-xs font-semibold overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between md:justify-start w-full md:w-auto bg-gray-100/90 p-1 rounded-xl text-xs font-semibold overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setTimeScope('DAY')}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
               timeScope === 'DAY'
                 ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                 : 'text-gray-500 hover:text-gray-900'
@@ -559,7 +559,7 @@ export const GardenVisual: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setTimeScope('WEEK')}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
               timeScope === 'WEEK'
                 ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                 : 'text-gray-500 hover:text-gray-900'
@@ -570,7 +570,7 @@ export const GardenVisual: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setTimeScope('MONTH')}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 ${
               timeScope === 'MONTH'
                 ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                 : 'text-gray-500 hover:text-gray-900'
@@ -581,26 +581,26 @@ export const GardenVisual: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setTimeScope('SEASON')}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
               timeScope === 'SEASON'
                 ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                 : 'text-gray-500 hover:text-gray-900'
             }`}
           >
             <span>فصل‌ها</span>
-            <span className="text-[10px] opacity-75">({SEASON_META[activeSeasonIdx].name})</span>
+            <span className="hidden sm:inline text-[10px] opacity-75">({SEASON_META[activeSeasonIdx].name})</span>
           </button>
           <button
             type="button"
             onClick={() => setTimeScope('YEAR')}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
               timeScope === 'YEAR'
                 ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                 : 'text-gray-500 hover:text-gray-900'
             }`}
           >
             <span>یک سال</span>
-            <span className="text-[10px] opacity-75">({toPersianDigits(activeYear)})</span>
+            <span className="hidden sm:inline text-[10px] opacity-75">({toPersianDigits(activeYear)})</span>
           </button>
         </div>
       </div>

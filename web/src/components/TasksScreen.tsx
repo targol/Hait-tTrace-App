@@ -309,7 +309,7 @@ export const TasksScreen: React.FC<Props> = ({
   return (
     <div className="space-y-4 animate-fade-in pb-12">
       {/* Sticky Header & Filters */}
-      <div className="sticky -top-5 z-20 pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md space-y-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="sm:sticky sm:-top-5 z-20 sm:pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md space-y-3 -mx-3 px-3 sm:mx-0 sm:px-0">
         {/* Header & Add Button */}
         <div className="flex items-center justify-between">
           <div>
@@ -753,7 +753,7 @@ export const TasksScreen: React.FC<Props> = ({
                     : 'bg-white border-emerald-100 shadow-xs hover:border-emerald-300'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3">
                   <div className="flex items-start gap-3 min-w-0">
                     <button
                       type="button"
@@ -903,7 +903,7 @@ export const TasksScreen: React.FC<Props> = ({
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center justify-end gap-0.5 sm:gap-1 shrink-0 border-t border-gray-100 pt-1.5 sm:border-0 sm:pt-0">
                     {/* If archived, show restore button */}
                     {isArchived && onRestoreTask && (
                       <button

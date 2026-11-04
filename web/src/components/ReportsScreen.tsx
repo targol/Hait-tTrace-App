@@ -362,7 +362,7 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header & Timeframe Switcher */}
-      <div className="sticky -top-5 z-20 pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="sm:sticky sm:-top-5 z-20 sm:pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 -mx-3 px-3 sm:mx-0 sm:px-0">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-emerald-600" />

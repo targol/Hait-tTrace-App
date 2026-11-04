@@ -859,7 +859,7 @@ export const SettingsScreen: React.FC<Props> = ({
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* Sticky Top Header Banner with User Profile Summary */}
-      <div className="sticky -top-5 z-20 pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="sm:sticky sm:-top-5 z-20 sm:pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md -mx-3 px-3 sm:mx-0 sm:px-0">
         <div className={`bg-gradient-to-l ${activeTheme.gradientHeader} text-white rounded-2xl p-4 sm:p-5 shadow-sm transition-all duration-300`}>
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">

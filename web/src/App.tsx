@@ -162,6 +162,7 @@ export const App: React.FC = () => {
   );
   const [isStandalone, setIsStandalone] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
+    if (window.location.protocol === 'file:') return true; // already running inside the APK
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone === true
@@ -1295,7 +1296,7 @@ export const App: React.FC = () => {
                 <h1 className="text-base sm:text-lg font-black tracking-tight text-gray-900">
                   جوانه
                 </h1>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="hidden sm:inline text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
                   v{APP_VERSION_INFO.currentVersion}
                 </span>
               </div>
@@ -1310,7 +1311,7 @@ export const App: React.FC = () => {
             {/* Today Plant Status Pill with Dynamic Growth & Circular Progress Ring */}
             <div 
               onClick={() => setActiveTab('TODAY')}
-              className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50/80 hover:bg-emerald-100/90 rounded-xl border border-emerald-200/80 cursor-pointer transition-all shadow-2xs group"
+              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 bg-emerald-50/80 hover:bg-emerald-100/90 rounded-xl border border-emerald-200/80 cursor-pointer transition-all shadow-2xs group min-w-0"
               title={`رشد امروز: ${toPersianDigits(plantState.progressPercent)}٪ - کلیک برای مشاهده باغچه امروز`}
             >
               <div className="relative w-7 h-7 flex items-center justify-center shrink-0">

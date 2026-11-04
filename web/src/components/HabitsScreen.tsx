@@ -307,7 +307,7 @@ export const HabitsScreen: React.FC<Props> = ({
   return (
     <div className="space-y-4 animate-fade-in pb-16">
       {/* Sticky Header & Filter Tabs */}
-      <div className="sticky -top-5 z-20 pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md space-y-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="sm:sticky sm:-top-5 z-20 sm:pt-5 pb-2.5 bg-[#F8F9F5]/95 backdrop-blur-md space-y-3 -mx-3 px-3 sm:mx-0 sm:px-0">
         {/* Header & New Habit Button */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-emerald-100 shadow-2xs">
           <div>

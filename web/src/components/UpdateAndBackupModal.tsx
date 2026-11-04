@@ -39,7 +39,7 @@ export interface FullBackupPayload {
   version: string;
   versionCode?: number;
   exportDate: string;
-  exportPersianDate: string;
+  exportPersianDate?: string;
   userId?: string;
   counts?: {
     categories: number;
@@ -160,9 +160,6 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
       calendarEvents,
       userProfile,
       reminderSettings,
-      version: APP_VERSION_INFO.currentVersion,
-      versionCode: APP_VERSION_INFO.currentVersionCode,
-      exportPersianDate: getCurrentPersianDateTimeString(),
     });
   };
 

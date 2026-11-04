@@ -113,7 +113,7 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
     // 1. Trigger sound
     if (soundEnabled) {
       const activeCustom = customSounds.find((c) => c.id === selectedSoundId);
-      handleTogglePreview(selectedSoundId, activeCustom?.dataUrl);
+      handleTogglePreview(selectedSoundId, (activeCustom?.audioData || activeCustom?.dataUrl));
     }
 
     // 2. Request permission if needed
@@ -123,11 +123,10 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
     }
 
     // 3. Send test notification
-    const success = sendBrowserNotification(
-      'تست اعلان و آلارم جوانه 🌱',
-      'سیستم یادآور مرورگر و زنگ ملایم با موفقیت فعال است.',
-      'test-notification'
-    );
+    const success = sendBrowserNotification('تست اعلان و آلارم جوانه 🌱', {
+      body: 'سیستم یادآور مرورگر و زنگ ملایم با موفقیت فعال است.',
+      tag: 'test-notification',
+    });
 
     if (success) {
       onNotify?.('اعلان آزمایشی به همراه زنگ صوتی ارسال شد!');
@@ -158,7 +157,8 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
         title,
         description: 'آهنگ اختصاصی کاربر',
         category: 'custom',
-        dataUrl,
+        type: 'audio',
+        audioData: dataUrl,
       };
 
       const updatedSounds = [...customSounds, newSound];
@@ -640,7 +640,7 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleTogglePreview(sound.id, sound.dataUrl);
+                          handleTogglePreview(sound.id, sound.audioData || sound.dataUrl);
                         }}
                         className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
                           isPlaying

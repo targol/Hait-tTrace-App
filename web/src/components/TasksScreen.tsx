@@ -882,7 +882,7 @@ export const TasksScreen: React.FC<Props> = ({
                         {t.weekOfMonth && (
                           <span className="text-emerald-800 bg-emerald-50/80 border border-emerald-200 px-1.5 py-0.5 rounded-md text-[10px] font-medium">
                             {WEEKS_OF_MONTH[t.weekOfMonth - 1] || `هفته ${toPersianDigits(t.weekOfMonth)}`}
-                            {t.dayOfWeek !== undefined ? ` - ${WEEKDAYS[t.dayOfWeek]}` : ''}
+                            {t.dayOfWeek !== undefined && t.dayOfWeek !== null ? ` - ${WEEKDAYS[t.dayOfWeek]}` : ''}
                           </span>
                         )}
 

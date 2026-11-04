@@ -992,7 +992,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
-                            data={circularChartData}
+                            data={circularChartData as any[]}
                             dataKey="value"
                             nameKey="name"
                             cx="50%"
@@ -1003,7 +1003,6 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
                             cornerRadius={6}
                             stroke="#ffffff"
                             strokeWidth={2.5}
-                            activeIndex={activePieIndex !== null ? activePieIndex : undefined}
                             activeShape={renderActivePieShape}
                             onMouseEnter={(_, index) => setActivePieIndex(index)}
                             onMouseLeave={() => setActivePieIndex(null)}

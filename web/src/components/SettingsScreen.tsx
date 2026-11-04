@@ -616,9 +616,6 @@ export const SettingsScreen: React.FC<Props> = ({
         calendarEvents,
         userProfile,
         reminderSettings,
-        version: APP_VERSION_INFO.currentVersion,
-        versionCode: APP_VERSION_INFO.currentVersionCode,
-        exportPersianDate: getCurrentPersianDateTimeString(),
       });
 
       const jsonString = JSON.stringify(backup, null, 2);
@@ -644,9 +641,6 @@ export const SettingsScreen: React.FC<Props> = ({
         calendarEvents,
         userProfile,
         reminderSettings,
-        version: APP_VERSION_INFO.currentVersion,
-        versionCode: APP_VERSION_INFO.currentVersionCode,
-        exportPersianDate: getCurrentPersianDateTimeString(),
       });
       const jsonString = JSON.stringify(backup, null, 2);
       const filename = `javaneh-full-backup-${datePart}.json`;
@@ -668,9 +662,6 @@ export const SettingsScreen: React.FC<Props> = ({
         calendarEvents,
         userProfile,
         reminderSettings,
-        version: APP_VERSION_INFO.currentVersion,
-        versionCode: APP_VERSION_INFO.currentVersionCode,
-        exportPersianDate: getCurrentPersianDateTimeString(),
       });
 
       await navigator.clipboard.writeText(JSON.stringify(backup, null, 2));

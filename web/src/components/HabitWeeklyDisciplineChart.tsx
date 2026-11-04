@@ -702,8 +702,9 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                 data={chartDataset}
                 margin={{ top: 20, right: 12, left: -10, bottom: 25 }}
                 onClick={(state) => {
-                  if (state && state.activePayload && state.activePayload.length > 0) {
-                    const clickedItem = state.activePayload[0].payload;
+                  const idx = state?.activeTooltipIndex != null ? Number(state.activeTooltipIndex) : -1;
+                  if (idx >= 0) {
+                    const clickedItem = chartDataset[idx];
                     if (clickedItem && clickedItem.dateStr) {
                       setSelectedDateStr(clickedItem.dateStr);
                     }

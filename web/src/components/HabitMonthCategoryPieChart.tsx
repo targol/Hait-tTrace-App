@@ -609,7 +609,6 @@ export const HabitMonthCategoryPieChart: React.FC<Props> = ({
                       cornerRadius={6}
                       stroke="#ffffff"
                       strokeWidth={2.5}
-                      activeIndex={activeIndex !== null ? activeIndex : undefined}
                       activeShape={renderActiveShape}
                       onMouseEnter={(_, index) => setActiveIndex(index)}
                       onMouseLeave={() => setActiveIndex(null)}

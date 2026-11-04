@@ -855,7 +855,7 @@ export const GoalsScreen: React.FC<Props> = ({
             goals={cleanGoals}
             tasks={tasks}
             habits={habits}
-            targetYear={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
+            year={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
           />
 
           {[0, 1, 2, 3].map((sIdx) => {
@@ -1190,7 +1190,7 @@ export const GoalsScreen: React.FC<Props> = ({
             goals={cleanGoals}
             tasks={tasks}
             habits={habits}
-            targetYear={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
+            year={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
           />
 
           {filteredTopLevelGoals.map((annual) => {
@@ -1486,7 +1486,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                 {/* Season Header */}
                                 <div className="flex items-center justify-between pb-1 border-b border-black/5">
                                   <div className="flex items-center gap-2">
-                                    <SeasonBadge seasonIndex={sIdx} showName={true} />
+                                    <SeasonBadge seasonIndex={sIdx} />
                                     {isCurrent && (
                                       <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.2 rounded-md">
                                         فصل جاری

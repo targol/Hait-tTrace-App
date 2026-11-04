@@ -62,6 +62,7 @@ export interface AppTask {
   id: string;
   title: string;
   notes: string;
+  createdAt?: string;
   categoryId: string;
   goalId?: string | null;
   startDate?: string | null; // "1403/07/15" - تاریخ شروع یا نمایش تسک (در صورت تعیین، تسک قبل از این تاریخ فعال نمی‌شود)
@@ -111,6 +112,7 @@ export interface Habit {
   timerMinutes: number;
   frequency: HabitFrequency;
   targetDaysOfWeek: number[];
+  targetCountPerWeek?: number; // هدف تعداد روز در هفته برای عادت‌های هفتگی (در صورت نبود، تعداد روزهای انتخاب‌شده)
   exemptHolidays: boolean;
   exemptWeekends: boolean;
   plantType: string;
@@ -155,6 +157,7 @@ export interface AlarmSoundItem {
   category: 'calm' | 'nature' | 'chime' | 'zen' | 'custom';
   type: 'synth' | 'audio';
   audioData?: string; // Base64 data URI for user uploaded files
+  dataUrl?: string; // legacy field name used by older versions (read-only fallback)
   synthPattern?: string; // For built-in high-res procedural audio
   durationSeconds?: number;
 }

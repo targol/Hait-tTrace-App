@@ -89,7 +89,7 @@ export const GoalModal: React.FC<Props> = ({
       const goalYear = goal.year || today.year;
       setYear(goalYear);
       setCustomYearInput(goalYear.toString());
-      setIsCustomYear(!standardYears.includes(goalYear));
+      setIsCustomYear(!selectableYears.includes(goalYear));
 
       setPeriod(goal.period || 'ANNUAL');
       setStatus(goal.status || 'IN_PROGRESS');

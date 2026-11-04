@@ -331,7 +331,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
               <button
                 key={cell.key}
                 type="button"
-                onClick={() => setSelectedDateStr(cell.dateStr)}
+                onClick={() => { if (cell.dateStr) setSelectedDateStr(cell.dateStr); }}
                 className={`h-16 sm:h-20 rounded-xl p-1 sm:p-1.5 text-right transition-all flex flex-col justify-between cursor-pointer border relative select-none ${
                   cell.isSelected
                     ? isHoliday
@@ -378,7 +378,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                 {/* Indicators: Task Dots / Counts / Events */}
                 <div className="flex items-center justify-between w-full mt-auto text-[10px] gap-1">
                   <div className="flex items-center gap-1 min-w-0 flex-wrap">
-                    {cell.taskCount > 0 && (
+                    {(cell.taskCount ?? 0) > 0 && (
                       <span
                         className={`inline-flex items-center gap-0.5 px-1 py-0.2 rounded font-bold text-[9px] ${
                           cell.doneTaskCount === cell.taskCount
@@ -391,7 +391,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                       </span>
                     )}
 
-                    {cell.eventCount > 0 && (
+                    {(cell.eventCount ?? 0) > 0 && (
                       <span
                         className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded font-bold text-[9px] bg-purple-100 text-purple-900 border border-purple-200"
                         title={`${toPersianDigits(cell.eventCount)} رویداد یا یادآور`}
@@ -402,7 +402,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                     )}
                   </div>
 
-                  {cell.habitCount > 0 && (
+                  {(cell.habitCount ?? 0) > 0 && (
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title={`${toPersianDigits(cell.habitCount)} عادت`}></span>
                   )}
                 </div>
@@ -633,7 +633,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                               className="px-1.5 py-0.2 rounded-md font-medium text-[10px]"
                               style={{ backgroundColor: `${cat.colorHex}15`, color: cat.colorHex }}
                             >
-                              {cat.name}
+                              {cat.title}
                             </span>
                           )}
                           {t.time && (

@@ -182,7 +182,7 @@ export const TodayScreen: React.FC<Props> = ({
             ...e,
             matchedDayStr: wDay.dateStr,
             matchedWeekdayName: WEEKDAYS[wDay.dayOfWeek],
-            matchedDayNumber: wDay.day,
+            matchedDayNumber: wDay.date.day,
             isToday: wDay.dateStr === todayStr,
           });
         }
@@ -304,7 +304,7 @@ export const TodayScreen: React.FC<Props> = ({
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       const catTitle = (getCategory(h.categoryId)?.title || '').toLowerCase();
-      if (!h.title.toLowerCase().includes(q) && !(h.description || '').toLowerCase().includes(q) && !catTitle.includes(q)) return false;
+      if (!h.title.toLowerCase().includes(q) && !(h.notes || '').toLowerCase().includes(q) && !catTitle.includes(q)) return false;
     }
     return true;
   });
@@ -317,7 +317,7 @@ export const TodayScreen: React.FC<Props> = ({
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       const catTitle = (getCategory(h.categoryId)?.title || '').toLowerCase();
-      if (!h.title.toLowerCase().includes(q) && !(h.description || '').toLowerCase().includes(q) && !catTitle.includes(q)) return false;
+      if (!h.title.toLowerCase().includes(q) && !(h.notes || '').toLowerCase().includes(q) && !catTitle.includes(q)) return false;
     }
     return true;
   });
@@ -1083,7 +1083,7 @@ export const TodayScreen: React.FC<Props> = ({
             ) : (
               <div className="space-y-3">
                 {weeklyHabits.map((h) => {
-                  const targetDays = h.targetDaysPerWeek || 3;
+                  const targetDays = Math.max(1, h.targetCountPerWeek || h.targetDaysOfWeek?.length || 3);
                   // Count completed days in the current week
                   const doneDaysThisWeek = currentWeekDateStrings.filter(dStr => !!h.completionHistory[dStr]).length;
                   const isGoalMet = doneDaysThisWeek >= targetDays;

@@ -22,7 +22,8 @@ import {
   Clock, 
   Plus, 
   Trash2,
-  Lock
+  Lock,
+  AlertCircle,
 } from 'lucide-react';
 import { PlantIcon } from './PlantIcon';
 import { EntityIcon, EntityBadge } from './EntityIcon';
@@ -354,12 +355,14 @@ export const AnnualGoalWizardModal: React.FC<Props> = ({
         title: habitTitle.trim(),
         categoryId: annualCategoryId,
         plantType: annualPlantType,
+        notes: '',
         frequency: 'DAILY',
-        targetDaysPerWeek: 7,
-        selectedDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-        currentStreak: 0,
-        longestStreak: 0,
+        targetDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+        exemptHolidays: false,
+        exemptWeekends: false,
+        time: null,
         completionHistory: {},
+        createdAt: todayStr,
         goalId: selectedGoalIdForItems,
         timerMinutes: habitTimerMinutes,
       };

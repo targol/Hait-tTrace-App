@@ -634,8 +634,9 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
                 margin={{ top: 15, right: 12, left: -16, bottom: 8 }}
                 barGap={chartMode === 'GROUPED' ? 6 : 0}
                 onClick={(state) => {
-                  if (state && state.activePayload && state.activePayload.length) {
-                    const clickedDate = state.activePayload[0].payload?.dateStr;
+                  const idx = state?.activeTooltipIndex != null ? Number(state.activeTooltipIndex) : -1;
+                  if (idx >= 0) {
+                    const clickedDate = chartDataset[idx]?.dateStr;
                     if (clickedDate) {
                       setSelectedDayDate(prev => prev === clickedDate ? null : clickedDate);
                     }

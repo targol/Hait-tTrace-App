@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { APP_VERSION_INFO } from '../version';
 import { toPersianDigits } from '../calendar/jalali';
-import { checkApkAvailability, downloadApkBlobSecure, DownloadProgress } from '../services/apkDownloadService';
+import { APK_RELEASES_URL, checkApkAvailability, downloadApkBlobSecure, DownloadProgress } from '../services/apkDownloadService';
 
 interface Props {
   isOpen: boolean;
@@ -77,10 +77,7 @@ export const ApkDownloadConfirmModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
-  const directApkUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/Javaneh-App.apk?v=${APP_VERSION_INFO.currentVersionCode}`
-      : `/Javaneh-App.apk?v=${APP_VERSION_INFO.currentVersionCode}`;
+  const directApkUrl = APK_RELEASES_URL;
 
   const handleVerifiedApkDownload = async (edition: 'PRIMARY' | 'LEGACY' = 'PRIMARY') => {
     setIsDownloading(true);

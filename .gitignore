@@ -44,3 +44,6 @@ debug.keystore.base64
 keystore/
 debug.key
 debug.crt
+
+# runtime data written by web/server.cjs
+/data/

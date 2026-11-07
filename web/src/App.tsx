@@ -1575,8 +1575,11 @@ export const App: React.FC = () => {
           <NotebookScreen
             tasks={tasks}
             goals={goals}
+            habits={habits}
             categories={categories}
             calendarEvents={calendarEvents}
+            onToggleTask={handleToggleTask}
+            onToggleHabitDate={handleToggleHabitDate}
           />
         )}
 

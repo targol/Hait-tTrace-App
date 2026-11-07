@@ -186,6 +186,7 @@ export interface AppPreferences {
   enablePlantAnimations?: boolean;
   enableHapticFeedback?: boolean;
   githubSyncConfig?: GitHubSyncConfig | null;
+  notebook?: import('./services/notebookService').NotebookData;
 }
 
 export interface AppBackupData {

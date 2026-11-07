@@ -1,3 +1,4 @@
+import { sanitizeNotebook } from './notebookService';
 import {
   AppTask,
   Goal,
@@ -543,6 +544,10 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
           ? rawPrefs.enableHapticFeedback
           : undefined,
       githubSyncConfig: rawPrefs.githubSyncConfig || null,
+      notebook:
+        rawPrefs.notebook && typeof rawPrefs.notebook === 'object'
+          ? sanitizeNotebook(rawPrefs.notebook)
+          : undefined,
     };
   }
 

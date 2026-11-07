@@ -1,4 +1,5 @@
 import { isNativeApp, isCapacitorNative } from '../utils/platform';
+import { loadNotebook, saveNotebook, sanitizeNotebook } from './notebookService';
 import {
   AppTask,
   Category,
@@ -120,6 +121,7 @@ export function collectCurrentAppPreferences(userProfile?: UserProfile): AppPref
       enablePlantAnimations,
       enableHapticFeedback,
       githubSyncConfig,
+      notebook: loadNotebook(),
     };
   } catch {
     return {};
@@ -162,6 +164,9 @@ export function applyRestoredAppPreferences(
         'javaneh_haptic_feedback',
         prefs.enableHapticFeedback ? 'true' : 'false'
       );
+    }
+    if (prefs?.notebook) {
+      saveNotebook(sanitizeNotebook(prefs.notebook));
     }
     if (prefs?.githubSyncConfig) {
       localStorage.setItem('javaneh_github_sync_config', JSON.stringify(prefs.githubSyncConfig));

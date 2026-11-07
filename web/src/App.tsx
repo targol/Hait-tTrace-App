@@ -1,3 +1,4 @@
+import { NotebookScreen } from './components/NotebookScreen';
 import { isNativeApp } from './utils/platform';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { 
@@ -107,6 +108,7 @@ import {
   Calendar as CalendarIcon, 
   BarChart3, 
   Settings as SettingsIcon,
+  BookOpen,
   Sprout,
   Plus,
   Bell,
@@ -119,7 +121,7 @@ import {
 } from 'lucide-react';
 import { PlantIcon } from './components/PlantIcon';
 
-export type MainTab = 'TODAY' | 'TASKS' | 'HABITS' | 'GOALS' | 'CALENDAR' | 'REPORTS' | 'SETTINGS';
+export type MainTab = 'TODAY' | 'TASKS' | 'HABITS' | 'GOALS' | 'CALENDAR' | 'REPORTS' | 'SETTINGS' | 'NOTEBOOK';
 
 export const App: React.FC = () => {
   const today = useMemo(() => getTodayJalali(), []);
@@ -1289,7 +1291,7 @@ export const App: React.FC = () => {
     { id: 'GOALS' as MainTab, label: 'اهداف', icon: Target },
     { id: 'CALENDAR' as MainTab, label: 'تقویم', icon: CalendarIcon },
     { id: 'REPORTS' as MainTab, label: 'گزارشات', icon: BarChart3 },
-    { id: 'SETTINGS' as MainTab, label: 'تنظیمات', icon: SettingsIcon },
+    { id: 'NOTEBOOK' as MainTab, label: 'دفتر', icon: BookOpen },
   ];
 
   return (
@@ -1372,6 +1374,15 @@ export const App: React.FC = () => {
                 )}
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('SETTINGS')}
+              className={`p-2 rounded-xl border cursor-pointer ${activeTab === 'SETTINGS' ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-gray-200 text-gray-600'}`}
+              title="تنظیمات"
+            >
+              <SettingsIcon className="w-4 h-4" />
+            </button>
 
             {/* Offline Status Badge */}
             {!isOnline && (
@@ -1557,6 +1568,15 @@ export const App: React.FC = () => {
             goals={goals}
             categories={categories}
             onNavigateToGoals={() => setActiveTab('GOALS')}
+          />
+        )}
+
+        {activeTab === 'NOTEBOOK' && (
+          <NotebookScreen
+            tasks={tasks}
+            goals={goals}
+            categories={categories}
+            calendarEvents={calendarEvents}
           />
         )}
 

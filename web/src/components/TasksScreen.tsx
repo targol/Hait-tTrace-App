@@ -771,6 +771,16 @@ export const TasksScreen: React.FC<Props> = ({
                       <h4 className={`text-xs font-bold ${t.isCompleted ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                         {t.title}
                       </h4>
+                      {t.dependsOn && t.dependsOn.length > 0 && (() => {
+                        const pre = tasks.filter(x => t.dependsOn!.includes(x.id));
+                        const pend = pre.filter(x => !x.isCompleted);
+                        if (pre.length === 0) return null;
+                        return (
+                          <p className={`text-[10px] mt-0.5 ${pend.length ? 'text-amber-700' : 'text-emerald-700'}`}>
+                            {pend.length ? '⏳ منتظر پیش‌نیاز: ' + pend.map(x => x.title).join('، ') : '✓ پیش‌نیازها انجام شده'}
+                          </p>
+                        );
+                      })()}
                       {t.notes && (
                         <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
                           {t.notes}

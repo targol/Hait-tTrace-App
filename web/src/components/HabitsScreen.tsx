@@ -50,7 +50,6 @@ import {
   Tooltip,
   Cell
 } from 'recharts';
-import { PlantIcon } from './PlantIcon';
 
 import { HabitContributionGrid } from './HabitContributionGrid';
 import { Hourglass } from 'lucide-react';
@@ -856,7 +855,6 @@ export const HabitsScreen: React.FC<Props> = ({
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           <div className={`p-0.5 rounded-lg shrink-0 ${isDoneOnSelected ? 'bg-white/20' : 'bg-emerald-50'}`}>
-                            <PlantIcon type={h.plantType} size="xs" />
                           </div>
                           <span className="text-xs font-bold truncate">{h.title}</span>
                           {cat && !isDoneOnSelected && (
@@ -922,7 +920,6 @@ export const HabitsScreen: React.FC<Props> = ({
                       <tr key={h.id} className="hover:bg-gray-50/80 transition-colors">
                         <td className="py-2 px-2 font-bold text-gray-900">
                           <div className="flex items-center gap-2">
-                            <PlantIcon type={h.plantType} size="xs" />
                             <span className="truncate max-w-[160px]">{h.title}</span>
                           </div>
                         </td>
@@ -1002,9 +999,6 @@ export const HabitsScreen: React.FC<Props> = ({
                 <div className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start gap-2.5 min-w-0">
-                      <div className="p-1 rounded-xl bg-emerald-50 border border-emerald-100 shrink-0">
-                        <PlantIcon type={h.plantType} size="md" />
-                      </div>
                       <div className="min-w-0">
                         <h3 className="text-sm font-bold text-gray-900 truncate leading-snug">
                           {h.title}

@@ -98,6 +98,7 @@ export interface AppTask {
   transferredToGoalId?: string | null; // هدفی که تسک به آن منتقل یا وابسته شده
   transferredToSeasonIndex?: number | null; // شاخص فصل مقصد (۰: بهار، ۱: تابستان، ۲: پاییز، ۳: زمستان)
   originSeasonalTaskId?: string | null; // شناسه تسک مبدأ در صورت انتقال
+  dependsOn?: string[]; // شناسه تسک‌های پیش‌نیاز (اختیاری)
 }
 
 export type HabitFrequency = 'DAILY' | 'WEEKLY';

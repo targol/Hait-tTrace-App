@@ -31,7 +31,6 @@ import {
   Copy,
   Filter
 } from 'lucide-react';
-import { PlantIcon } from './PlantIcon';
 import { GoalProgressModal } from './GoalProgressModal';
 import { TransferPeriodItemsModal } from './TransferPeriodItemsModal';
 import { EntityIcon, EntityBadge } from './EntityIcon';

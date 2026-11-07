@@ -23,6 +23,7 @@ interface Props {
   task?: AppTask | null;
   categories: Category[];
   goals: Goal[];
+  allTasks?: AppTask[];
   reminderSettings?: ReminderSettings;
   isDuplicate?: boolean;
   onClose: () => void;
@@ -34,6 +35,7 @@ export const TaskModal: React.FC<Props> = ({
   task,
   categories,
   goals,
+  allTasks = [],
   reminderSettings,
   isDuplicate = false,
   onClose,
@@ -44,6 +46,26 @@ export const TaskModal: React.FC<Props> = ({
   const bodyContainerRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(task?.title || '');
   const [notes, setNotes] = useState(task?.notes || '');
+  const candidatePrereqs = React.useMemo(() => {
+    const selfId = task?.id;
+    const blocked = new Set<string>();
+    if (selfId) {
+      blocked.add(selfId);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const t of allTasks) {
+          if (!blocked.has(t.id) && (t.dependsOn || []).some(d => blocked.has(d))) {
+            blocked.add(t.id);
+            changed = true;
+          }
+        }
+      }
+    }
+    return allTasks.filter(t => !blocked.has(t.id) && !t.isArchived);
+  }, [allTasks, task?.id]);
+
+  const [dependsOn, setDependsOn] = useState<string[]>(task?.dependsOn || []);
   
   // Inherit category from linked goal if available
   const initialGoal = goals.find(g => g.id === task?.goalId);
@@ -148,6 +170,7 @@ export const TaskModal: React.FC<Props> = ({
       setDeadlineTime(task.deadlineTime || '18:00');
       setHasDeadlineTime(Boolean(task.deadlineTime));
       setReminderMinutes(task.reminderMinutesBefore ?? null);
+      setDependsOn(task.dependsOn || []);
       setIsImportant(Boolean(task.isImportant));
       setReminderEnabled(Boolean(task.reminderEnabled || task.isImportant));
       setReminderTime(task.reminderTime || '');
@@ -284,6 +307,7 @@ export const TaskModal: React.FC<Props> = ({
       notes: notes.trim(),
       categoryId,
       goalId: goalId || null,
+      dependsOn: dependsOn.length ? dependsOn : undefined,
       startDate: startDateStr,
       dueDate: dueDateStr,
       time: hasTime ? time : null,
@@ -470,6 +494,31 @@ export const TaskModal: React.FC<Props> = ({
                   <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>پیش‌نیاز (اختیاری)</span>
+              </label>
+              {candidatePrereqs.length === 0 ? (
+                <p className="text-[11px] text-gray-400">تسک دیگری برای انتخاب وجود ندارد.</p>
+              ) : (
+                <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
+                  {candidatePrereqs.map(t => (
+                    <label key={t.id} className="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-emerald-50/50">
+                      <input
+                        type="checkbox"
+                        checked={dependsOn.includes(t.id)}
+                        onChange={(e) =>
+                          setDependsOn(prev => e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id))
+                        }
+                      />
+                      <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              <p className="text-[10px] text-gray-400 mt-1">این تسک بعد از انجام تسک‌های انتخاب‌شده قابل انجام است.</p>
             </div>
 
             <div>

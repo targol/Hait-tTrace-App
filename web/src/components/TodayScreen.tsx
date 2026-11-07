@@ -41,7 +41,6 @@ import {
   Search,
   X
 } from 'lucide-react';
-import { PlantIcon } from './PlantIcon';
 
 import { Hourglass, History } from 'lucide-react';
 import { FocusHistoryModal } from './FocusHistoryModal';
@@ -854,7 +853,6 @@ export const TodayScreen: React.FC<Props> = ({
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <PlantIcon type={h.plantType} size="sm" />
                         <div className="min-w-0">
                           <p className={`text-xs font-bold truncate ${isDoneToday ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                             {h.title}
@@ -1097,7 +1095,6 @@ export const TodayScreen: React.FC<Props> = ({
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-3">
-                          <PlantIcon type={h.plantType} size="md" />
                           <div>
                             <h4 className="text-xs font-bold text-gray-900">{h.title}</h4>
                             <div className="flex items-center gap-2 mt-0.5 text-[11px] text-gray-500">

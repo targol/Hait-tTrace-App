@@ -11,7 +11,7 @@ import {
   isYearPast
 } from '../calendar/jalali';
 import { X, Folder, Target, Clock, ShieldCheck, Sprout, Edit3, Plus, Archive, Sparkles, Copy } from 'lucide-react';
-import { PlantIcon, ALL_PLANT_TYPES } from './PlantIcon';
+import { ALL_PLANT_TYPES } from './PlantIcon';
 
 interface Props {
   isOpen: boolean;
@@ -496,37 +496,7 @@ export const HabitModal: React.FC<Props> = ({
             </p>
           </div>
 
-          {/* Plant Symbol & Focus Timer */}
-          <div>
-            <label className="block font-bold text-gray-800 mb-1.5 flex items-center justify-between">
-              <span className="flex items-center gap-1">
-                <Sprout className="w-3.5 h-3.5 text-emerald-600" />
-                <span>انتخاب گیاه نمادین</span>
-              </span>
-              <span className="text-[11px] font-normal text-emerald-700">با انجام مرتب رشد می‌کند</span>
-            </label>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-36 overflow-y-auto p-1.5 bg-emerald-50/30 rounded-xl border border-emerald-100">
-              {ALL_PLANT_TYPES.map((p) => {
-                const isSelected = plantType === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPlantType(p.id)}
-                    className={`p-2 rounded-xl border text-center transition-all flex flex-col items-center gap-1 cursor-pointer ${
-                      isSelected
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-200'
-                        : 'bg-white text-gray-700 border-gray-100 hover:border-emerald-300 hover:bg-emerald-50/50'
-                    }`}
-                  >
-                    <PlantIcon type={p.id} size="md" />
-                    <span className="text-[10px] font-bold truncate w-full">{p.name.split(' ')[0]}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
+          {/* Focus Timer */}
           <div>
             <label className="block font-bold text-gray-800 mb-1 flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-emerald-600" />

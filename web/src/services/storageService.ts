@@ -799,6 +799,35 @@ export function saveLocalSnapshot(data: AppDataPayload): void {
   }
 }
 
+const LAST_RUN_VERSION_KEY = 'javaneh_last_run_version';
+
+/**
+ * On the first launch after an app update, keep a safety copy of the data exactly as it was
+ * (extra snapshot + a dedicated pre-update copy), so an update can never silently lose user data.
+ */
+export function snapshotBeforeUpdate(data: AppDataPayload | null | undefined): void {
+  try {
+    const current = String(APP_VERSION_INFO.currentVersionCode);
+    const last = localStorage.getItem(LAST_RUN_VERSION_KEY);
+    if (last === current) return;
+    const hasContent =
+      !!data &&
+      ((data.tasks?.length || 0) > 0 ||
+        (data.habits?.length || 0) > 0 ||
+        (data.goals?.length || 0) > 0);
+    if (hasContent && last) {
+      saveLocalSnapshot(data as AppDataPayload);
+      const payload = { fromVersionCode: last, savedAt: Date.now(), data };
+      saveToIndexedDB('pre_update_backup', payload).catch(() => {});
+      try {
+        const json = JSON.stringify(payload);
+        if (json.length < 2_500_000) localStorage.setItem('javaneh_pre_update_backup', json);
+      } catch {}
+    }
+    localStorage.setItem(LAST_RUN_VERSION_KEY, current);
+  } catch {}
+}
+
 export function resetLocalSnapshotsWithData(data: AppDataPayload): void {
   if (typeof window === 'undefined') return;
   try {

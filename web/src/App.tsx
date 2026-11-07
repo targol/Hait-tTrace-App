@@ -52,7 +52,8 @@ import {
   loadEntityListWithFallback,
   hasExistingLocalUserData,
   applyRestoredAppPreferences,
-  recoverAllLocalData
+  recoverAllLocalData,
+  snapshotBeforeUpdate
 } from './services/storageService';
 import { 
   setupThemeListeners, 
@@ -222,6 +223,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     // 1. Recover from IndexedDB / local snapshot (critical for Android WebView file:// persistence across APK updates)
     recoverAllLocalData().then(localRecovered => {
+      snapshotBeforeUpdate(localRecovered as any);
       if (localRecovered) {
         if (Array.isArray(localRecovered.categories) && localRecovered.categories.length > 0) {
           setCategories(prev => mergeEntitiesById(INITIAL_CATEGORIES, localRecovered.categories, prev));
@@ -633,6 +635,14 @@ export const App: React.FC = () => {
 
   // --- Handlers: Tasks ---
   const handleToggleTask = useCallback((taskId: string) => {
+    const target = tasks.find(t => t.id === taskId);
+    if (target && !target.isCompleted && target.dependsOn?.length) {
+      const pending = tasks.filter(t => target.dependsOn!.includes(t.id) && !t.isCompleted);
+      if (pending.length > 0) {
+        const names = pending.map(t => '• ' + t.title).join('\n');
+        if (!window.confirm('پیش‌نیازهای این تسک هنوز انجام نشده‌اند:\n' + names + '\n\nباز هم انجام‌شده علامت بخورد؟')) return;
+      }
+    }
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
         const nextState = !t.isCompleted;
@@ -644,7 +654,7 @@ export const App: React.FC = () => {
       }
       return t;
     }));
-  }, [todayStr]);
+  }, [todayStr, tasks]);
 
   const handleSaveTask = useCallback((taskData: AppTask) => {
     setTasks(prev => {
@@ -1612,6 +1622,7 @@ export const App: React.FC = () => {
         task={editingTask}
         categories={categories}
         goals={goals}
+        allTasks={tasks}
         reminderSettings={reminderSettings}
         isDuplicate={isDuplicateTaskMode}
         onClose={() => {

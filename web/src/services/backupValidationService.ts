@@ -220,6 +220,9 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
           typeof item.transferredToSeasonIndex === 'number' ? item.transferredToSeasonIndex : null,
         originSeasonalTaskId:
           typeof item.originSeasonalTaskId === 'string' ? item.originSeasonalTaskId : null,
+        dependsOn: Array.isArray(item.dependsOn)
+          ? item.dependsOn.filter((d: unknown) => typeof d === 'string')
+          : undefined,
       });
     } else {
       corruptedTasks++;

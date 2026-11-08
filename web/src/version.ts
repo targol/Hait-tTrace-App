@@ -13,8 +13,8 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.5.0',
-  currentVersionCode: 250,
+  currentVersion: '2.5.1',
+  currentVersionCode: 251,
   versionCode: 240,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
@@ -25,6 +25,18 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.5.1',
+    versionCode: 251,
+    releaseDate: '۱۴۰۵/۰۸/۱۷',
+    gregorianDate: '2026-11-08',
+    title: 'رفع کار نکردن پشتیبان‌گیری در اپ اندروید',
+    highlights: [
+      'پلاگین‌های بومی ذخیره و اشتراک‌گذاری فایل در ساخت اپ فعال شد؛ خروجی و اشتراک‌گذاری پشتیبان در اپ کار می‌کند',
+      'در صورت خطا، پیام خطا نمایش داده می‌شود'
+    ],
+    changes: []
+  },
   {
     version: '2.5.0',
     versionCode: 250,

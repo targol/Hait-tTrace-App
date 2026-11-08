@@ -326,6 +326,10 @@ export async function exportBackupFileUniversal(
       if (/cancel/i.test(String(err?.message || err))) {
         return { method: 'ANDROID_NATIVE', message: 'ذخیره لغو شد (نسخه‌ای در کلیپ‌بورد کپی شده است).' };
       }
+      return {
+        method: 'FAILED',
+        message: 'ذخیره فایل ناموفق بود: ' + String(err?.message || err) + ' — نسخه‌ای از پشتیبان در کلیپ‌بورد کپی شد.',
+      } as any;
     }
   }
 
@@ -416,6 +420,7 @@ export async function shareBackupFileUniversal(
       if (/cancel/i.test(String(err?.message || err))) {
         return { method: 'ABORTED', message: 'اشتراک‌گذاری لغو شد.' };
       }
+      return { method: 'FAILED', message: 'اشتراک‌گذاری ناموفق بود: ' + String(err?.message || err) } as any;
     }
   }
 

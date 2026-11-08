@@ -13,8 +13,8 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.4.0',
-  currentVersionCode: 240,
+  currentVersion: '2.5.0',
+  currentVersionCode: 250,
   versionCode: 240,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',

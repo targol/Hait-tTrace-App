@@ -15,7 +15,7 @@ export interface ReleaseNote {
 export const APP_VERSION_INFO = {
   currentVersion: '2.5.1',
   currentVersionCode: 251,
-  versionCode: 240,
+  versionCode: 251,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',

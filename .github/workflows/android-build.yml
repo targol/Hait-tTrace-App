@@ -104,7 +104,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Javaneh-APK
+          name: Javaneh-APK-${{ steps.ver.outputs.name }}
           path: out/*
 
       - name: Publish release

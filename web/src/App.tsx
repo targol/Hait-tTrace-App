@@ -1,3 +1,4 @@
+import { syncNativeAlarms } from './services/nativeAlarmService';
 import { NotebookScreen } from './components/NotebookScreen';
 import { isNativeApp } from './utils/platform';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -645,6 +646,13 @@ export const App: React.FC = () => {
         if (!window.confirm('پیش‌نیازهای این تسک هنوز انجام نشده‌اند:\n' + names + '\n\nباز هم انجام‌شده علامت بخورد؟')) return;
       }
     }
+    let alsoComplete: string[] = [];
+    if (target && !target.isCompleted) {
+      const linked = tasks.filter(t => !t.isCompleted && !t.isArchived && (target.linkedWith?.includes(t.id) || t.linkedWith?.includes(target.id)));
+      if (linked.length > 0 && window.confirm('تسک‌های همراه هم انجام‌شده علامت بخورند؟\n' + linked.map(t => '• ' + t.title).join('\n'))) {
+        alsoComplete = linked.map(t => t.id);
+      }
+    }
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
         const nextState = !t.isCompleted;
@@ -654,9 +662,19 @@ export const App: React.FC = () => {
           completedAt: nextState ? todayStr : null,
         };
       }
+      if (alsoComplete.includes(t.id)) {
+        return { ...t, isCompleted: true, completedAt: todayStr };
+      }
       return t;
     }));
   }, [todayStr, tasks]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      syncNativeAlarms(tasks, reminderSettings.enabled !== false);
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, [tasks, reminderSettings.enabled]);
 
   const handleSaveTask = useCallback((taskData: AppTask) => {
     setTasks(prev => {

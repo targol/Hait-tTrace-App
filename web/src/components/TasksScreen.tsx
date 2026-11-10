@@ -1,3 +1,4 @@
+import { tagColor } from '../utils/tags';
 import React, { useState, useMemo } from 'react';
 import { AppTask, Category, Goal } from '../types';
 import { 
@@ -107,6 +108,7 @@ export const TasksScreen: React.FC<Props> = ({
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
   const [selectedTaskYear, setSelectedTaskYear] = useState<number | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [taskToTransfer, setTaskToTransfer] = useState<AppTask | null>(null);
   const [focusHistoryTask, setFocusHistoryTask] = useState<AppTask | null>(null);
 
@@ -207,6 +209,8 @@ export const TasksScreen: React.FC<Props> = ({
     return false;
   };
 
+  const allTagNames = useMemo(() => Array.from(new Set(tasks.flatMap(x => x.tags || []))).sort(), [tasks]);
+
   // Split tasks into active (current) and archived
   const activeTasks = tasks.filter(t => !isTaskArchived(t));
   const archivedTasks = tasks.filter(t => isTaskArchived(t));
@@ -244,6 +248,10 @@ export const TasksScreen: React.FC<Props> = ({
 
       // Category
       if (selectedCatId && t.categoryId !== selectedCatId) {
+        return false;
+      }
+
+      if (selectedTag && !(t.tags || []).includes(selectedTag)) {
         return false;
       }
 
@@ -689,6 +697,17 @@ export const TasksScreen: React.FC<Props> = ({
         </div>
       )}
 
+      {allTagNames.length > 0 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <button type="button" onClick={() => setSelectedTag(null)} className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer ${selectedTag === null ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-200'}`}>همهٔ برچسب‌ها</button>
+          {allTagNames.map(tg => (
+            <button key={tg} type="button" onClick={() => setSelectedTag(selectedTag === tg ? null : tg)} className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer" style={selectedTag === tg ? { background: tagColor(tg), color: '#fff', borderColor: tagColor(tg) } : { color: tagColor(tg), borderColor: tagColor(tg) + '88', background: '#fff' }}>
+              #{tg}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Task List */}
       {filteredTasks.length === 0 ? (
         activeTab === 'ARCHIVE' ? (
@@ -771,6 +790,17 @@ export const TasksScreen: React.FC<Props> = ({
                       <h4 className={`text-xs font-bold ${t.isCompleted ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                         {t.title}
                       </h4>
+                      {t.tags && t.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-0.5">
+                          {t.tags.map(tg => (
+                            <button key={tg} type="button" onClick={() => setSelectedTag(tg)} className="px-1.5 py-px rounded-full text-[9px] font-bold text-white cursor-pointer" style={{ background: tagColor(tg) }}>#{tg}</button>
+                          ))}
+                        </div>
+                      )}
+                      {t.linkedWith && t.linkedWith.length > 0 && (() => {
+                        const lk = tasks.filter(x => t.linkedWith!.includes(x.id));
+                        return lk.length ? <p className="text-[10px] mt-0.5 text-sky-700">🔗 همراه با: {lk.map(x => x.title).join('، ')}</p> : null;
+                      })()}
                       {t.dependsOn && t.dependsOn.length > 0 && (() => {
                         const pre = tasks.filter(x => t.dependsOn!.includes(x.id));
                         const pend = pre.filter(x => !x.isCompleted);

@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.5.1',
-  currentVersionCode: 251,
-  versionCode: 251,
+  currentVersion: '2.6.0',
+  currentVersionCode: 260,
+  versionCode: 260,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.6.0',
+    versionCode: 260,
+    releaseDate: '۱۴۰۵/۰۸/۱۹',
+    gregorianDate: '2026-11-10',
+    title: 'برچسب رنگی، تسک‌های همراه و الارم خودکار شروع و پایان',
+    highlights: [
+      'برچسب‌های رنگی برای تسک‌ها و فیلتر بر اساس برچسب',
+      'پیوند «همراه با»: با انجام یک تسک، پیشنهاد انجام تسک‌های همراه',
+      'الارم خودکار در زمان شروع، پیش از شروع و زمان پایان مهلت، حتی وقتی اپ بسته است (نسخهٔ اندروید)'
+    ],
+    changes: []
+  },
   {
     version: '2.5.1',
     versionCode: 251,

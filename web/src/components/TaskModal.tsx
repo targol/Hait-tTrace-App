@@ -1,3 +1,4 @@
+import { tagColor, normalizeTag } from '../utils/tags';
 import React, { useState, useEffect, useRef } from 'react';
 import { AppTask, Category, Goal, ReminderSettings, AlarmSoundItem } from '../types';
 import { 
@@ -46,6 +47,16 @@ export const TaskModal: React.FC<Props> = ({
   const bodyContainerRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(task?.title || '');
   const [notes, setNotes] = useState(task?.notes || '');
+  const allKnownTags = React.useMemo(
+    () => Array.from(new Set(allTasks.flatMap(t => t.tags || []))).sort(),
+    [allTasks]
+  );
+  const addTag = (raw: string) => {
+    const n = normalizeTag(raw);
+    if (n && !tags.includes(n)) setTags(prev => [...prev, n]);
+    setTagInput('');
+  };
+
   const candidatePrereqs = React.useMemo(() => {
     const selfId = task?.id;
     const blocked = new Set<string>();
@@ -66,6 +77,9 @@ export const TaskModal: React.FC<Props> = ({
   }, [allTasks, task?.id]);
 
   const [dependsOn, setDependsOn] = useState<string[]>(task?.dependsOn || []);
+  const [linkedWith, setLinkedWith] = useState<string[]>(task?.linkedWith || []);
+  const [tags, setTags] = useState<string[]>(task?.tags || []);
+  const [tagInput, setTagInput] = useState('');
   
   // Inherit category from linked goal if available
   const initialGoal = goals.find(g => g.id === task?.goalId);
@@ -171,6 +185,8 @@ export const TaskModal: React.FC<Props> = ({
       setHasDeadlineTime(Boolean(task.deadlineTime));
       setReminderMinutes(task.reminderMinutesBefore ?? null);
       setDependsOn(task.dependsOn || []);
+      setLinkedWith(task.linkedWith || []);
+      setTags(task.tags || []);
       setIsImportant(Boolean(task.isImportant));
       setReminderEnabled(Boolean(task.reminderEnabled || task.isImportant));
       setReminderTime(task.reminderTime || '');
@@ -308,6 +324,8 @@ export const TaskModal: React.FC<Props> = ({
       categoryId,
       goalId: goalId || null,
       dependsOn: dependsOn.length ? dependsOn : undefined,
+      linkedWith: linkedWith.length ? linkedWith : undefined,
+      tags: (() => { const t2 = normalizeTag(tagInput); const all = t2 && !tags.includes(t2) ? [...tags, t2] : tags; return all.length ? all : undefined; })(),
       startDate: startDateStr,
       dueDate: dueDateStr,
       time: hasTime ? time : null,
@@ -519,6 +537,61 @@ export const TaskModal: React.FC<Props> = ({
                 </div>
               )}
               <p className="text-[10px] text-gray-400 mt-1">این تسک بعد از انجام تسک‌های انتخاب‌شده قابل انجام است.</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>همراه با (انجام هم‌زمان)</span>
+              </label>
+              {candidatePrereqs.length === 0 ? (
+                <p className="text-[11px] text-gray-400">تسک دیگری برای انتخاب وجود ندارد.</p>
+              ) : (
+                <div className="max-h-28 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
+                  {allTasks.filter(t => t.id !== task?.id && !t.isArchived).map(t => (
+                    <label key={t.id} className="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-emerald-50/50">
+                      <input
+                        type="checkbox"
+                        checked={linkedWith.includes(t.id)}
+                        onChange={(e) =>
+                          setLinkedWith(prev => e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id))
+                        }
+                      />
+                      <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              <p className="text-[10px] text-gray-400 mt-1">هنگام انجام یکی، می‌توانید دیگری را هم انجام‌شده کنید.</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>برچسب‌های رنگی</span>
+              </label>
+              <div className="flex flex-wrap gap-1.5 mb-1.5">
+                {tags.map(tg => (
+                  <button key={tg} type="button" onClick={() => setTags(prev => prev.filter(x => x !== tg))} className="px-2 py-0.5 rounded-full text-[11px] font-bold text-white cursor-pointer" style={{ background: tagColor(tg) }}>
+                    #{tg} ×
+                  </button>
+                ))}
+              </div>
+              <input
+                value={tagInput}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ',' || e.key === '،') { e.preventDefault(); addTag(tagInput); } }}
+                onBlur={() => tagInput && addTag(tagInput)}
+                placeholder="نام برچسب را بنویسید و Enter بزنید"
+                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs"
+              />
+              {allKnownTags.filter(x => !tags.includes(x)).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {allKnownTags.filter(x => !tags.includes(x)).slice(0, 12).map(tg => (
+                    <button key={tg} type="button" onClick={() => addTag(tg)} className="px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer" style={{ color: tagColor(tg), borderColor: tagColor(tg) + '88' }}>
+                      #{tg}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>

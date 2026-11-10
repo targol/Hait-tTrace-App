@@ -1,3 +1,4 @@
+import { SubtaskList } from './SubtaskList';
 import { tagColor } from '../utils/tags';
 import React, { useState, useMemo } from 'react';
 import { AppTask, Category, Goal } from '../types';
@@ -48,6 +49,7 @@ interface Props {
   categories: Category[];
   goals: Goal[];
   onToggleTask: (taskId: string) => void;
+  onUpdateSubtasks?: (taskId: string, subtasks: NonNullable<AppTask['subtasks']>) => void;
   onDeleteTask: (taskId: string) => void;
   onEditTask: (task: AppTask) => void;
   onNewTask: () => void;
@@ -86,6 +88,7 @@ export const TasksScreen: React.FC<Props> = ({
   categories,
   goals,
   onToggleTask,
+  onUpdateSubtasks,
   onDeleteTask,
   onEditTask,
   onNewTask,
@@ -791,6 +794,7 @@ export const TasksScreen: React.FC<Props> = ({
                       <h4 className={`text-xs font-bold ${t.isCompleted ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                         {t.title}
                       </h4>
+                      {onUpdateSubtasks && <SubtaskList task={t} onChange={onUpdateSubtasks} />}
                       {t.tags && t.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-0.5">
                           {t.tags.map(tg => (

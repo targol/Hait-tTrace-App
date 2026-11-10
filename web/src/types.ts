@@ -101,6 +101,7 @@ export interface AppTask {
   dependsOn?: string[]; // شناسه تسک‌های پیش‌نیاز (اختیاری)
   linkedWith?: string[]; // شناسه تسک‌هایی که باید همراه/هم‌زمان با این تسک انجام شوند
   tags?: string[]; // برچسب‌های رنگی
+  subtasks?: { id: string; title: string; done: boolean }[]; // تسک‌های فرعی (قدم‌ها)
 }
 
 export type HabitFrequency = 'DAILY' | 'WEEKLY';

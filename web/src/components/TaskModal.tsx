@@ -80,6 +80,8 @@ export const TaskModal: React.FC<Props> = ({
   const [linkedWith, setLinkedWith] = useState<string[]>(task?.linkedWith || []);
   const [tags, setTags] = useState<string[]>(task?.tags || []);
   const [tagInput, setTagInput] = useState('');
+  const [subtasks, setSubtasks] = useState<NonNullable<AppTask['subtasks']>>(task?.subtasks || []);
+  const [subInput, setSubInput] = useState('');
   
   // Inherit category from linked goal if available
   const initialGoal = goals.find(g => g.id === task?.goalId);
@@ -187,6 +189,7 @@ export const TaskModal: React.FC<Props> = ({
       setDependsOn(task.dependsOn || []);
       setLinkedWith(task.linkedWith || []);
       setTags(task.tags || []);
+      setSubtasks(task.subtasks || []);
       setIsImportant(Boolean(task.isImportant));
       setReminderEnabled(Boolean(task.reminderEnabled || task.isImportant));
       setReminderTime(task.reminderTime || '');
@@ -325,6 +328,7 @@ export const TaskModal: React.FC<Props> = ({
       goalId: goalId || null,
       dependsOn: dependsOn.length ? dependsOn : undefined,
       linkedWith: linkedWith.length ? linkedWith : undefined,
+      subtasks: (() => { const s2 = subInput.trim(); const all = s2 ? [...subtasks, { id: 'st_' + Date.now().toString(36), title: s2, done: false }] : subtasks; return all.length ? all : undefined; })(),
       tags: (() => { const t2 = normalizeTag(tagInput); const all = t2 && !tags.includes(t2) ? [...tags, t2] : tags; return all.length ? all : undefined; })(),
       startDate: startDateStr,
       dueDate: dueDateStr,
@@ -512,6 +516,31 @@ export const TaskModal: React.FC<Props> = ({
                   <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>تسک‌های فرعی (قدم‌ها)</span>
+              </label>
+              <div className="space-y-1 mb-1.5">
+                {subtasks.map(s => (
+                  <div key={s.id} className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1">
+                    <input type="checkbox" checked={s.done} onChange={e => setSubtasks(prev => prev.map(x => x.id === s.id ? { ...x, done: e.target.checked } : x))} />
+                    <span className={`flex-1 text-xs ${s.done ? 'line-through text-gray-400' : ''}`}>{s.title}</span>
+                    <button type="button" onClick={() => setSubtasks(prev => prev.filter(x => x.id !== s.id))} className="text-rose-500 text-xs cursor-pointer px-1">×</button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-1.5">
+                <input
+                  value={subInput}
+                  onChange={e => setSubInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); const v = subInput.trim(); if (v) { setSubtasks(prev => [...prev, { id: 'st_' + Date.now().toString(36) + prev.length, title: v, done: false }]); setSubInput(''); } } }}
+                  placeholder="یک قدم بنویسید و Enter بزنید"
+                  className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-xs"
+                />
+                <button type="button" onClick={() => { const v = subInput.trim(); if (v) { setSubtasks(prev => [...prev, { id: 'st_' + Date.now().toString(36) + prev.length, title: v, done: false }]); setSubInput(''); } }} className="px-3 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">افزودن</button>
+              </div>
             </div>
 
             <div>

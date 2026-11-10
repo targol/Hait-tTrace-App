@@ -1,3 +1,4 @@
+import { SubtaskList } from './SubtaskList';
 import React, { useState, useMemo } from 'react';
 import { AppTask, Habit, Category, PlantState, Goal, UserProfile, CalendarEvent } from '../types';
 import { TransferTaskModal } from './TransferTaskModal';
@@ -72,6 +73,7 @@ interface Props {
   onOpenNewHabit: () => void;
   onDuplicateTask?: (task: AppTask) => void;
   onEditTask?: (task: AppTask) => void;
+  onUpdateSubtasks?: (taskId: string, subtasks: NonNullable<AppTask['subtasks']>) => void;
   onTransferTask?: (taskId: string, targetGoalId: string | null, closeTask: boolean, noteAppend?: string) => void;
   onCreateSeasonalGoalAndTransfer?: (
     taskId: string, 
@@ -103,6 +105,7 @@ export const TodayScreen: React.FC<Props> = ({
   onOpenNewHabit,
   onDuplicateTask,
   onEditTask,
+  onUpdateSubtasks,
   onTransferTask,
   onCreateSeasonalGoalAndTransfer,
   onNewCalendarEvent,
@@ -622,6 +625,7 @@ export const TodayScreen: React.FC<Props> = ({
                             )}
                             <span>{t.title}</span>
                           </p>
+                          {onUpdateSubtasks && <SubtaskList task={t} onChange={onUpdateSubtasks} />}
                           <div className="flex flex-wrap items-center gap-1.5 mt-1 text-[11px] text-gray-500">
                             {t.reminderEnabled && (
                               <span className="px-1.5 py-0.2 rounded-md font-medium text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 flex items-center gap-1">

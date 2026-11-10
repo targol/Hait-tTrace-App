@@ -588,7 +588,7 @@ export const App: React.FC = () => {
           }`.trim(),
           tag: `calev-${ev.id}-${dueCheck.uniqueKey}`,
           onClick: () => {
-            setActiveTab('CALENDAR');
+            setActiveTab('NOTEBOOK');
           },
         });
 
@@ -675,6 +675,15 @@ export const App: React.FC = () => {
     }, 1500);
     return () => window.clearTimeout(id);
   }, [tasks, reminderSettings.enabled]);
+
+  const handleUpdateSubtasks = useCallback((taskId: string, subtasks: NonNullable<AppTask['subtasks']>) => {
+    setTasks(prev => prev.map(t => {
+      if (t.id !== taskId) return t;
+      const allDone = subtasks.length > 0 && subtasks.every(s => s.done);
+      if (allDone && !t.isCompleted) return { ...t, subtasks, isCompleted: true, completedAt: todayStr };
+      return { ...t, subtasks };
+    }));
+  }, [todayStr]);
 
   const handleSaveTask = useCallback((taskData: AppTask) => {
     setTasks(prev => {
@@ -1307,7 +1316,6 @@ export const App: React.FC = () => {
     { id: 'TASKS' as MainTab, label: 'وظایف', icon: CheckSquare, badge: tasks.filter(t => !t.isCompleted && !t.isArchived).length },
     { id: 'HABITS' as MainTab, label: 'عادت‌ها', icon: RotateCw, badge: habits.filter(h => !h.isClosed && !h.completionHistory?.[todayStr]).length },
     { id: 'GOALS' as MainTab, label: 'اهداف', icon: Target },
-    { id: 'CALENDAR' as MainTab, label: 'تقویم', icon: CalendarIcon },
     { id: 'REPORTS' as MainTab, label: 'گزارشات', icon: BarChart3 },
     { id: 'NOTEBOOK' as MainTab, label: 'دفتر', icon: BookOpen },
   ];
@@ -1459,6 +1467,7 @@ export const App: React.FC = () => {
             onOpenNewHabit={() => handleNewHabit()}
             onDuplicateTask={handleDuplicateTask}
             onEditTask={handleEditTask}
+            onUpdateSubtasks={handleUpdateSubtasks}
             calendarEvents={calendarEvents}
             onTransferTask={handleTransferTask}
             onCreateSeasonalGoalAndTransfer={handleCreateSeasonalGoalAndTransfer}
@@ -1473,6 +1482,7 @@ export const App: React.FC = () => {
             categories={categories}
             goals={goals}
             onToggleTask={handleToggleTask}
+            onUpdateSubtasks={handleUpdateSubtasks}
             onDeleteTask={handleDeleteTask}
             onEditTask={handleEditTask}
             onNewTask={() => handleNewTask()}
@@ -1598,6 +1608,9 @@ export const App: React.FC = () => {
             calendarEvents={calendarEvents}
             onToggleTask={handleToggleTask}
             onToggleHabitDate={handleToggleHabitDate}
+            onNewCalendarEvent={handleNewCalendarEvent}
+            onEditCalendarEvent={handleEditCalendarEvent}
+            onDeleteCalendarEvent={handleDeleteCalendarEvent}
           />
         )}
 
@@ -1812,7 +1825,7 @@ export const App: React.FC = () => {
           setActiveAlertCalendarEvent(null);
           setActiveAlertTask(null);
           setActiveAlertRepeatNotice(null);
-          setActiveTab('CALENDAR');
+          setActiveTab('NOTEBOOK');
         }}
         onSnooze={(id, mins) => {
           stopAllAlarmSounds();

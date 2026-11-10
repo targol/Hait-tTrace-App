@@ -13,8 +13,8 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.6.1',
-  currentVersionCode: 261,
+  currentVersion: '2.7.0',
+  currentVersionCode: 270,
   versionCode: 260,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
@@ -25,6 +25,18 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.7.0',
+    versionCode: 270,
+    releaseDate: '۱۴۰۵/۰۸/۱۹',
+    gregorianDate: '2026-11-10',
+    title: 'تسک فرعی، ادغام تقویم در دفتر',
+    highlights: [
+      'تسک‌های فرعی (قدم‌ها): در فرم تسک اضافه می‌شوند، روی کارت پیشرفتشان دیده می‌شود و با تیک همهٔ قدم‌ها تسک انجام‌شده می‌شود',
+      'تب «تقویم» حذف شد؛ افزودن و ویرایش رویداد و دیدن رویدادها در «دفتر ← برنامهٔ ماه» و صفحهٔ هفته‌هاست'
+    ],
+    changes: []
+  },
   {
     version: '2.6.1',
     versionCode: 261,

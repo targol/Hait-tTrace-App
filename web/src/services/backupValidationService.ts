@@ -221,6 +221,11 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
           typeof item.transferredToSeasonIndex === 'number' ? item.transferredToSeasonIndex : null,
         originSeasonalTaskId:
           typeof item.originSeasonalTaskId === 'string' ? item.originSeasonalTaskId : null,
+        subtasks: Array.isArray(item.subtasks)
+          ? item.subtasks
+              .filter((x: any) => x && typeof x.title === 'string')
+              .map((x: any, i: number) => ({ id: typeof x.id === 'string' ? x.id : 'st_' + i, title: x.title, done: Boolean(x.done) }))
+          : undefined,
         dependsOn: Array.isArray(item.dependsOn)
           ? item.dependsOn.filter((d: unknown) => typeof d === 'string')
           : undefined,

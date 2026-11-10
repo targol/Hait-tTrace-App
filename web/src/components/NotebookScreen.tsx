@@ -28,6 +28,9 @@ interface Props {
   calendarEvents: CalendarEvent[];
   onToggleTask: (taskId: string) => void;
   onToggleHabitDate: (habitId: string, dateStr: string) => void;
+  onNewCalendarEvent: (dateStr?: string) => void;
+  onEditCalendarEvent: (event: CalendarEvent) => void;
+  onDeleteCalendarEvent: (eventId: string) => void;
 }
 
 const GREEN = '#16a34a';
@@ -126,7 +129,7 @@ const GoalRow: React.FC<{ g: Goal; percent: number; color: string }> = ({ g, per
 );
 
 // ---------- main ----------
-export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categories, calendarEvents, onToggleTask, onToggleHabitDate }) => {
+export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categories, calendarEvents, onToggleTask, onToggleHabitDate, onNewCalendarEvent, onEditCalendarEvent, onDeleteCalendarEvent }) => {
   const today = useMemo(() => getTodayJalali(), []);
   const [year, setYear] = useState(today.year);
   const [section, setSection] = useState<Section>('MONTHS');
@@ -183,7 +186,7 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
   const annualGoals = goals.filter(g => g.year === year && g.period === 'ANNUAL');
 
   const importantDays = useMemo(() => {
-    const out: { m: number; d: number; title: string; kind: 'holiday' | 'event' }[] = [];
+    const out: { m: number; d: number; title: string; kind: 'holiday' | 'event'; ev?: CalendarEvent }[] = [];
     for (let m = 1; m <= 12; m++) {
       const n = getDaysInJalaliMonth(year, m);
       for (let d = 1; d <= n; d++) {
@@ -193,10 +196,13 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
     }
     for (const e of calendarEvents) {
       const j = parseDue(e.date);
-      if (j && (j.year === year || e.repeatYearly)) out.push({ m: j.month, d: j.day, title: e.title, kind: 'event' });
+      if (j && (j.year === year || e.repeatYearly)) out.push({ m: j.month, d: j.day, title: e.title, kind: 'event', ev: e });
     }
     return out.sort((a, b) => a.m - b.m || a.d - b.d);
   }, [year, calendarEvents]);
+
+  const eventsOn = (m: number, d: number) => importantDays.filter(x => x.m === m && x.d === d && x.kind === 'event');
+  const hasEvent = (m: number, d: number) => eventsOn(m, d).length > 0;
 
   // weeks (Saturday-based) of the selected month
   const weeks = useMemo(() => {
@@ -328,8 +334,9 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
                 <div key={i} className={`rounded-lg border px-0.5 py-0.5 text-center min-h-[40px] ${d.isToday ? 'border-emerald-600 bg-emerald-50' : 'border-gray-100 bg-white'}`}>
                   <div className={`text-[11px] font-black leading-none ${d.isHoliday ? 'text-rose-600' : 'text-gray-800'}`}>{toPersianDigits(d.day)}</div>
                   <div className="text-[8px] text-gray-400 leading-none mt-0.5">{g.getDate()}</div>
-                  {ts.length > 0 && (
+                  {(ts.length > 0 || hasEvent(d.month, d.day)) && (
                     <div className="flex justify-center gap-px mt-0.5 flex-wrap">
+                      {hasEvent(d.month, d.day) && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />}
                       {ts.slice(0, 4).map(t => <span key={t.id} className={`w-1.5 h-1.5 rounded-full ${t.isCompleted ? 'bg-emerald-500' : 'bg-amber-400'}`} />)}
                     </div>
                   )}
@@ -337,20 +344,35 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
               );
             })}
           </div>
-          <p className="text-[9px] text-gray-400 mt-1">نقطهٔ سبز: انجام‌شده • نارنجی: باقی‌مانده • عدد کوچک: روز میلادی</p>
+          <p className="text-[9px] text-gray-400 mt-1">نقطهٔ سبز: انجام‌شده • نارنجی: باقی‌مانده • آبی: رویداد • عدد کوچک: روز میلادی</p>
         </div>
         <Bar left={`${toPersianDigits(st.done)}/${toPersianDigits(st.total)} کار`}>اهداف و اولویت‌های این ماه</Bar>
         {mGoals.length === 0 ? <p className="text-[11px] text-gray-400">هدفی برای این ماه یا فصل ثبت نشده.</p> : (
           <div className="space-y-1.5">{mGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} />)}</div>
         )}
-        <Bar>مناسبت‌های این ماه</Bar>
+        <div className="flex items-center justify-between rounded-full px-3 py-1 text-white text-[11px] font-black" style={{ background: GREEN }}>
+          <span>مناسبت‌ها و رویدادهای این ماه</span>
+          <button
+            type="button"
+            onClick={() => onNewCalendarEvent(year === today.year && month === today.month ? jalaliToFormattedString(today) : `${year}/${pad(month)}/01`)}
+            className="bg-white/25 hover:bg-white/35 rounded-full px-2.5 py-0.5 text-[10px] font-black cursor-pointer"
+          >
+            + رویداد
+          </button>
+        </div>
         {events.length === 0 ? <p className="text-[11px] text-gray-400">مناسبتی ثبت نشده.</p> : (
           <div className="space-y-1">
             {events.map((d, i) => (
               <div key={i} className="flex items-center gap-2 text-[11px]">
-                <span className={`w-1.5 h-1.5 rounded-full ${d.kind === 'holiday' ? 'bg-rose-500' : 'bg-sky-500'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${d.kind === 'holiday' ? 'bg-rose-500' : 'bg-sky-500'}`} />
                 <span className="text-gray-500 w-6 shrink-0">{toPersianDigits(d.d)}</span>
-                <span className="text-gray-800">{d.title}</span>
+                <span className="text-gray-800 flex-1 truncate">{d.title}{d.ev?.time ? ` • ${toPersianDigits(d.ev.time)}` : ''}</span>
+                {d.ev && (
+                  <>
+                    <button type="button" onClick={() => onEditCalendarEvent(d.ev!)} className="text-[10px] text-emerald-700 font-bold cursor-pointer">ویرایش</button>
+                    <button type="button" onClick={() => { if (window.confirm('این رویداد حذف شود؟')) onDeleteCalendarEvent(d.ev!.id); }} className="text-[10px] text-rose-600 font-bold cursor-pointer">حذف</button>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -393,6 +415,12 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
                   <span className="text-[9px] font-bold opacity-90">{hol.title && !hol.title.includes('هفتگی') ? hol.title + ' • ' : ''}{g.getDate()} {GREG_MONTHS[g.getMonth()]}</span>
                 </div>
                 <div className="px-2 pt-1 space-y-0.5">
+                  {eventsOn(month, d).map((x, xi) => (
+                    <button key={'e' + xi} type="button" onClick={() => x.ev && onEditCalendarEvent(x.ev)} className="flex items-center gap-2 text-[11px] w-full text-right cursor-pointer text-sky-700 font-bold">
+                      <span className="w-2 h-2 rounded-sm bg-sky-500 shrink-0" />
+                      <span>{x.title}{x.ev?.time ? ` • ${toPersianDigits(x.ev.time)}` : ''}</span>
+                    </button>
+                  ))}
                   {ts.map(t => (
                     <button key={t.id} type="button" onClick={() => onToggleTask(t.id)} className="flex items-center gap-2 text-[11px] w-full text-right cursor-pointer">
                       <span className={`w-3.5 h-3.5 rounded-full border shrink-0 ${t.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />

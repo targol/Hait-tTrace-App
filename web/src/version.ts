@@ -13,8 +13,8 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.7.0',
-  currentVersionCode: 270,
+  currentVersion: '2.7.1',
+  currentVersionCode: 271,
   versionCode: 260,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.7.1',
+    versionCode: 271,
+    releaseDate: '۱۴۰۵/۰۸/۱۹',
+    gregorianDate: '2026-11-10',
+    title: 'انتخاب رنگ برچسب‌ها',
+    highlights: [
+      'رنگ هر برچسب را خودتان انتخاب کنید (روی برچسب در فرم تسک بزنید)',
+      'برچسب‌های پیشنهادی و برچسب‌های قبلی در فرم نشان داده می‌شوند',
+      'رنگ برچسب‌ها در پشتیبان‌گیری می‌آید'
+    ],
+    changes: []
+  },
   {
     version: '2.7.0',
     versionCode: 270,

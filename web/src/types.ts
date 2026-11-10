@@ -190,6 +190,7 @@ export interface AppPreferences {
   enableHapticFeedback?: boolean;
   githubSyncConfig?: GitHubSyncConfig | null;
   notebook?: import('./services/notebookService').NotebookData;
+  tagColors?: Record<string, string>;
 }
 
 export interface AppBackupData {

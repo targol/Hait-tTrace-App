@@ -1,4 +1,4 @@
-import { tagColor, normalizeTag } from '../utils/tags';
+import { tagColor, normalizeTag, setTagColor, TAG_PALETTE, SUGGESTED_TAGS } from '../utils/tags';
 import React, { useState, useEffect, useRef } from 'react';
 import { AppTask, Category, Goal, ReminderSettings, AlarmSoundItem } from '../types';
 import { 
@@ -80,6 +80,8 @@ export const TaskModal: React.FC<Props> = ({
   const [linkedWith, setLinkedWith] = useState<string[]>(task?.linkedWith || []);
   const [tags, setTags] = useState<string[]>(task?.tags || []);
   const [tagInput, setTagInput] = useState('');
+  const [colorEditTag, setColorEditTag] = useState<string | null>(null);
+  const [, bumpTagColors] = useState(0);
   const [subtasks, setSubtasks] = useState<NonNullable<AppTask['subtasks']>>(task?.subtasks || []);
   const [subInput, setSubInput] = useState('');
   
@@ -599,22 +601,33 @@ export const TaskModal: React.FC<Props> = ({
               </label>
               <div className="flex flex-wrap gap-1.5 mb-1.5">
                 {tags.map(tg => (
-                  <button key={tg} type="button" onClick={() => setTags(prev => prev.filter(x => x !== tg))} className="px-2 py-0.5 rounded-full text-[11px] font-bold text-white cursor-pointer" style={{ background: tagColor(tg) }}>
-                    #{tg} ×
+                  <button key={tg} type="button" onClick={() => setColorEditTag(colorEditTag === tg ? null : tg)} className="px-2 py-0.5 rounded-full text-[11px] font-bold text-white cursor-pointer" style={{ background: tagColor(tg), outline: colorEditTag === tg ? '2px solid #111827' : 'none' }}>
+                    #{tg}
                   </button>
                 ))}
               </div>
+              {colorEditTag && (
+                <div className="rounded-xl border border-gray-200 bg-white p-2 mb-1.5">
+                  <p className="text-[10px] text-gray-500 mb-1.5">رنگ «{colorEditTag}» را انتخاب کنید:</p>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {TAG_PALETTE.map(c => (
+                      <button key={c} type="button" onClick={() => { setTagColor(colorEditTag, c); bumpTagColors(n => n + 1); }} className="w-6 h-6 rounded-full cursor-pointer border-2" style={{ background: c, borderColor: tagColor(colorEditTag) === c ? '#111827' : 'transparent' }} />
+                    ))}
+                    <button type="button" onClick={() => { setTags(prev => prev.filter(x => x !== colorEditTag)); setColorEditTag(null); }} className="text-[11px] text-rose-600 font-bold cursor-pointer mr-auto">حذف برچسب</button>
+                  </div>
+                </div>
+              )}
               <input
                 value={tagInput}
                 onChange={e => setTagInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' || e.key === ',' || e.key === '،') { e.preventDefault(); addTag(tagInput); } }}
                 onBlur={() => tagInput && addTag(tagInput)}
-                placeholder="نام برچسب را بنویسید و Enter بزنید"
+                placeholder="برچسب تازه بنویسید و Enter بزنید، یا از پایین انتخاب کنید"
                 className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs"
               />
-              {allKnownTags.filter(x => !tags.includes(x)).length > 0 && (
+              {[...allKnownTags, ...SUGGESTED_TAGS.filter(x => !allKnownTags.includes(x))].filter(x => !tags.includes(x)).length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1.5">
-                  {allKnownTags.filter(x => !tags.includes(x)).slice(0, 12).map(tg => (
+                  {[...allKnownTags, ...SUGGESTED_TAGS.filter(x => !allKnownTags.includes(x))].filter(x => !tags.includes(x)).slice(0, 14).map(tg => (
                     <button key={tg} type="button" onClick={() => addTag(tg)} className="px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer" style={{ color: tagColor(tg), borderColor: tagColor(tg) + '88' }}>
                       #{tg}
                     </button>

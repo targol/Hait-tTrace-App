@@ -1,4 +1,5 @@
 import { isNativeApp, isCapacitorNative } from '../utils/platform';
+import { loadTagColors, saveTagColors } from '../utils/tags';
 import { loadNotebook, saveNotebook, sanitizeNotebook } from './notebookService';
 import {
   AppTask,
@@ -122,6 +123,7 @@ export function collectCurrentAppPreferences(userProfile?: UserProfile): AppPref
       enableHapticFeedback,
       githubSyncConfig,
       notebook: loadNotebook(),
+      tagColors: loadTagColors(),
     };
   } catch {
     return {};
@@ -164,6 +166,9 @@ export function applyRestoredAppPreferences(
         'javaneh_haptic_feedback',
         prefs.enableHapticFeedback ? 'true' : 'false'
       );
+    }
+    if (prefs?.tagColors) {
+      saveTagColors({ ...loadTagColors(), ...prefs.tagColors });
     }
     if (prefs?.notebook) {
       saveNotebook(sanitizeNotebook(prefs.notebook));

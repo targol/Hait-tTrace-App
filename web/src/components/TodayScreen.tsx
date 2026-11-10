@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { AppTask, Habit, Category, PlantState, Goal, UserProfile, CalendarEvent } from '../types';
-import { GardenVisual } from './GardenVisual';
 import { TransferTaskModal } from './TransferTaskModal';
 import { 
   getTodayJalali, 
@@ -42,7 +41,7 @@ import {
   X
 } from 'lucide-react';
 
-import { Hourglass, History } from 'lucide-react';
+import { Hourglass, History, MoreHorizontal } from 'lucide-react';
 import { FocusHistoryModal } from './FocusHistoryModal';
 
 interface Props {
@@ -115,6 +114,7 @@ export const TodayScreen: React.FC<Props> = ({
   const weekdayName = WEEKDAYS[currentDayOfWeek];
   const holidayInfo = isDateHoliday(today);
 
+  const [menuTaskId, setMenuTaskId] = useState<string | null>(null);
   const [activeViewMode, setActiveViewMode] = useState<'DAY' | 'WEEK'>('DAY');
   const [filterCategory, setFilterCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -351,15 +351,29 @@ export const TodayScreen: React.FC<Props> = ({
 
   return (
     <div className="space-y-5 animate-fade-in pb-12">
-      {/* Modern Uncluttered Garden Visual */}
-      <GardenVisual
-        plantState={plantState}
-        habits={habits}
-        goals={goals}
-        tasks={tasks}
-        categories={categories}
-        onWaterHabit={onToggleHabitToday}
-      />
+      {/* Compact overall status for today */}
+      {(() => {
+        const pct = Math.max(0, Math.min(100, Math.round(plantState.progressPercent || 0)));
+        const emoji = pct >= 100 ? '🌸' : pct >= 60 ? '🌿' : pct > 0 ? '🌱' : '🪴';
+        const msg = pct >= 100 ? 'عالی بود! همه‌چیز انجام شد' : pct >= 60 ? 'خیلی خوب پیش می‌روید' : pct > 0 ? 'شروع خوبی بود' : 'امروز را شروع کنید';
+        return (
+          <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-2xs">
+            <div className="text-3xl leading-none">{emoji}</div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-black text-gray-900">{msg}</span>
+                <span className="text-sm font-black text-emerald-700">{toPersianDigits(pct)}٪</span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100 mt-1.5 overflow-hidden">
+                <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1">
+                {toPersianDigits(plantState.completedCount)} از {toPersianDigits(plantState.totalCount)} کار و عادت امروز انجام شده
+              </p>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Official Iranian Holiday Alert Banner */}
       {holidayInfo.isHoliday && (
@@ -666,6 +680,27 @@ export const TodayScreen: React.FC<Props> = ({
 
                       <div className="flex items-center gap-1 shrink-0">
                         {/* History button */}
+                        {onEditTask && (
+                          <button
+                            type="button"
+                            onClick={() => onEditTask(t)}
+                            title="ویرایش تسک"
+                            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => setMenuTaskId(menuTaskId === t.id ? null : t.id)}
+                          title="گزینه‌های بیشتر"
+                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${menuTaskId === t.id ? 'bg-gray-200 text-gray-800' : 'text-gray-400 hover:bg-gray-100'}`}
+                        >
+                          <MoreHorizontal className="w-3.5 h-3.5" />
+                        </button>
+                        {menuTaskId === t.id && (
+                          <>
                         <button
                           type="button"
                           onClick={() => setFocusHistoryEntity({
@@ -695,17 +730,6 @@ export const TodayScreen: React.FC<Props> = ({
                           </button>
                         )}
 
-                        {onEditTask && (
-                          <button
-                            type="button"
-                            onClick={() => onEditTask(t)}
-                            title="ویرایش تسک"
-                            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-
                         <button
                           type="button"
                           onClick={() => setTaskToTransfer(t)}
@@ -714,6 +738,9 @@ export const TodayScreen: React.FC<Props> = ({
                         >
                           <Repeat className="w-3.5 h-3.5" />
                         </button>
+
+                          </>
+                        )}
 
                         <button
                           type="button"

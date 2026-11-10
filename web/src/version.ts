@@ -13,8 +13,8 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.6.0',
-  currentVersionCode: 260,
+  currentVersion: '2.6.1',
+  currentVersionCode: 261,
   versionCode: 260,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.6.1',
+    versionCode: 261,
+    releaseDate: '۱۴۰۵/۰۸/۱۹',
+    gregorianDate: '2026-11-10',
+    title: 'سبک‌تر شدن صفحه‌ها',
+    highlights: [
+      'صفحهٔ «امروز»: باغچهٔ بزرگ با یک نوار وضعیت کوچک جایگزین شد',
+      'کارت تسک‌ها: فقط ویرایش، حذف و تایمر دیده می‌شود و بقیه پشت دکمهٔ «⋯» است',
+      'نمودار هفتگی عادت‌ها به‌طور پیش‌فرض بسته است'
+    ],
+    changes: []
+  },
   {
     version: '2.6.0',
     versionCode: 260,

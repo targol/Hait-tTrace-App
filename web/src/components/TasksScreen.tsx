@@ -40,7 +40,7 @@ import {
 import { EntityBadge, EntityIcon } from './EntityIcon';
 import { SeasonBadge } from './SeasonBadge';
 import { TransferTaskModal } from './TransferTaskModal';
-import { Hourglass, History } from 'lucide-react';
+import { Hourglass, History, MoreHorizontal } from 'lucide-react';
 import { FocusHistoryModal } from './FocusHistoryModal';
 
 interface Props {
@@ -108,6 +108,7 @@ export const TasksScreen: React.FC<Props> = ({
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
   const [selectedTaskYear, setSelectedTaskYear] = useState<number | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [menuTaskId, setMenuTaskId] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [taskToTransfer, setTaskToTransfer] = useState<AppTask | null>(null);
   const [focusHistoryTask, setFocusHistoryTask] = useState<AppTask | null>(null);
@@ -957,39 +958,6 @@ export const TasksScreen: React.FC<Props> = ({
                       </button>
                     )}
 
-                    {/* If completed and not in archive, show manual archive button */}
-                    {!isArchived && t.isCompleted && onArchiveTask && (
-                      <button
-                        type="button"
-                        onClick={() => onArchiveTask(t.id)}
-                        title="انتقال به بایگانی"
-                        className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
-                      >
-                        <Archive className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    {!isArchived && (
-                      <button
-                        type="button"
-                        onClick={() => setTaskToTransfer(t)}
-                        title="انتقال یا بستن تسک (فصلی / سالانه)"
-                        className="p-1.5 text-gray-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
-                      >
-                        <Repeat className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    {/* Focus History Modal trigger */}
-                    <button
-                      type="button"
-                      onClick={() => setFocusHistoryTask(t)}
-                      title="مشاهده تاریخچه ساعت شنی تمرکز"
-                      className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <History className="w-3.5 h-3.5" />
-                    </button>
-
                     {!t.isCompleted && (
                       <button
                         type="button"
@@ -1023,6 +991,51 @@ export const TasksScreen: React.FC<Props> = ({
                       </button>
                     )}
 
+                    {!isArchived && (
+                      <button
+                        type="button"
+                        onClick={() => setMenuTaskId(menuTaskId === t.id ? null : t.id)}
+                        title="گزینه‌های بیشتر"
+                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${menuTaskId === t.id ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:bg-gray-100'}`}
+                      >
+                        <MoreHorizontal className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {(menuTaskId === t.id || isArchived) && (
+                      <>
+                    {/* If completed and not in archive, show manual archive button */}
+                    {!isArchived && t.isCompleted && onArchiveTask && (
+                      <button
+                        type="button"
+                        onClick={() => onArchiveTask(t.id)}
+                        title="انتقال به بایگانی"
+                        className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <Archive className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {!isArchived && (
+                      <button
+                        type="button"
+                        onClick={() => setTaskToTransfer(t)}
+                        title="انتقال یا بستن تسک (فصلی / سالانه)"
+                        className="p-1.5 text-gray-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <Repeat className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {/* Focus History Modal trigger */}
+                    <button
+                      type="button"
+                      onClick={() => setFocusHistoryTask(t)}
+                      title="مشاهده تاریخچه ساعت شنی تمرکز"
+                      className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <History className="w-3.5 h-3.5" />
+                    </button>
+
                     {onDuplicateTask && (
                       <button
                         type="button"
@@ -1032,6 +1045,9 @@ export const TasksScreen: React.FC<Props> = ({
                       >
                         <Copy className="w-3.5 h-3.5" />
                       </button>
+                    )}
+
+                      </>
                     )}
 
                     <button

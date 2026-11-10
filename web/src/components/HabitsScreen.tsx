@@ -106,7 +106,7 @@ export const HabitsScreen: React.FC<Props> = ({
   const [focusHistoryHabit, setFocusHistoryHabit] = useState<Habit | null>(null);
 
   // Weekly BarChart & Compact Calendar states
-  const [showWeeklyChart, setShowWeeklyChart] = useState<boolean>(true);
+  const [showWeeklyChart, setShowWeeklyChart] = useState<boolean>(false);
   const [chartMetric, setChartMetric] = useState<'PERCENT' | 'DAYS'>('PERCENT');
   const [displayMode, setDisplayMode] = useState<'BOTH' | 'CALENDAR_ONLY' | 'CARDS_ONLY'>('BOTH');
   const [calendarSubMode, setCalendarSubMode] = useState<'MONTHLY' | 'WEEKLY_MATRIX'>('MONTHLY');

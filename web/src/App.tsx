@@ -670,6 +670,11 @@ export const App: React.FC = () => {
   }, [todayStr, tasks]);
 
   useEffect(() => {
+    try { localStorage.removeItem('javaneh_tag_colors'); } catch {}
+    setTasks(prev => (prev.some(t => (t as any).tags) ? prev.map(t => { const { tags, ...rest } = t as any; return rest as AppTask; }) : prev));
+  }, []);
+
+  useEffect(() => {
     const id = window.setTimeout(() => {
       syncNativeAlarms(tasks, reminderSettings.enabled !== false);
     }, 1500);

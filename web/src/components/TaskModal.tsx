@@ -1,4 +1,4 @@
-import { tagColor, normalizeTag, setTagColor, TAG_PALETTE, SUGGESTED_TAGS } from '../utils/tags';
+import { PRIORITIES, priorityOf, TaskPriority } from '../utils/priority';
 import React, { useState, useEffect, useRef } from 'react';
 import { AppTask, Category, Goal, ReminderSettings, AlarmSoundItem } from '../types';
 import { 
@@ -47,16 +47,6 @@ export const TaskModal: React.FC<Props> = ({
   const bodyContainerRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(task?.title || '');
   const [notes, setNotes] = useState(task?.notes || '');
-  const allKnownTags = React.useMemo(
-    () => Array.from(new Set(allTasks.flatMap(t => t.tags || []))).sort(),
-    [allTasks]
-  );
-  const addTag = (raw: string) => {
-    const n = normalizeTag(raw);
-    if (n && !tags.includes(n)) setTags(prev => [...prev, n]);
-    setTagInput('');
-  };
-
   const candidatePrereqs = React.useMemo(() => {
     const selfId = task?.id;
     const blocked = new Set<string>();
@@ -78,10 +68,7 @@ export const TaskModal: React.FC<Props> = ({
 
   const [dependsOn, setDependsOn] = useState<string[]>(task?.dependsOn || []);
   const [linkedWith, setLinkedWith] = useState<string[]>(task?.linkedWith || []);
-  const [tags, setTags] = useState<string[]>(task?.tags || []);
-  const [tagInput, setTagInput] = useState('');
-  const [colorEditTag, setColorEditTag] = useState<string | null>(null);
-  const [, bumpTagColors] = useState(0);
+  const [priority, setPriority] = useState<TaskPriority | undefined>(task ? priorityOf(task) : undefined);
   const [subtasks, setSubtasks] = useState<NonNullable<AppTask['subtasks']>>(task?.subtasks || []);
   const [subInput, setSubInput] = useState('');
   
@@ -190,7 +177,7 @@ export const TaskModal: React.FC<Props> = ({
       setReminderMinutes(task.reminderMinutesBefore ?? null);
       setDependsOn(task.dependsOn || []);
       setLinkedWith(task.linkedWith || []);
-      setTags(task.tags || []);
+      setPriority(priorityOf(task));
       setSubtasks(task.subtasks || []);
       setIsImportant(Boolean(task.isImportant));
       setReminderEnabled(Boolean(task.reminderEnabled || task.isImportant));
@@ -331,13 +318,13 @@ export const TaskModal: React.FC<Props> = ({
       dependsOn: dependsOn.length ? dependsOn : undefined,
       linkedWith: linkedWith.length ? linkedWith : undefined,
       subtasks: (() => { const s2 = subInput.trim(); const all = s2 ? [...subtasks, { id: 'st_' + Date.now().toString(36), title: s2, done: false }] : subtasks; return all.length ? all : undefined; })(),
-      tags: (() => { const t2 = normalizeTag(tagInput); const all = t2 && !tags.includes(t2) ? [...tags, t2] : tags; return all.length ? all : undefined; })(),
+      priority,
       startDate: startDateStr,
       dueDate: dueDateStr,
       time: hasTime ? time : null,
       deadlineTime: hasDeadlineTime ? deadlineTime : null,
       reminderMinutesBefore: reminderMinutes,
-      isImportant,
+      isImportant: priority === 'HIGH',
       reminderEnabled,
       reminderTime: reminderTime.trim() ? reminderTime.trim() : null,
       reminderDate: dueDateStr || startDateStr || null,
@@ -466,32 +453,27 @@ export const TaskModal: React.FC<Props> = ({
             />
           </div>
 
-          {/* Important Task & Reminder Banner */}
-          <div className="p-3 bg-gradient-to-r from-amber-50/80 to-amber-100/40 rounded-xl border border-amber-200 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-lg ${isImportant ? 'bg-amber-500 text-white' : 'bg-white text-amber-600'} border border-amber-300 shadow-2xs`}>
-                <Star className={`w-4 h-4 ${isImportant ? 'fill-white' : ''}`} />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-amber-950 block">علامت‌گذاری به عنوان تسک مهم</span>
-                <span className="text-[10px] text-amber-800/80 block">نمایش برجسته و اولویت‌دار در لیست امروز و داشبورد</span>
-              </div>
+          {/* Priority */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">اولویت</label>
+            <div className="grid grid-cols-3 gap-2">
+              {PRIORITIES.map(pr => (
+                <button
+                  key={pr.id}
+                  type="button"
+                  onClick={() => {
+                    const next = priority === pr.id ? undefined : pr.id;
+                    setPriority(next);
+                    setIsImportant(next === 'HIGH');
+                    if (next === 'HIGH' && !reminderEnabled) setReminderEnabled(true);
+                  }}
+                  className="py-2 rounded-xl text-xs font-black border-2 cursor-pointer transition-colors"
+                  style={priority === pr.id ? { background: pr.color, color: '#fff', borderColor: pr.color } : { background: '#fff', color: pr.color, borderColor: pr.color + '66' }}
+                >
+                  {pr.label}
+                </button>
+              ))}
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isImportant}
-                onChange={(e) => {
-                  const val = e.target.checked;
-                  setIsImportant(val);
-                  if (val && !reminderEnabled) {
-                    setReminderEnabled(true);
-                  }
-                }}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-            </label>
           </div>
 
           {/* Category & Goal */}
@@ -593,47 +575,6 @@ export const TaskModal: React.FC<Props> = ({
                 </div>
               )}
               <p className="text-[10px] text-gray-400 mt-1">هنگام انجام یکی، می‌توانید دیگری را هم انجام‌شده کنید.</p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                <span>برچسب‌های رنگی</span>
-              </label>
-              <div className="flex flex-wrap gap-1.5 mb-1.5">
-                {tags.map(tg => (
-                  <button key={tg} type="button" onClick={() => setColorEditTag(colorEditTag === tg ? null : tg)} className="px-2 py-0.5 rounded-full text-[11px] font-bold text-white cursor-pointer" style={{ background: tagColor(tg), outline: colorEditTag === tg ? '2px solid #111827' : 'none' }}>
-                    #{tg}
-                  </button>
-                ))}
-              </div>
-              {colorEditTag && (
-                <div className="rounded-xl border border-gray-200 bg-white p-2 mb-1.5">
-                  <p className="text-[10px] text-gray-500 mb-1.5">رنگ «{colorEditTag}» را انتخاب کنید:</p>
-                  <div className="flex flex-wrap gap-2 items-center">
-                    {TAG_PALETTE.map(c => (
-                      <button key={c} type="button" onClick={() => { setTagColor(colorEditTag, c); bumpTagColors(n => n + 1); }} className="w-6 h-6 rounded-full cursor-pointer border-2" style={{ background: c, borderColor: tagColor(colorEditTag) === c ? '#111827' : 'transparent' }} />
-                    ))}
-                    <button type="button" onClick={() => { setTags(prev => prev.filter(x => x !== colorEditTag)); setColorEditTag(null); }} className="text-[11px] text-rose-600 font-bold cursor-pointer mr-auto">حذف برچسب</button>
-                  </div>
-                </div>
-              )}
-              <input
-                value={tagInput}
-                onChange={e => setTagInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' || e.key === ',' || e.key === '،') { e.preventDefault(); addTag(tagInput); } }}
-                onBlur={() => tagInput && addTag(tagInput)}
-                placeholder="برچسب تازه بنویسید و Enter بزنید، یا از پایین انتخاب کنید"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs"
-              />
-              {[...allKnownTags, ...SUGGESTED_TAGS.filter(x => !allKnownTags.includes(x))].filter(x => !tags.includes(x)).length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1.5">
-                  {[...allKnownTags, ...SUGGESTED_TAGS.filter(x => !allKnownTags.includes(x))].filter(x => !tags.includes(x)).slice(0, 14).map(tg => (
-                    <button key={tg} type="button" onClick={() => addTag(tg)} className="px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer" style={{ color: tagColor(tg), borderColor: tagColor(tg) + '88' }}>
-                      #{tg}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>

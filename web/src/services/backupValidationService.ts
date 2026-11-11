@@ -549,10 +549,6 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
           ? rawPrefs.enableHapticFeedback
           : undefined,
       githubSyncConfig: rawPrefs.githubSyncConfig || null,
-      tagColors:
-        rawPrefs.tagColors && typeof rawPrefs.tagColors === 'object'
-          ? Object.fromEntries(Object.entries(rawPrefs.tagColors).filter(([, v]) => typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v as string))) as Record<string, string>
-          : undefined,
       notebook:
         rawPrefs.notebook && typeof rawPrefs.notebook === 'object'
           ? sanitizeNotebook(rawPrefs.notebook)

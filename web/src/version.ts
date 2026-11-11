@@ -13,8 +13,8 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.7.1',
-  currentVersionCode: 271,
+  currentVersion: '2.8.0',
+  currentVersionCode: 280,
   versionCode: 260,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.8.0',
+    versionCode: 280,
+    releaseDate: '۱۴۰۵/۰۸/۲۰',
+    gregorianDate: '2026-11-11',
+    title: 'اولویت سه‌سطحی به‌جای برچسب',
+    highlights: [
+      'برچسب‌های آزاد حذف و جایشان اولویت «مهم / متوسط / عادی» با رنگ ثابت آمد',
+      'فیلتر لیست وظایف بر اساس اولویت',
+      'ستارهٔ «تسک مهم» همان اولویت «مهم» شد'
+    ],
+    changes: []
+  },
   {
     version: '2.7.1',
     versionCode: 271,

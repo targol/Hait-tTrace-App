@@ -1,5 +1,5 @@
 import { SubtaskList } from './SubtaskList';
-import { tagColor } from '../utils/tags';
+import { PRIORITIES, priorityOf, priorityInfo, TaskPriority } from '../utils/priority';
 import React, { useState, useMemo } from 'react';
 import { AppTask, Category, Goal } from '../types';
 import { 
@@ -112,7 +112,7 @@ export const TasksScreen: React.FC<Props> = ({
   const [selectedTaskYear, setSelectedTaskYear] = useState<number | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [menuTaskId, setMenuTaskId] = useState<string | null>(null);
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedPriority, setSelectedPriority] = useState<TaskPriority | null>(null);
   const [taskToTransfer, setTaskToTransfer] = useState<AppTask | null>(null);
   const [focusHistoryTask, setFocusHistoryTask] = useState<AppTask | null>(null);
 
@@ -213,8 +213,6 @@ export const TasksScreen: React.FC<Props> = ({
     return false;
   };
 
-  const allTagNames = useMemo(() => Array.from(new Set(tasks.flatMap(x => x.tags || []))).sort(), [tasks]);
-
   // Split tasks into active (current) and archived
   const activeTasks = tasks.filter(t => !isTaskArchived(t));
   const archivedTasks = tasks.filter(t => isTaskArchived(t));
@@ -255,7 +253,7 @@ export const TasksScreen: React.FC<Props> = ({
         return false;
       }
 
-      if (selectedTag && !(t.tags || []).includes(selectedTag)) {
+      if (selectedPriority && priorityOf(t) !== selectedPriority) {
         return false;
       }
 
@@ -701,16 +699,14 @@ export const TasksScreen: React.FC<Props> = ({
         </div>
       )}
 
-      {allTagNames.length > 0 && (
-        <div className="flex gap-1.5 overflow-x-auto pb-1">
-          <button type="button" onClick={() => setSelectedTag(null)} className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer ${selectedTag === null ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-200'}`}>همهٔ برچسب‌ها</button>
-          {allTagNames.map(tg => (
-            <button key={tg} type="button" onClick={() => setSelectedTag(selectedTag === tg ? null : tg)} className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer" style={selectedTag === tg ? { background: tagColor(tg), color: '#fff', borderColor: tagColor(tg) } : { color: tagColor(tg), borderColor: tagColor(tg) + '88', background: '#fff' }}>
-              #{tg}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-1.5 overflow-x-auto pb-1">
+        <button type="button" onClick={() => setSelectedPriority(null)} className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer ${selectedPriority === null ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-200'}`}>همهٔ اولویت‌ها</button>
+        {PRIORITIES.map(pr => (
+          <button key={pr.id} type="button" onClick={() => setSelectedPriority(selectedPriority === pr.id ? null : pr.id)} className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border cursor-pointer" style={selectedPriority === pr.id ? { background: pr.color, color: '#fff', borderColor: pr.color } : { color: pr.color, borderColor: pr.color + '88', background: '#fff' }}>
+            {pr.label}
+          </button>
+        ))}
+      </div>
 
       {/* Task List */}
       {filteredTasks.length === 0 ? (
@@ -795,12 +791,10 @@ export const TasksScreen: React.FC<Props> = ({
                         {t.title}
                       </h4>
                       {onUpdateSubtasks && <SubtaskList task={t} onChange={onUpdateSubtasks} />}
-                      {t.tags && t.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-0.5">
-                          {t.tags.map(tg => (
-                            <button key={tg} type="button" onClick={() => setSelectedTag(tg)} className="px-1.5 py-px rounded-full text-[9px] font-bold text-white cursor-pointer" style={{ background: tagColor(tg) }}>#{tg}</button>
-                          ))}
-                        </div>
+                      {priorityInfo(priorityOf(t)) && (
+                        <span className="inline-block mt-0.5 px-1.5 py-px rounded-full text-[9px] font-black text-white" style={{ background: priorityInfo(priorityOf(t))!.color }}>
+                          {priorityInfo(priorityOf(t))!.label}
+                        </span>
                       )}
                       {t.linkedWith && t.linkedWith.length > 0 && (() => {
                         const lk = tasks.filter(x => t.linkedWith!.includes(x.id));

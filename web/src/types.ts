@@ -100,7 +100,7 @@ export interface AppTask {
   originSeasonalTaskId?: string | null; // شناسه تسک مبدأ در صورت انتقال
   dependsOn?: string[]; // شناسه تسک‌های پیش‌نیاز (اختیاری)
   linkedWith?: string[]; // شناسه تسک‌هایی که باید همراه/هم‌زمان با این تسک انجام شوند
-  tags?: string[]; // برچسب‌های رنگی
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW'; // اولویت: مهم، متوسط، عادی
   subtasks?: { id: string; title: string; done: boolean }[]; // تسک‌های فرعی (قدم‌ها)
 }
 
@@ -190,7 +190,6 @@ export interface AppPreferences {
   enableHapticFeedback?: boolean;
   githubSyncConfig?: GitHubSyncConfig | null;
   notebook?: import('./services/notebookService').NotebookData;
-  tagColors?: Record<string, string>;
 }
 
 export interface AppBackupData {

@@ -1,3 +1,4 @@
+import { DayPlanner } from './components/DayPlanner';
 import { syncNativeAlarms } from './services/nativeAlarmService';
 import { NotebookScreen } from './components/NotebookScreen';
 import { isNativeApp } from './utils/platform';
@@ -196,6 +197,7 @@ export const App: React.FC = () => {
     return loadEntityListWithFallback<CalendarEvent>(STORAGE_KEYS.CALENDAR_EVENTS, 'calendarEvents', []);
   });
   const [isCalendarEventModalOpen, setIsCalendarEventModalOpen] = useState(false);
+  const [isDayPlannerOpen, setIsDayPlannerOpen] = useState(false);
   const [editingCalendarEvent, setEditingCalendarEvent] = useState<CalendarEvent | null>(null);
   const [calendarEventTargetDate, setCalendarEventTargetDate] = useState<string>(todayStr);
 
@@ -680,6 +682,10 @@ export const App: React.FC = () => {
     }, 1500);
     return () => window.clearTimeout(id);
   }, [tasks, reminderSettings.enabled]);
+
+  const handleMoveTaskToDate = useCallback((taskId: string, dateStr: string) => {
+    setTasks(prev => prev.map(t => (t.id === taskId ? { ...t, dueDate: dateStr } : t)));
+  }, []);
 
   const handleUpdateSubtasks = useCallback((taskId: string, subtasks: NonNullable<AppTask['subtasks']>) => {
     setTasks(prev => prev.map(t => {
@@ -1473,6 +1479,7 @@ export const App: React.FC = () => {
             onDuplicateTask={handleDuplicateTask}
             onEditTask={handleEditTask}
             onUpdateSubtasks={handleUpdateSubtasks}
+            onOpenDayPlanner={() => setIsDayPlannerOpen(true)}
             calendarEvents={calendarEvents}
             onTransferTask={handleTransferTask}
             onCreateSeasonalGoalAndTransfer={handleCreateSeasonalGoalAndTransfer}
@@ -1902,6 +1909,16 @@ export const App: React.FC = () => {
       )}
 
       {/* Calendar Event Modal (تولد، جلسه، یادآوری مستقل تقویم) */}
+      {isDayPlannerOpen && (
+        <DayPlanner
+          tasks={tasks}
+          calendarEvents={calendarEvents}
+          onToggleTask={handleToggleTask}
+          onMoveTask={handleMoveTaskToDate}
+          onClose={() => setIsDayPlannerOpen(false)}
+        />
+      )}
+
       <CalendarEventModal
         isOpen={isCalendarEventModalOpen}
         event={editingCalendarEvent}

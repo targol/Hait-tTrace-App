@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.8.0',
-  currentVersionCode: 280,
-  versionCode: 260,
+  currentVersion: '2.9.0',
+  currentVersionCode: 290,
+  versionCode: 290,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.9.0',
+    versionCode: 290,
+    releaseDate: '۱۴۰۵/۰۸/۲۰',
+    gregorianDate: '2026-11-11',
+    title: 'برنامهٔ ساعتی و مرور پایان روز',
+    highlights: [
+      'خط زمانی ساعتی روز (۶ صبح تا ۱۲ شب) با کارها و رویدادها',
+      'مرور پایان روز: تکمیل یا انتقال کارهای ناتمام به فردا',
+      'یادداشت و دستاورد روز در دفتر ذخیره می‌شود'
+    ],
+    changes: []
+  },
   {
     version: '2.8.0',
     versionCode: 280,

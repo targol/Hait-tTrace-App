@@ -74,6 +74,7 @@ interface Props {
   onDuplicateTask?: (task: AppTask) => void;
   onEditTask?: (task: AppTask) => void;
   onUpdateSubtasks?: (taskId: string, subtasks: NonNullable<AppTask['subtasks']>) => void;
+  onOpenDayPlanner?: () => void;
   onTransferTask?: (taskId: string, targetGoalId: string | null, closeTask: boolean, noteAppend?: string) => void;
   onCreateSeasonalGoalAndTransfer?: (
     taskId: string, 
@@ -106,6 +107,7 @@ export const TodayScreen: React.FC<Props> = ({
   onDuplicateTask,
   onEditTask,
   onUpdateSubtasks,
+  onOpenDayPlanner,
   onTransferTask,
   onCreateSeasonalGoalAndTransfer,
   onNewCalendarEvent,
@@ -370,9 +372,16 @@ export const TodayScreen: React.FC<Props> = ({
               <div className="h-2 rounded-full bg-gray-100 mt-1.5 overflow-hidden">
                 <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
               </div>
-              <p className="text-[11px] text-gray-500 mt-1">
-                {toPersianDigits(plantState.completedCount)} از {toPersianDigits(plantState.totalCount)} کار و عادت امروز انجام شده
-              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-[11px] text-gray-500">
+                  {toPersianDigits(plantState.completedCount)} از {toPersianDigits(plantState.totalCount)} کار و عادت امروز انجام شده
+                </p>
+                {onOpenDayPlanner && (
+                  <button type="button" onClick={onOpenDayPlanner} className="shrink-0 text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5 cursor-pointer">
+                    برنامهٔ ساعتی و مرور
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         );

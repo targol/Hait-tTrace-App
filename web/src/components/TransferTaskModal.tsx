@@ -94,7 +94,7 @@ export const TransferTaskModal: React.FC<Props> = ({
 
   const handleConfirm = () => {
     if (activeTab === 'CLOSE') {
-      onTransfer(task.id, task.goalId || null, true, '[پایان دوره و بستن تسک]');
+      onTransfer(task.id, task.goalId || null, true, '[پایان دوره و بستن وظیفه]');
       onClose();
       return;
     }
@@ -152,10 +152,10 @@ export const TransferTaskModal: React.FC<Props> = ({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-gray-900">
-                انتقال یا بستن تسک
+                انتقال یا بستن وظیفه
               </h3>
               <p className="text-[11px] text-gray-500">
-                تعیین مقصد جدید (هدف سالانه یا فصلی) یا بستن تسک با پایان فصل
+                تعیین مقصد جدید (هدف سالانه یا فصلی) یا بستن وظیفه با پایان فصل
               </p>
             </div>
           </div>
@@ -173,7 +173,7 @@ export const TransferTaskModal: React.FC<Props> = ({
           {/* Current Task Info Card */}
           <div className="bg-gray-50 rounded-xl p-3 border border-gray-200 space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-gray-500 font-medium">تسک انتخابی:</span>
+              <span className="text-[11px] text-gray-500 font-medium">وظیفه انتخابی:</span>
               {taskCategory && (
                 <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
                   {taskCategory.title}
@@ -262,7 +262,7 @@ export const TransferTaskModal: React.FC<Props> = ({
               >
                 <div className="flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
-                  <span>بستن تسک</span>
+                  <span>بستن وظیفه</span>
                 </div>
                 <span className="text-[9px] font-normal opacity-80">(اتمام در این فصل)</span>
               </button>
@@ -406,10 +406,10 @@ export const TransferTaskModal: React.FC<Props> = ({
           {activeTab === 'ANNUAL' && (
             <div className="space-y-2">
               <span className="font-bold text-gray-700 text-xs block">
-                انتقال مستقیم تسک به هدف کلان سالانه:
+                انتقال مستقیم وظیفه به هدف کلان سالانه:
               </span>
               <p className="text-[11px] text-gray-500">
-                این تسک به طور مستقیم زیرمجموعه هدف سالانه خواهد شد و در ارزیابی کلی سال لحاظ می‌گردد.
+                این وظیفه به طور مستقیم زیرمجموعه هدف سالانه خواهد شد و در ارزیابی کلی سال لحاظ می‌گردد.
               </p>
 
               <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1 pt-1">
@@ -465,10 +465,10 @@ export const TransferTaskModal: React.FC<Props> = ({
             <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 space-y-2 text-xs">
               <div className="flex items-center gap-2 font-bold text-amber-950">
                 <CheckCircle2 className="w-4 h-4 text-amber-600" />
-                <span>بستن تسک با پایان فصل جاری</span>
+                <span>بستن وظیفه با پایان فصل جاری</span>
               </div>
               <p className="text-amber-800 leading-relaxed text-[11px]">
-                این تسک به عنوان انجام‌شده / خاتمه‌یافته علامت‌گذاری می‌شود و در آمار و تاریخچه فصل ثبت می‌گردد. تسک به فصل بعدی منتقل نخواهد شد.
+                این وظیفه به عنوان انجام‌شده / خاتمه‌یافته علامت‌گذاری می‌شود و در آمار و تاریخچه فصل ثبت می‌گردد. وظیفه به فصل بعدی منتقل نخواهد شد.
               </p>
             </div>
           )}
@@ -493,10 +493,10 @@ export const TransferTaskModal: React.FC<Props> = ({
             <CheckCircle2 className="w-4 h-4" />
             <span>
               {activeTab === 'CLOSE' 
-                ? 'تایید و بستن تسک' 
+                ? 'تایید و بستن وظیفه' 
                 : isCreatingNewSeasonal 
-                ? 'ایجاد هدف و انتقال تسک' 
-                : 'انتقال تسک'}
+                ? 'ایجاد هدف و انتقال وظیفه' 
+                : 'انتقال وظیفه'}
             </span>
           </button>
         </div>

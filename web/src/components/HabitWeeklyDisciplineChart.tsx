@@ -151,10 +151,10 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
   // Week offset state (0 = current week, -1 = previous week, +1 = next week)
   const [weekOffset, setWeekOffset] = useState<number>(0);
 
-  // View mode: 'STACKED' (تفکیک تسک‌ها و عادات), 'PERCENTAGE' (درصد نظم), 'SEPARATE' (میله‌های مجزا)
+  // View mode: 'STACKED' (تفکیک وظیفه‌ها و عادات), 'PERCENTAGE' (درصد نظم), 'SEPARATE' (میله‌های مجزا)
   const [chartMode, setChartMode] = useState<'STACKED' | 'PERCENTAGE'>('STACKED');
 
-  // Filter: 'ALL' (همه), 'HABITS' (فقط عادات), 'TASKS' (فقط تسک‌ها)
+  // Filter: 'ALL' (همه), 'HABITS' (فقط عادات), 'TASKS' (فقط وظیفه‌ها)
   const [activityFilter, setActivityFilter] = useState<'ALL' | 'HABITS' | 'TASKS'>('ALL');
 
   // Selected Day for drilldown inspection (defaults to today in current week)
@@ -438,7 +438,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
           <div className="flex items-center justify-between text-gray-700">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
-              <span>تسک‌های تکمیل‌شده:</span>
+              <span>وظیفه‌های تکمیل‌شده:</span>
             </span>
             <span className="font-bold">{toPersianDigits(raw.tasksDoneCount)}</span>
           </div>
@@ -478,7 +478,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-extrabold text-gray-900 tracking-tight">
-                  نمودار ستونی تکمیل تسک‌ها و عادات در هفته جاری
+                  نمودار ستونی تکمیل وظیفه‌ها و عادات در هفته جاری
                 </h3>
                 {weekOffset === 0 ? (
                   <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-lg">
@@ -522,7 +522,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                   : 'text-gray-500 hover:text-gray-900'
               }`}
             >
-              تسک‌ها
+              وظیفه‌ها
             </button>
             <button
               type="button"
@@ -613,14 +613,14 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
         {/* Card 2: Completed Tasks */}
         <div className="bg-teal-50/50 rounded-2xl p-3.5 border border-teal-100 flex flex-col justify-between">
           <div className="flex items-center justify-between text-xs text-teal-800 mb-1">
-            <span className="font-semibold">تسک‌های تکمیل‌شده</span>
+            <span className="font-semibold">وظیفه‌های تکمیل‌شده</span>
             <CheckSquare className="w-4 h-4 text-teal-600" />
           </div>
           <div className="text-2xl font-black text-teal-950 font-mono">
-            {toPersianDigits(totalTasksDoneInWeek)} <span className="text-xs font-normal text-teal-700">تسک</span>
+            {toPersianDigits(totalTasksDoneInWeek)} <span className="text-xs font-normal text-teal-700">وظیفه</span>
           </div>
           <p className="text-[11px] text-teal-700/80 mt-1">
-            مجموع تسک‌های ثبت شده در این هفته
+            مجموع وظیفه‌های ثبت شده در این هفته
           </p>
         </div>
 
@@ -663,7 +663,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                 {(activityFilter === 'ALL' || activityFilter === 'TASKS') && (
                   <span className="flex items-center gap-1.5 font-medium text-emerald-800">
                     <span className="w-3 h-3 rounded-md bg-emerald-600 inline-block shadow-2xs" />
-                    <span>تسک‌های تکمیل‌شده</span>
+                    <span>وظیفه‌های تکمیل‌شده</span>
                   </span>
                 )}
                 {(activityFilter === 'ALL' || activityFilter === 'HABITS') && (
@@ -691,7 +691,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
             )}
           </div>
           <div className="text-[11px] text-emerald-700 font-medium hidden md:block">
-            برای بررسی تسک‌ها و عادت‌های هر روز، روی ستون آن کلیک کنید
+            برای بررسی وظیفه‌ها و عادت‌های هر روز، روی ستون آن کلیک کنید
           </div>
         </div>
 
@@ -773,7 +773,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                     {(activityFilter === 'ALL' || activityFilter === 'TASKS') && (
                       <Bar 
                         dataKey="tasksDone" 
-                        name="تسک‌ها"
+                        name="وظیفه‌ها"
                         stackId={activityFilter === 'ALL' ? 'a' : undefined}
                         fill="#059669"
                         radius={activityFilter === 'TASKS' || activityFilter === 'ALL' ? [6, 6, 0, 0] : [0, 0, 0, 0]}
@@ -823,7 +823,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
               <p className="text-xs text-gray-500 mt-0.5">
                 {selectedDay.isFuture 
                   ? 'برنامه فعالیت‌ها و عاداتی که برای این روز تنظیم شده‌اند'
-                  : `در این روز ${toPersianDigits(selectedDay.tasksDoneCount)} تسک و ${toPersianDigits(selectedDay.habitsDoneCount)} عادت با موفقیت انجام شد.`
+                  : `در این روز ${toPersianDigits(selectedDay.tasksDoneCount)} وظیفه و ${toPersianDigits(selectedDay.habitsDoneCount)} عادت با موفقیت انجام شد.`
                 }
               </p>
             </div>
@@ -851,7 +851,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  تسک‌ها ({toPersianDigits(selectedDay.tasksDoneCount)})
+                  وظیفه‌ها ({toPersianDigits(selectedDay.tasksDoneCount)})
                 </button>
                 <button
                   type="button"
@@ -890,7 +890,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                 <div className="flex items-center justify-between text-xs text-gray-600 font-bold px-1">
                   <span className="flex items-center gap-1.5 text-emerald-800">
                     <CheckSquare className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>تسک‌های این روز</span>
+                    <span>وظیفه‌های این روز</span>
                   </span>
                   <span className="text-[11px] text-gray-400">
                     {toPersianDigits(selectedDay.tasksDoneCount)} تکمیل شده
@@ -899,7 +899,7 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
 
                 {selectedDay.completedTasks.length === 0 && selectedDay.pendingTasks.length === 0 ? (
                   <div className="text-center py-4 bg-white rounded-xl border border-dashed border-gray-200 text-xs text-gray-400">
-                    تسکی برای این روز ثبت یا برنامه‌ریزی نشده است.
+                    وظیفه‌ای برای این روز ثبت یا برنامه‌ریزی نشده است.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

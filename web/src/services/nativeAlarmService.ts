@@ -92,9 +92,9 @@ export function planAlarms(tasks: AppTask[], now = new Date()): PlannedAlarm[] {
         const total = start.h * 60 + start.m - t.reminderMinutesBefore;
         if (total >= 0) add('REMIND', { h: Math.floor(total / 60), m: total % 60 }, `⏰ ${t.title}`, `تا شروع ${t.reminderMinutesBefore} دقیقه مانده`);
       }
-      if (t.reminderTime && (!start || t.reminderTime !== t.time)) add('REMIND', parseHM(t.reminderTime), `⏰ ${t.title}`, 'یادآور تسک');
-      add('START', start, `▶️ زمان شروع: ${t.title}`, t.notes || 'زمان شروع این کار فرا رسیده است.');
-      add('END', end, `⌛ پایان مهلت: ${t.title}`, 'مهلت این کار رسیده است.');
+      if (t.reminderTime && (!start || t.reminderTime !== t.time)) add('REMIND', parseHM(t.reminderTime), `⏰ ${t.title}`, 'یادآور وظیفه');
+      add('START', start, `▶️ زمان شروع: ${t.title}`, t.notes || 'زمان شروع این وظیفه فرا رسیده است.');
+      add('END', end, `⌛ پایان مهلت: ${t.title}`, 'مهلت این وظیفه رسیده است.');
     }
   }
   out.sort((a, b) => a.at.getTime() - b.at.getTime());

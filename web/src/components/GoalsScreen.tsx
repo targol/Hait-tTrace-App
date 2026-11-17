@@ -797,7 +797,7 @@ export const GoalsScreen: React.FC<Props> = ({
               <Repeat className="w-4 h-4" />
             </div>
             <div className="text-xs">
-              <span className="font-bold text-amber-950 block">انتقال تسک‌ها و عادات دوره پایان‌یافته:</span>
+              <span className="font-bold text-amber-950 block">انتقال وظیفه‌ها و عادات دوره پایان‌یافته:</span>
               <p className="text-amber-800 mt-0.5 leading-relaxed">
                 دوره مربوط به «{firstPendingRolloverGoal.title}» به پایان رسیده و موارد تکمیل‌نشده دارد. مایلید به دوره بعد منتقل شوند؟
               </p>
@@ -835,7 +835,7 @@ export const GoalsScreen: React.FC<Props> = ({
               <div>
                 <h4 className="font-extrabold text-emerald-950">نمای تفکیک فصلی اهداف</h4>
                 <p className="text-emerald-800 text-[11px] mt-0.5">
-                  تمام اهداف میانی فصلی در ۴ فصل سال به همراه تسک‌ها و عادات متصل به آن‌ها
+                  تمام اهداف میانی فصلی در ۴ فصل سال به همراه وظیفه‌ها و عادات متصل به آن‌ها
                 </p>
               </div>
             </div>
@@ -1031,7 +1031,7 @@ export const GoalsScreen: React.FC<Props> = ({
                               </span>
                             </div>
                             <span className="text-[10px] text-gray-500 font-semibold">
-                              {toPersianDigits(sTasks.length)} تسک • {toPersianDigits(sHabits.length)} عادت
+                              {toPersianDigits(sTasks.length)} وظیفه • {toPersianDigits(sHabits.length)} عادت
                             </span>
                           </div>
 
@@ -1059,7 +1059,7 @@ export const GoalsScreen: React.FC<Props> = ({
                               <div className="space-y-1.5 pt-1">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[10px] font-bold text-gray-500">
-                                    تسک‌ها ({toPersianDigits(sTasks.length)}) و عادات ({toPersianDigits(sHabits.length)})
+                                    وظیفه‌ها ({toPersianDigits(sTasks.length)}) و عادات ({toPersianDigits(sHabits.length)})
                                   </span>
                                   <div className="flex items-center gap-1">
                                     <button
@@ -1067,7 +1067,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                       onClick={() => onNewTaskForGoal(sGoal.id)}
                                       className="text-[10px] text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold px-2 py-0.5 rounded border border-emerald-200 cursor-pointer"
                                     >
-                                      + تسک
+                                      + وظیفه
                                     </button>
                                     {onNewHabitForGoal && (
                                       <button
@@ -1097,7 +1097,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                           type="button"
                                           onClick={() => onDuplicateTask(t)}
                                           className="p-1 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors cursor-pointer"
-                                          title="کپی گرفتن از تسک (داپلیکیت)"
+                                          title="کپی گرفتن از وظیفه (داپلیکیت)"
                                         >
                                           <Copy className="w-3 h-3" />
                                         </button>
@@ -1106,7 +1106,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                         type="button"
                                         onClick={() => setTaskToTransfer(t)}
                                         className="p-1 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors cursor-pointer"
-                                        title="انتقال یا بستن تسک"
+                                        title="انتقال یا بستن وظیفه"
                                       >
                                         <Repeat className="w-3 h-3" />
                                       </button>
@@ -1263,7 +1263,7 @@ export const GoalsScreen: React.FC<Props> = ({
                       </span>
 
                       <span className="text-[10px] font-semibold text-gray-600 bg-white/80 px-2 py-0.5 rounded-md border border-black/5">
-                        {toPersianDigits(subGoals.length)} هدف میانی • {toPersianDigits(directTasks.length)} تسک • {toPersianDigits(directHabits.length)} عادت
+                        {toPersianDigits(subGoals.length)} هدف میانی • {toPersianDigits(directTasks.length)} وظیفه • {toPersianDigits(directHabits.length)} عادت
                       </span>
                     </div>
                   </div>
@@ -1273,7 +1273,7 @@ export const GoalsScreen: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => handleOpenTransferModal(annual)}
-                      title="انتقال تسک‌ها و عادات این هدف"
+                      title="انتقال وظیفه‌ها و عادات این هدف"
                       className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
                     >
                       <Repeat className="w-3.5 h-3.5" />
@@ -1405,7 +1405,7 @@ export const GoalsScreen: React.FC<Props> = ({
                             className="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-medium rounded-xl flex items-center gap-1 transition-colors cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
-                            <span>+ تسک سالانه</span>
+                            <span>+ وظیفه سالانه</span>
                           </button>
                         </div>
                       </div>
@@ -1576,7 +1576,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                               <button
                                                 type="button"
                                                 onClick={() => handleOpenTransferModal(seasonalGoal)}
-                                                title="انتقال تسک‌ها و عادات به دوره بعد"
+                                                title="انتقال وظیفه‌ها و عادات به دوره بعد"
                                                 className="p-1 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-md transition-colors cursor-pointer"
                                               >
                                                 <Repeat className="w-3.5 h-3.5" />
@@ -1615,7 +1615,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                           {/* Actions for Seasonal Goal */}
                                           <div className="flex items-center justify-between pt-1 text-[10px]">
                                             <span className="text-gray-500">
-                                              اقدامات: {toPersianDigits(subTasks.length)} تسک | {toPersianDigits(subHabits.length)} عادت
+                                              اقدامات: {toPersianDigits(subTasks.length)} وظیفه | {toPersianDigits(subHabits.length)} عادت
                                             </span>
                                             <div className="flex items-center gap-1">
                                               <button
@@ -1623,7 +1623,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                                 onClick={() => onNewTaskForGoal(seasonalGoal.id)}
                                                 className="px-2 py-0.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded font-semibold transition-colors cursor-pointer"
                                               >
-                                                + تسک
+                                                + وظیفه
                                               </button>
                                               {onNewHabitForGoal && (
                                                 <button
@@ -1667,7 +1667,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                                       type="button"
                                                       onClick={() => setTaskToTransfer(task)}
                                                       className="p-1 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors cursor-pointer"
-                                                      title="انتقال یا بستن تسک"
+                                                      title="انتقال یا بستن وظیفه"
                                                     >
                                                       <Repeat className="w-3 h-3" />
                                                     </button>
@@ -1767,7 +1767,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                                 <button
                                                   type="button"
                                                   onClick={() => handleOpenTransferModal(mGoal)}
-                                                  title="انتقال تسک‌ها و عادات به دوره بعد"
+                                                  title="انتقال وظیفه‌ها و عادات به دوره بعد"
                                                   className="p-1 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-md transition-colors cursor-pointer"
                                                 >
                                                   <Repeat className="w-3.5 h-3.5" />
@@ -1806,7 +1806,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                             {/* Actions for Monthly Goal */}
                                             <div className="flex items-center justify-between pt-1 text-[10px]">
                                               <span className="text-gray-500">
-                                                {toPersianDigits(mTasks.length)} تسک | {toPersianDigits(mHabits.length)} عادت
+                                                {toPersianDigits(mTasks.length)} وظیفه | {toPersianDigits(mHabits.length)} عادت
                                               </span>
                                               <div className="flex items-center gap-1">
                                                 <button
@@ -1814,7 +1814,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                                   onClick={() => onNewTaskForGoal(mGoal.id)}
                                                   className="px-2 py-0.5 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 rounded font-semibold transition-colors cursor-pointer"
                                                 >
-                                                  + تسک
+                                                  + وظیفه
                                                 </button>
                                                 {onNewHabitForGoal && (
                                                   <button
@@ -1859,7 +1859,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                                           type="button"
                                                           onClick={() => onDuplicateTask(task)}
                                                           className="p-1 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors cursor-pointer"
-                                                          title="کپی گرفتن از تسک (داپلیکیت)"
+                                                          title="کپی گرفتن از وظیفه (داپلیکیت)"
                                                         >
                                                           <Copy className="w-3 h-3" />
                                                         </button>
@@ -1868,7 +1868,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                                         type="button"
                                                         onClick={() => setTaskToTransfer(task)}
                                                         className="p-1 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors cursor-pointer"
-                                                        title="انتقال یا بستن تسک"
+                                                        title="انتقال یا بستن وظیفه"
                                                       >
                                                         <Repeat className="w-3 h-3" />
                                                       </button>
@@ -1932,7 +1932,7 @@ export const GoalsScreen: React.FC<Props> = ({
                       {(directTasks.length > 0 || directHabits.length > 0) && (
                         <div className="p-2.5 bg-blue-50/50 rounded-xl border border-blue-100 space-y-1.5 text-xs">
                           <span className="font-bold text-blue-950 text-[11px] block">
-                            تسک‌ها و عادات مستقیم هدف سالانه:
+                            وظیفه‌ها و عادات مستقیم هدف سالانه:
                           </span>
                           <div className="space-y-1">
                             {directTasks.map((t) => (
@@ -1950,7 +1950,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                       type="button"
                                       onClick={() => onDuplicateTask(t)}
                                       className="p-1 text-gray-400 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors cursor-pointer"
-                                      title="کپی گرفتن از تسک (داپلیکیت)"
+                                      title="کپی گرفتن از وظیفه (داپلیکیت)"
                                     >
                                       <Copy className="w-3 h-3" />
                                     </button>
@@ -1959,7 +1959,7 @@ export const GoalsScreen: React.FC<Props> = ({
                                     type="button"
                                     onClick={() => setTaskToTransfer(t)}
                                     className="p-1 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors cursor-pointer"
-                                    title="انتقال یا بستن تسک (انتقال به فصلی یا سالانه)"
+                                    title="انتقال یا بستن وظیفه (انتقال به فصلی یا سالانه)"
                                   >
                                     <Repeat className="w-3 h-3" />
                                   </button>
@@ -2072,7 +2072,7 @@ export const GoalsScreen: React.FC<Props> = ({
             </div>
 
             <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200 leading-relaxed">
-              تمام اهداف، تسک‌ها و عادت‌های این دسته به صورت خودکار به دسته‌بندی پیش‌فرض دیگری منتقل خواهند شد تا هیچ موردی از بین نرود.
+              تمام اهداف، وظیفه‌ها و عادت‌های این دسته به صورت خودکار به دسته‌بندی پیش‌فرض دیگری منتقل خواهند شد تا هیچ موردی از بین نرود.
             </p>
 
             <div className="flex justify-end gap-2 pt-1">

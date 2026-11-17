@@ -141,11 +141,11 @@ export const DayPlanner: React.FC<Props> = ({ tasks, calendarEvents, onToggleTas
           {tab === 'REVIEW' && (
             <>
               <div className="rounded-xl bg-emerald-50 p-3 text-center">
-                <p className="text-sm font-black text-emerald-800">{toPersianDigits(todays.length - open.length)} از {toPersianDigits(todays.length)} کار امروز انجام شد</p>
+                <p className="text-sm font-black text-emerald-800">{toPersianDigits(todays.length - open.length)} از {toPersianDigits(todays.length)} وظیفه امروز انجام شد</p>
               </div>
               {open.length > 0 ? (
                 <div>
-                  <p className="text-xs font-black text-gray-800 mb-1.5">کارهای انجام‌نشده</p>
+                  <p className="text-xs font-black text-gray-800 mb-1.5">وظیفه‌های انجام‌نشده</p>
                   <div className="space-y-1.5">
                     {open.map(t => {
                       const recurring = t.repeatType === 'DAILY' || t.repeatType === 'WEEKLY';
@@ -164,7 +164,7 @@ export const DayPlanner: React.FC<Props> = ({ tasks, calendarEvents, onToggleTas
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-emerald-700 font-bold text-center">همهٔ کارهای امروز انجام شده است 🌸</p>
+                <p className="text-xs text-emerald-700 font-bold text-center">همهٔ وظیفه‌های امروز انجام شده است 🌸</p>
               )}
               <div className="space-y-1.5">
                 <p className="text-xs font-black text-gray-800">یادداشت امروز</p>

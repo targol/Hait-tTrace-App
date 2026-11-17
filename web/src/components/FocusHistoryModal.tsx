@@ -137,7 +137,7 @@ export const FocusHistoryModal: React.FC<Props> = ({
         <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[140px]">
           {sessions.length === 0 ? (
             <div className="p-6 text-center text-xs text-gray-400 bg-gray-50/70 rounded-2xl border border-dashed border-gray-200">
-              هنوز جلسه تمرکزی برای این {entityType === 'HABIT' ? 'عادت' : 'تسک'} ذخیره نشده است. با فعال کردن ساعت شنی، تاریخچه تمرکز شما در اینجا ثبت می‌شود.
+              هنوز جلسه تمرکزی برای این {entityType === 'HABIT' ? 'عادت' : 'وظیفه'} ذخیره نشده است. با فعال کردن ساعت شنی، تاریخچه تمرکز شما در اینجا ثبت می‌شود.
             </div>
           ) : (
             sessions.map((s, idx) => {

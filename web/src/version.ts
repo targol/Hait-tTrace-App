@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.9.0',
-  currentVersionCode: 290,
-  versionCode: 290,
+  currentVersion: '2.9.1',
+  currentVersionCode: 291,
+  versionCode: 291,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,20 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.9.1',
+    versionCode: 291,
+    releaseDate: '۱۴۰۵/۰۸/۲۶',
+    gregorianDate: '2026-11-17',
+    title: 'نمایش همهٔ وظیفه‌ها و رفتن از دفتر به مورد',
+    highlights: [
+      'لیست وظیفه‌ها به‌صورت پیش‌فرض همه را نشان می‌دهد و وظیفه‌های آینده پنهان نمی‌مانند',
+      'وظیفه‌های آینده نشان «شروع: تاریخ» دارند و در دفتر روی تاریخ شروع می‌آیند',
+      'در دفتر با لمس عنوان وظیفه، هدف یا عادت، صفحهٔ ویرایش همان مورد باز می‌شود',
+      'در همهٔ متن‌ها فقط واژهٔ «وظیفه» به کار می‌رود'
+    ],
+    changes: []
+  },
   {
     version: '2.9.0',
     versionCode: 290,

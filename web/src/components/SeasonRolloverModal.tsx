@@ -49,7 +49,7 @@ export const SeasonRolloverModal: React.FC<Props> = ({
               <Repeat className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-gray-900">انتقال تسک‌ها و عادات به فصل بعد</h3>
+              <h3 className="text-sm font-bold text-gray-900">انتقال وظیفه‌ها و عادات به فصل بعد</h3>
               <p className="text-[11px] text-gray-500">انتقال موارد باقیمانده به هدف فصل جدید</p>
             </div>
           </div>
@@ -82,7 +82,7 @@ export const SeasonRolloverModal: React.FC<Props> = ({
           </div>
 
           <p className="text-gray-600 leading-relaxed">
-            با تایید شما، تمام تسک‌های انجام‌نشده و عادات فعال متصل به این هدف، به صورت خودکار به هدف فصل <strong className="text-emerald-800">{targetSeasonName}</strong> منتقل می‌شوند.
+            با تایید شما، تمام وظیفه‌های انجام‌نشده و عادات فعال متصل به این هدف، به صورت خودکار به هدف فصل <strong className="text-emerald-800">{targetSeasonName}</strong> منتقل می‌شوند.
           </p>
 
           {/* Pending Tasks List */}
@@ -90,13 +90,13 @@ export const SeasonRolloverModal: React.FC<Props> = ({
             <div className="flex items-center justify-between font-bold text-gray-800 text-xs">
               <span className="flex items-center gap-1.5">
                 <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
-                <span>تسک‌های انجام‌نشده ({toPersianDigits(pendingTasks.length)})</span>
+                <span>وظیفه‌های انجام‌نشده ({toPersianDigits(pendingTasks.length)})</span>
               </span>
             </div>
 
             {pendingTasks.length === 0 ? (
               <div className="p-2.5 bg-gray-50 rounded-xl text-gray-400 text-[11px] text-center border border-gray-100">
-                همه تسک‌های این فصل تکمیل شده‌اند.
+                همه وظیفه‌های این فصل تکمیل شده‌اند.
               </div>
             ) : (
               <div className="space-y-1 max-h-32 overflow-y-auto pr-1">

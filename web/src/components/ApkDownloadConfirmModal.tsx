@@ -336,7 +336,7 @@ export const ApkDownloadConfirmModal: React.FC<Props> = ({
               <li className="flex items-start gap-1.5">
                 <span className="font-black text-emerald-800">۱.</span>
                 <span>
-                  <strong>نیازی به حذف (Uninstall) نسخه فعلی نیست!</strong> کافی است فایل APK جدید را دانلود و مستقیماً روی نسخه فعلی نصب (Update) کنید تا تمام اهداف، عادت‌ها، تسک‌ها و رویدادهای شما دست‌نخورده باقی بمانند.
+                  <strong>نیازی به حذف (Uninstall) نسخه فعلی نیست!</strong> کافی است فایل APK جدید را دانلود و مستقیماً روی نسخه فعلی نصب (Update) کنید تا تمام اهداف، عادت‌ها، وظیفه‌ها و رویدادهای شما دست‌نخورده باقی بمانند.
                 </span>
               </li>
               <li className="flex items-start gap-1.5">

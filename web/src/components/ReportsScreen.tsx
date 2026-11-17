@@ -369,7 +369,7 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
             <span>گزارش‌ها و تحلیل روند پیشرفت</span>
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            بررسی دسته‌بندی‌ها، عملکرد تسک‌ها و درصد دقیق تحقق اهداف
+            بررسی دسته‌بندی‌ها، عملکرد وظیفه‌ها و درصد دقیق تحقق اهداف
           </p>
         </div>
 
@@ -439,14 +439,14 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
 
         <div className="bg-white rounded-2xl p-4 border border-emerald-100 shadow-xs">
           <div className="flex items-center justify-between text-gray-500 text-xs mb-1">
-            <span>تکمیل تسک‌ها</span>
+            <span>تکمیل وظیفه‌ها</span>
             <CheckCircle className="w-4 h-4 text-teal-600" />
           </div>
           <div className="text-xl sm:text-2xl font-extrabold text-teal-950">
             {toPersianDigits(taskCompletionRate)}٪
           </div>
           <p className="text-[11px] text-gray-400 mt-1">
-            {toPersianDigits(completedTasks)} از {toPersianDigits(totalTasks)} تسک
+            {toPersianDigits(completedTasks)} از {toPersianDigits(totalTasks)} وظیفه
           </p>
         </div>
 
@@ -493,7 +493,7 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
                 }`}
               >
                 <BarChart3 className="w-4 h-4 text-emerald-300" />
-                <span>نمودار میله‌ای تسک‌ها و عادت‌های هفته</span>
+                <span>نمودار میله‌ای وظیفه‌ها و عادت‌های هفته</span>
               </button>
               <button
                 type="button"
@@ -523,10 +523,10 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
             
             <div className="text-[11px] text-gray-500 font-medium px-2 hidden sm:block">
               {weeklyReportView === 'WEEKLY_TREND' 
-                ? 'نمودار ستونی تعداد تسک‌ها و عادات تکمیل‌شده بر اساس روزهای تقویم شمسی'
+                ? 'نمودار ستونی تعداد وظیفه‌ها و عادات تکمیل‌شده بر اساس روزهای تقویم شمسی'
                 : weeklyReportView === 'HABITS_DISCIPLINE'
                 ? 'نمودار ستونی میزان تکمیل عادات به تفکیک هر روز هفته'
-                : 'گزارش تفکیکی فعالیت‌های تسک و عادت‌ها'
+                : 'گزارش تفکیکی فعالیت‌های وظیفه و عادت‌ها'
               }
             </div>
           </div>
@@ -555,13 +555,13 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
                 </span>
               </h3>
               <p className="text-[11px] text-gray-400 mt-0.5">
-                مجموع تسک‌ها و عادت‌های انجام شده در هر بازه
+                مجموع وظیفه‌ها و عادت‌های انجام شده در هر بازه
               </p>
             </div>
             <div className="flex items-center gap-3 text-[11px]">
               <span className="flex items-center gap-1 text-emerald-700 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span>تسک</span>
+                <span>وظیفه</span>
               </span>
               <span className="flex items-center gap-1 text-amber-600 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -634,7 +634,7 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
               <span>تحلیل درصد دستیابی به اهداف (Goal Achievement)</span>
             </h3>
             <p className="text-[11px] text-gray-500 mt-0.5">
-              محاسبه دقیق درصد پیشرفت بر اساس تسک‌های خرد تکمیل‌شده و پیوستگی عادات مرتبط
+              محاسبه دقیق درصد پیشرفت بر اساس وظیفه‌های خرد تکمیل‌شده و پیوستگی عادات مرتبط
             </p>
           </div>
 
@@ -799,7 +799,7 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
                   <div className="pt-2 border-t border-emerald-100/60 flex items-center justify-between text-[11px] text-gray-600">
                     <span className="flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{toPersianDigits(metrics.completedTasks)} از {toPersianDigits(metrics.totalTasks)} تسک انجام شده</span>
+                      <span>{toPersianDigits(metrics.completedTasks)} از {toPersianDigits(metrics.totalTasks)} وظیفه انجام شده</span>
                     </span>
                     {metrics.linkedHabitsCount > 0 && (
                       <span className="flex items-center gap-1 text-amber-700">
@@ -815,12 +815,12 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
         )}
       </div>
 
-      {/* Task Breakdown by Category (گزارش تفکیکی بر اساس تسک‌ها) */}
+      {/* Task Breakdown by Category (گزارش تفکیکی بر اساس وظیفه‌ها) */}
       <div className="bg-white rounded-2xl p-5 border border-emerald-100 shadow-xs space-y-4">
         <div>
           <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <PieChart className="w-4 h-4 text-emerald-600" />
-            <span>تحلیل تسک‌ها بر اساس دسته‌بندی و حوزه‌ها</span>
+            <span>تحلیل وظیفه‌ها بر اساس دسته‌بندی و حوزه‌ها</span>
           </h3>
           <p className="text-[11px] text-gray-500 mt-0.5">
             بررسی نرخ موفقیت و تکمیل وظایف در هر بخش از زندگی یا کار
@@ -838,7 +838,7 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
                   />
                   <span>{stat.category.title}</span>
                   <span className="text-[10px] text-gray-400 font-normal">
-                    ({toPersianDigits(stat.completed)} از {toPersianDigits(stat.total)} تسک)
+                    ({toPersianDigits(stat.completed)} از {toPersianDigits(stat.total)} وظیفه)
                   </span>
                 </span>
                 <span className="font-bold text-gray-700">

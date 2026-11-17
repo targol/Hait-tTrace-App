@@ -548,10 +548,10 @@ export const TimerModal: React.FC<Props> = ({
                 </div>
 
                 <h4 className="text-sm font-black text-gray-900">
-                  وضعیت ثبت این {entityType === 'HABIT' ? 'عادت' : 'تسک'} چیست؟
+                  وضعیت ثبت این {entityType === 'HABIT' ? 'عادت' : 'وظیفه'} چیست؟
                 </h4>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed px-2">
-                  می‌توانید تسک را ۱۰۰٪ تکمیل شده ثبت کنید، یا به صورت «نصفه» ذخیره کنید تا در ادامه امروز تکمیل کنید.
+                  می‌توانید وظیفه را ۱۰۰٪ تکمیل شده ثبت کنید، یا به صورت «نصفه» ذخیره کنید تا در ادامه امروز تکمیل کنید.
                 </p>
               </div>
 
@@ -580,7 +580,7 @@ export const TimerModal: React.FC<Props> = ({
                 className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>تسک تمام شد و ۱۰۰٪ انجام شد</span>
+                <span>وظیفه تمام شد و ۱۰۰٪ انجام شد</span>
               </button>
 
               {/* Option 2: Keep partial progress and continue later */}

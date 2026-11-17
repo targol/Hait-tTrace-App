@@ -374,7 +374,7 @@ export const TodayScreen: React.FC<Props> = ({
               </div>
               <div className="flex items-center justify-between mt-1">
                 <p className="text-[11px] text-gray-500">
-                  {toPersianDigits(plantState.completedCount)} از {toPersianDigits(plantState.totalCount)} کار و عادت امروز انجام شده
+                  {toPersianDigits(plantState.completedCount)} از {toPersianDigits(plantState.totalCount)} وظیفه و عادت امروز انجام شده
                 </p>
                 {onOpenDayPlanner && (
                   <button type="button" onClick={onOpenDayPlanner} className="shrink-0 text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5 cursor-pointer">
@@ -402,7 +402,7 @@ export const TodayScreen: React.FC<Props> = ({
             </span>
           </div>
           <p className="text-[11px] text-rose-800 leading-relaxed">
-            💡 <strong>توجه به روز تعطیل:</strong> امروز فرصت مناسبی برای استراحت، تجدید انرژی، یا پیگیری بدون دغدغه کارهای آرامش‌بخش است. پیش از شروع ساعت شنی تسک‌ها یا پروژه‌های جدی کاری، تعطیلی رسمی در نظر گرفته می‌شود.
+            💡 <strong>توجه به روز تعطیل:</strong> امروز فرصت مناسبی برای استراحت، تجدید انرژی، یا پیگیری بدون دغدغه وظیفه‌های آرامش‌بخش است. پیش از شروع ساعت شنی وظیفه‌ها یا پروژه‌های جدی کاری، تعطیلی رسمی در نظر گرفته می‌شود.
           </p>
         </div>
       )}
@@ -419,7 +419,7 @@ export const TodayScreen: React.FC<Props> = ({
           }`}
         >
           <Sun className="w-4 h-4" />
-          <span>کارهای امروز (روز)</span>
+          <span>وظیفه‌های امروز (روز)</span>
           <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
             activeViewMode === 'DAY' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-800'
           }`}>
@@ -455,7 +455,7 @@ export const TodayScreen: React.FC<Props> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="جستجو بر اساس عنوان یا دسته‌بندی در کارهای امروز..."
+            placeholder="جستجو بر اساس عنوان یا دسته‌بندی در وظیفه‌های امروز..."
             className="w-full pr-8 pl-8 py-1.5 rounded-xl border border-gray-200 bg-gray-50/60 focus:bg-white text-xs font-medium text-gray-900 focus:border-emerald-500 outline-hidden placeholder:text-gray-400 transition-colors"
           />
           {searchQuery && (
@@ -590,7 +590,7 @@ export const TodayScreen: React.FC<Props> = ({
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                 <CalendarDays className="w-4 h-4 text-emerald-600" />
-                <span>تسک‌های امروز ({toPersianDigits(completedTodayTasks.length)} از {toPersianDigits(todayTasks.length)})</span>
+                <span>وظیفه‌های امروز ({toPersianDigits(completedTodayTasks.length)} از {toPersianDigits(todayTasks.length)})</span>
               </h3>
               <button
                 type="button"
@@ -598,13 +598,13 @@ export const TodayScreen: React.FC<Props> = ({
                 className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>افزودن تسک</span>
+                <span>افزودن وظیفه</span>
               </button>
             </div>
 
             {todayTasks.length === 0 ? (
               <div className="bg-white rounded-xl border border-dashed border-gray-200 p-6 text-center text-xs text-gray-500">
-                برای امروز هیچ تسکی برنامه‌ریزی نشده است. می‌توانید یک تسک جدید اضافه کنید.
+                برای امروز هیچ وظیفه‌ای برنامه‌ریزی نشده است. می‌توانید یک وظیفه جدید اضافه کنید.
               </div>
             ) : (
               <div className="space-y-2">
@@ -620,7 +620,7 @@ export const TodayScreen: React.FC<Props> = ({
                         <button
                           type="button"
                           onClick={() => onToggleTask(t.id)}
-                          title="ثبت انجام تسک"
+                          title="ثبت انجام وظیفه"
                           className="cursor-pointer text-gray-300 hover:text-emerald-600 transition-colors shrink-0"
                         >
                           <Circle className="w-5 h-5 hover:text-emerald-500" />
@@ -628,7 +628,7 @@ export const TodayScreen: React.FC<Props> = ({
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-gray-900 truncate flex items-center gap-1.5">
                             {t.isImportant && (
-                              <span className="shrink-0 p-0.5 rounded-xs bg-amber-100 text-amber-600" title="تسک مهم">
+                              <span className="shrink-0 p-0.5 rounded-xs bg-amber-100 text-amber-600" title="وظیفه مهم">
                                 <Star className="w-3 h-3 fill-amber-500" />
                               </span>
                             )}
@@ -697,7 +697,7 @@ export const TodayScreen: React.FC<Props> = ({
                           <button
                             type="button"
                             onClick={() => onEditTask(t)}
-                            title="ویرایش تسک"
+                            title="ویرایش وظیفه"
                             className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -736,7 +736,7 @@ export const TodayScreen: React.FC<Props> = ({
                           <button
                             type="button"
                             onClick={() => onDuplicateTask(t)}
-                            title="کپی گرفتن و ویرایش تسک (داپلیکیت)"
+                            title="کپی گرفتن و ویرایش وظیفه (داپلیکیت)"
                             className="p-1.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -746,7 +746,7 @@ export const TodayScreen: React.FC<Props> = ({
                         <button
                           type="button"
                           onClick={() => setTaskToTransfer(t)}
-                          title="انتقال یا بستن تسک (انتقال به فصل بعد یا هدف وابسته)"
+                          title="انتقال یا بستن وظیفه (انتقال به فصل بعد یا هدف وابسته)"
                           className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
                         >
                           <Repeat className="w-3.5 h-3.5" />
@@ -772,7 +772,7 @@ export const TodayScreen: React.FC<Props> = ({
                               }
                             );
                           })}
-                          title="شروع ساعت شنی تمرکز روی این تسک"
+                          title="شروع ساعت شنی تمرکز روی این وظیفه"
                           className="p-2 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg shrink-0 transition-colors cursor-pointer flex items-center gap-1"
                         >
                           <Hourglass className="w-3.5 h-3.5 text-emerald-700" />
@@ -794,7 +794,7 @@ export const TodayScreen: React.FC<Props> = ({
                       className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 py-1 transition-colors cursor-pointer"
                     >
                       <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>تسک‌های انجام‌شده ({toPersianDigits(completedTodayTasks.length)})</span>
+                      <span>وظیفه‌های انجام‌شده ({toPersianDigits(completedTodayTasks.length)})</span>
                       {showCompletedTasks ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     </button>
 
@@ -811,7 +811,7 @@ export const TodayScreen: React.FC<Props> = ({
                                 <button
                                   type="button"
                                   onClick={() => onToggleTask(t.id)}
-                                  title="بازگردانی تسک"
+                                  title="بازگردانی وظیفه"
                                   className="cursor-pointer text-emerald-600 hover:text-emerald-700 shrink-0"
                                 >
                                   <CheckCircle2 className="w-5 h-5 fill-emerald-600 text-white" />
@@ -833,7 +833,7 @@ export const TodayScreen: React.FC<Props> = ({
                                   <button
                                     type="button"
                                     onClick={() => onDuplicateTask(t)}
-                                    title="کپی گرفتن و ویرایش تسک (داپلیکیت)"
+                                    title="کپی گرفتن و ویرایش وظیفه (داپلیکیت)"
                                     className="p-1.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                                   >
                                     <Copy className="w-3.5 h-3.5" />
@@ -1210,7 +1210,7 @@ export const TodayScreen: React.FC<Props> = ({
               <div>
                 <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                   <CalendarDays className="w-4 h-4 text-emerald-600" />
-                  <span>تسک‌های این هفته ({toPersianDigits(weekTasks.filter(t => t.isCompleted).length)} از {toPersianDigits(weekTasks.length)})</span>
+                  <span>وظیفه‌های این هفته ({toPersianDigits(weekTasks.filter(t => t.isCompleted).length)} از {toPersianDigits(weekTasks.length)})</span>
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">وظایفی که موعد انجام آن‌ها در روزهای شنبه تا جمعه این هفته است</p>
               </div>
@@ -1220,13 +1220,13 @@ export const TodayScreen: React.FC<Props> = ({
                 className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>افزودن تسک</span>
+                <span>افزودن وظیفه</span>
               </button>
             </div>
 
             {weekTasks.length === 0 ? (
               <div className="bg-white rounded-xl border border-dashed border-gray-200 p-6 text-center text-xs text-gray-500">
-                در این هفته تسک موعدداری ثبت نشده است.
+                در این هفته وظیفه موعدداری ثبت نشده است.
               </div>
             ) : (
               <div className="space-y-2">

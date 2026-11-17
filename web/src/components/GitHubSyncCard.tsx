@@ -219,7 +219,7 @@ export const GitHubSyncCard: React.FC<Props> = ({
     if (res.success && res.data) {
       if (onImportAllData) {
         const confirmRestore = window.confirm(
-          `اطلاعات از مخزن گیت‌هاب دریافت شد (${toPersianDigits(res.data.goals?.length || 0)} هدف، ${toPersianDigits(res.data.tasks?.length || 0)} تسک، ${toPersianDigits(res.data.habits?.length || 0)} عادت).\n\nآیا مایل به جایگزینی و همگام‌سازی داده‌های کنونی برنامه هستید؟`
+          `اطلاعات از مخزن گیت‌هاب دریافت شد (${toPersianDigits(res.data.goals?.length || 0)} هدف، ${toPersianDigits(res.data.tasks?.length || 0)} وظیفه، ${toPersianDigits(res.data.habits?.length || 0)} عادت).\n\nآیا مایل به جایگزینی و همگام‌سازی داده‌های کنونی برنامه هستید؟`
         );
         if (confirmRestore) {
           onImportAllData(res.data, 'REPLACE');

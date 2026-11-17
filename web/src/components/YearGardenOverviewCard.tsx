@@ -120,7 +120,7 @@ export const YearGardenOverviewCard: React.FC<Props> = ({
                       <strong className="text-gray-800">{toPersianDigits(s.completedGoalsCount)}/{toPersianDigits(s.goalsCount)}</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span>تسک‌ها:</span>
+                      <span>وظیفه‌ها:</span>
                       <strong className="text-gray-800">{toPersianDigits(s.completedTasksCount)}/{toPersianDigits(s.tasksCount)}</strong>
                     </div>
                   </div>
@@ -139,9 +139,9 @@ export const YearGardenOverviewCard: React.FC<Props> = ({
             </div>
 
             <div className="bg-white/80 rounded-xl p-2 border border-emerald-100 shadow-2xs">
-              <span className="text-[10px] text-gray-500 block">کل تسک‌های ثمررسیده</span>
+              <span className="text-[10px] text-gray-500 block">کل وظیفه‌های ثمررسیده</span>
               <strong className="text-emerald-950 font-black text-xs mt-0.5 block">
-                {toPersianDigits(summary.completedTasksCount)} از {toPersianDigits(summary.totalTasksCount)} تسک
+                {toPersianDigits(summary.completedTasksCount)} از {toPersianDigits(summary.totalTasksCount)} وظیفه
               </strong>
             </div>
 

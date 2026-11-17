@@ -645,13 +645,13 @@ export const App: React.FC = () => {
       const pending = tasks.filter(t => target.dependsOn!.includes(t.id) && !t.isCompleted);
       if (pending.length > 0) {
         const names = pending.map(t => '• ' + t.title).join('\n');
-        if (!window.confirm('پیش‌نیازهای این تسک هنوز انجام نشده‌اند:\n' + names + '\n\nباز هم انجام‌شده علامت بخورد؟')) return;
+        if (!window.confirm('پیش‌نیازهای این وظیفه هنوز انجام نشده‌اند:\n' + names + '\n\nباز هم انجام‌شده علامت بخورد؟')) return;
       }
     }
     let alsoComplete: string[] = [];
     if (target && !target.isCompleted) {
       const linked = tasks.filter(t => !t.isCompleted && !t.isArchived && (target.linkedWith?.includes(t.id) || t.linkedWith?.includes(target.id)));
-      if (linked.length > 0 && window.confirm('تسک‌های همراه هم انجام‌شده علامت بخورند؟\n' + linked.map(t => '• ' + t.title).join('\n'))) {
+      if (linked.length > 0 && window.confirm('وظیفه‌های همراه هم انجام‌شده علامت بخورند؟\n' + linked.map(t => '• ' + t.title).join('\n'))) {
         alsoComplete = linked.map(t => t.id);
       }
     }
@@ -811,7 +811,7 @@ export const App: React.FC = () => {
     const newGoal: Goal = {
       id: newGoalId,
       title: title.trim(),
-      description: `هدف فصل ${PERSIAN_SEASONS[seasonIdx]?.name} (وابسته به تسک «${curTask?.title || ''}»)`,
+      description: `هدف فصل ${PERSIAN_SEASONS[seasonIdx]?.name} (وابسته به وظیفه «${curTask?.title || ''}»)`,
       visionWhy: curGoal?.visionWhy || `امتداد و تکمیل اقدامات فصل ${curGoal?.seasonIndex !== undefined ? PERSIAN_SEASONS[curGoal.seasonIndex]?.name : 'گذشته'}`,
       year,
       period: 'SEASONAL',
@@ -828,7 +828,7 @@ export const App: React.FC = () => {
           id: `hist_${Date.now()}`,
           timestamp: getCurrentPersianDateTimeString(),
           action: 'CREATED',
-          description: `ایجاد هدف فصلی وابسته به تسک «${curTask?.title || ''}» در ادامه هدف «${curGoal?.title || ''}»`,
+          description: `ایجاد هدف فصلی وابسته به وظیفه «${curTask?.title || ''}» در ادامه هدف «${curGoal?.title || ''}»`,
         }
       ],
       createdAt: todayStr,
@@ -1451,7 +1451,7 @@ export const App: React.FC = () => {
               type="button"
               onClick={() => handleNewTask()}
               className="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-2xs flex items-center justify-center transition-all active:scale-95 cursor-pointer"
-              title="افزودن تسک سریع"
+              title="افزودن وظیفه سریع"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -1623,6 +1623,9 @@ export const App: React.FC = () => {
             onNewCalendarEvent={handleNewCalendarEvent}
             onEditCalendarEvent={handleEditCalendarEvent}
             onDeleteCalendarEvent={handleDeleteCalendarEvent}
+            onOpenTask={handleEditTask}
+            onOpenGoal={handleEditGoal}
+            onOpenHabit={handleEditHabit}
           />
         )}
 

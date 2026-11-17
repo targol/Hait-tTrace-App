@@ -31,6 +31,9 @@ interface Props {
   onNewCalendarEvent: (dateStr?: string) => void;
   onEditCalendarEvent: (event: CalendarEvent) => void;
   onDeleteCalendarEvent: (eventId: string) => void;
+  onOpenTask: (task: AppTask) => void;
+  onOpenGoal: (goal: Goal) => void;
+  onOpenHabit: (habit: Habit) => void;
 }
 
 const GREEN = '#16a34a';
@@ -114,8 +117,8 @@ const Chip: React.FC<{ active: boolean; onClick: () => void; children: React.Rea
   </button>
 );
 
-const GoalRow: React.FC<{ g: Goal; percent: number; color: string }> = ({ g, percent, color }) => (
-  <div className="flex items-center gap-2.5 rounded-xl border bg-white/90 px-2.5 py-1.5" style={{ borderColor: color + '66' }}>
+const GoalRow: React.FC<{ g: Goal; percent: number; color: string; onOpen: (g: Goal) => void }> = ({ g, percent, color, onOpen }) => (
+  <div role="button" tabIndex={0} onClick={() => onOpen(g)} className="flex items-center gap-2.5 rounded-xl border bg-white/90 px-2.5 py-1.5 cursor-pointer" style={{ borderColor: color + '66' }}>
     <Ring percent={percent} color={color} size={36} />
     <div className="min-w-0 flex-1">
       <p className="text-xs font-bold text-gray-900 truncate">{g.title}</p>
@@ -129,7 +132,7 @@ const GoalRow: React.FC<{ g: Goal; percent: number; color: string }> = ({ g, per
 );
 
 // ---------- main ----------
-export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categories, calendarEvents, onToggleTask, onToggleHabitDate, onNewCalendarEvent, onEditCalendarEvent, onDeleteCalendarEvent }) => {
+export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categories, calendarEvents, onToggleTask, onToggleHabitDate, onNewCalendarEvent, onEditCalendarEvent, onDeleteCalendarEvent, onOpenTask, onOpenGoal, onOpenHabit }) => {
   const today = useMemo(() => getTodayJalali(), []);
   const [year, setYear] = useState(today.year);
   const [section, setSection] = useState<Section>('MONTHS');
@@ -154,7 +157,7 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
   const tasksByDay = useMemo(() => {
     const map = new Map<string, AppTask[]>();
     for (const t of activeTasks) {
-      const j = parseDue(t.dueDate);
+      const j = parseDue(t.dueDate || t.startDate);
       if (!j) continue;
       const k = `${j.year}-${j.month}-${j.day}`;
       map.set(k, [...(map.get(k) || []), t]);
@@ -240,7 +243,7 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
   const pathView = (
     <Page>
       <Bar left={`${toPersianDigits(year)}`}>مسیر سال</Bar>
-      <p className="text-[10px] text-gray-500">هر ایستگاه یک ماه است؛ حلقه درصد کارهای آن ماه را نشان می‌دهد.</p>
+      <p className="text-[10px] text-gray-500">هر ایستگاه یک ماه است؛ حلقه درصد وظیفه‌های آن ماه را نشان می‌دهد.</p>
       <div className="space-y-2.5">
         {PERSIAN_SEASONS.map((s, si) => (
           <div key={si} className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-2.5">
@@ -267,7 +270,7 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
       {annualGoals.length === 0 ? (
         <p className="text-[11px] text-gray-400">هدف سالانه‌ای برای این سال ثبت نشده؛ از تب «اهداف» اضافه کنید.</p>
       ) : (
-        <div className="space-y-1.5">{annualGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} />)}</div>
+        <div className="space-y-1.5">{annualGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} onOpen={onOpenGoal} />)}</div>
       )}
     </Page>
   );
@@ -346,9 +349,9 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
           </div>
           <p className="text-[9px] text-gray-400 mt-1">نقطهٔ سبز: انجام‌شده • نارنجی: باقی‌مانده • آبی: رویداد • عدد کوچک: روز میلادی</p>
         </div>
-        <Bar left={`${toPersianDigits(st.done)}/${toPersianDigits(st.total)} کار`}>اهداف و اولویت‌های این ماه</Bar>
+        <Bar left={`${toPersianDigits(st.done)}/${toPersianDigits(st.total)} وظیفه`}>اهداف و اولویت‌های این ماه</Bar>
         {mGoals.length === 0 ? <p className="text-[11px] text-gray-400">هدفی برای این ماه یا فصل ثبت نشده.</p> : (
-          <div className="space-y-1.5">{mGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} />)}</div>
+          <div className="space-y-1.5">{mGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} onOpen={onOpenGoal} />)}</div>
         )}
         <div className="flex items-center justify-between rounded-full px-3 py-1 text-white text-[11px] font-black" style={{ background: GREEN }}>
           <span>مناسبت‌ها و رویدادهای این ماه</span>
@@ -392,12 +395,12 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
       <Page key={wi} refCb={el => { subRefs.current[1 + wi] = el; }}>
         <Bar left={`${toPersianDigits(w.from)} تا ${toPersianDigits(w.to)} ${PERSIAN_MONTHS[month - 1]}`}>{`هفتهٔ ${WEEK_NAMES[wi]}`}</Bar>
         <div className="flex items-center justify-between text-[10px] text-gray-500">
-          <span>{toPersianDigits(wdone)} از {toPersianDigits(weekTasks.length)} کار انجام شده</span>
+          <span>{toPersianDigits(wdone)} از {toPersianDigits(weekTasks.length)} وظیفه انجام شده</span>
         </div>
         {mGoals.length > 0 && (
           <>
             <Bar>اهداف در جریان</Bar>
-            <div className="space-y-1.5">{mGoals.slice(0, 4).map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} />)}</div>
+            <div className="space-y-1.5">{mGoals.slice(0, 4).map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} onOpen={onOpenGoal} />)}</div>
           </>
         )}
         <div className="space-y-2">
@@ -422,10 +425,10 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
                     </button>
                   ))}
                   {ts.map(t => (
-                    <button key={t.id} type="button" onClick={() => onToggleTask(t.id)} className="flex items-center gap-2 text-[11px] w-full text-right cursor-pointer">
-                      <span className={`w-3.5 h-3.5 rounded-full border shrink-0 ${t.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
-                      <span className={t.isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}>{t.title}</span>
-                    </button>
+                    <div key={t.id} className="flex items-center gap-2 text-[11px] w-full">
+                      <button type="button" aria-label="انجام شد" onClick={() => onToggleTask(t.id)} className={`w-4 h-4 rounded-full border shrink-0 cursor-pointer ${t.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
+                      <button type="button" onClick={() => onOpenTask(t)} className={`flex-1 text-right cursor-pointer ${t.isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}`}>{t.title}</button>
+                    </div>
                   ))}
                   <input
                     value={rv(dk).text || ''}
@@ -472,7 +475,7 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
               <tbody>
                 {activeHabits.map(h => (
                   <tr key={h.id} className="border-t border-gray-100">
-                    <td className="sticky right-0 bg-white z-10 px-2 py-1 font-bold text-gray-800 max-w-[110px] truncate">{h.title}</td>
+                    <td className="sticky right-0 bg-white z-10 px-2 py-1 font-bold text-gray-800 max-w-[110px] truncate cursor-pointer" onClick={() => onOpenHabit(h)}>{h.title}</td>
                     {dayList.map(d => {
                       const ds = jalaliToFormattedString({ year, month, day: d });
                       const on = !!h.completionHistory?.[ds];
@@ -504,9 +507,9 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
       <Page refCb={el => { subRefs.current[2 + weeks.length] = el; }}>
         <Bar>{`ارزیابی ${PERSIAN_MONTHS[month - 1]}`}</Bar>
         <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(st.percent)}٪</p><p className="text-[10px] text-gray-500">کارها</p></div>
+          <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(st.percent)}٪</p><p className="text-[10px] text-gray-500">وظیفه‌ها</p></div>
           <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(habitRate(month))}٪</p><p className="text-[10px] text-gray-500">عادت‌ها</p></div>
-          <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(st.done)}</p><p className="text-[10px] text-gray-500">کار انجام‌شده</p></div>
+          <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(st.done)}</p><p className="text-[10px] text-gray-500">وظیفه انجام‌شده</p></div>
         </div>
         <ReviewBox rv={rv(k)} onChange={p => setReview(k, p)} label="این ماه چطور بود؟ چه چیزی را بهتر می‌کنید؟ چرا بعضی عادت‌ها متوقف شد؟" showRating />
       </Page>
@@ -520,13 +523,13 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
       <Page>
         <Bar left={toPersianDigits(year)}>ارزیابی سال</Bar>
         <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(yDone)}</p><p className="text-[10px] text-gray-500">کار انجام‌شده</p></div>
+          <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(yDone)}</p><p className="text-[10px] text-gray-500">وظیفه انجام‌شده</p></div>
           <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(annualGoals.filter(g => goalPercent(g, tasks) >= 100).length)}/{toPersianDigits(annualGoals.length)}</p><p className="text-[10px] text-gray-500">هدف سالانه</p></div>
           <div className="rounded-xl bg-emerald-50 p-2"><p className="text-base font-black text-emerald-700">{toPersianDigits(Math.round(Array.from({ length: 12 }, (_, i) => habitRate(i + 1)).reduce((a, b) => a + b, 0) / 12))}٪</p><p className="text-[10px] text-gray-500">میانگین عادت‌ها</p></div>
         </div>
         <ReviewBox rv={rv(k)} onChange={p => setReview(k, p)} label="سال چطور گذشت؟ مهم‌ترین درس‌ها؟ برنامهٔ سال بعد؟" showRating />
         <Bar>اهداف سالانه</Bar>
-        <div className="space-y-1.5">{annualGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} />)}</div>
+        <div className="space-y-1.5">{annualGoals.map(g => <GoalRow key={g.id} g={g} percent={goalPercent(g, tasks)} color={goalColor(g)} onOpen={onOpenGoal} />)}</div>
       </Page>
     );
   };

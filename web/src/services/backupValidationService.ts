@@ -568,7 +568,7 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
     return {
       isValid: false,
       fatalError:
-        'هیچ داده معتبری (تسک، هدف، عادت، رویداد، دسته یا پروفایل) در این فایل یافت نشد. جهت جلوگیری از پاک شدن اطلاعات فعلی شما، بارگذاری متوقف شد.',
+        'هیچ داده معتبری (وظیفه، هدف، عادت، رویداد، دسته یا پروفایل) در این فایل یافت نشد. جهت جلوگیری از پاک شدن اطلاعات فعلی شما، بارگذاری متوقف شد.',
       warnings: [],
       counts: {
         categories: 0,
@@ -586,7 +586,7 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
   }
 
   if (corruptedTasks > 0) {
-    warnings.push(`${corruptedTasks} تسک ناقص (فاقد عنوان یا شناسه) نادیده گرفته شد.`);
+    warnings.push(`${corruptedTasks} وظیفه ناقص (فاقد عنوان یا شناسه) نادیده گرفته شد.`);
   }
   if (corruptedGoals > 0) {
     warnings.push(`${corruptedGoals} هدف با ساختار نامعتبر نادیده گرفته شد.`);
@@ -695,7 +695,7 @@ function validateDirectTasksArray(arr: any[]): ValidatedBackupResult {
   if (validTasks.length === 0) {
     return {
       isValid: false,
-      fatalError: 'فایل حاوی هیچ تسک معتبری نیست. اطلاعات فعلی شما بدون تغییر حفظ گردید.',
+      fatalError: 'فایل حاوی هیچ وظیفه معتبری نیست. اطلاعات فعلی شما بدون تغییر حفظ گردید.',
       warnings: [],
       counts: {
         categories: 0,
@@ -715,7 +715,7 @@ function validateDirectTasksArray(arr: any[]): ValidatedBackupResult {
   return {
     isValid: true,
     fatalError: null,
-    warnings: corrupted > 0 ? [`${corrupted} تسک ناقص در فایل نادیده گرفته شد.`] : [],
+    warnings: corrupted > 0 ? [`${corrupted} وظیفه ناقص در فایل نادیده گرفته شد.`] : [],
     counts: {
       categories: 0,
       goals: 0,

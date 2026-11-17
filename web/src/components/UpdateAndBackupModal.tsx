@@ -205,7 +205,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
       const jsonString = JSON.stringify(payload, null, 2);
       await navigator.clipboard.writeText(jsonString);
       setIsCopiedJson(true);
-      setBackupSuccessMessage('متن کامل نسخه پشتیبان (شامل اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) کپی شد!');
+      setBackupSuccessMessage('متن کامل نسخه پشتیبان (شامل اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) کپی شد!');
       setTimeout(() => setIsCopiedJson(false), 3000);
       setTimeout(() => setBackupSuccessMessage(null), 6000);
     } catch (err) {
@@ -330,7 +330,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
     );
 
     const modeText = fullImportMode === 'REPLACE' ? 'جایگزینی کامل' : 'ترکیب و ادغام هوشمند';
-    setFullImportSuccess(`تمامی بخش‌ها (اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) با موفقیت به شیوه «${modeText}» بازیابی و ذخیره شدند.`);
+    setFullImportSuccess(`تمامی بخش‌ها (اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) با موفقیت به شیوه «${modeText}» بازیابی و ذخیره شدند.`);
     setFullImportData(null);
     setFullImportFile(null);
     setValidationWarnings([]);
@@ -365,7 +365,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
       setTimeout(() => setBackupSuccessMessage(null), 5000);
     } catch (e) {
       console.error(e);
-      setBackupSuccessMessage('خطا در تهیه نسخه پشتیبان تسک‌ها');
+      setBackupSuccessMessage('خطا در تهیه نسخه پشتیبان وظیفه‌ها');
     }
   };
 
@@ -386,7 +386,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
       const jsonString = JSON.stringify(payload, null, 2);
       await navigator.clipboard.writeText(jsonString);
       setIsCopiedTaskJson(true);
-      setBackupSuccessMessage(`کد JSON تسک‌ها (${toPersianDigits(tasks.length)} تسک) در حافظه کپی شد.`);
+      setBackupSuccessMessage(`کد JSON وظیفه‌ها (${toPersianDigits(tasks.length)} وظیفه) در حافظه کپی شد.`);
       setTimeout(() => setIsCopiedTaskJson(false), 3000);
       setTimeout(() => setBackupSuccessMessage(null), 5000);
     } catch (err) {
@@ -395,7 +395,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
   };
 
   // 6c. Parse Tasks JSON from String (File or Paste)
-  const parseTasksJsonString = (text: string, sourceName = 'فایل تسک‌ها') => {
+  const parseTasksJsonString = (text: string, sourceName = 'فایل وظیفه‌ها') => {
     setTaskImportError(null);
     setTaskImportSuccess(null);
     try {
@@ -410,7 +410,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
       }
 
       if (rawList.length === 0) {
-        setTaskImportError('هیچ تسک معتبری در این فایل یا متن یافت نشد.');
+        setTaskImportError('هیچ وظیفه معتبری در این فایل یا متن یافت نشد.');
         setTaskImportData(null);
         return;
       }
@@ -426,7 +426,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
         }));
 
       if (sanitizedTasks.length === 0) {
-        setTaskImportError('عناوین تسک‌ها در ساختار JSON معتبر نیست.');
+        setTaskImportError('عناوین وظیفه‌ها در ساختار JSON معتبر نیست.');
         setTaskImportData(null);
         return;
       }
@@ -469,7 +469,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
   const handleConfirmTaskImport = () => {
     if (!taskImportData || !onImportTasksOnly) return;
     onImportTasksOnly(taskImportData, taskImportMode);
-    setTaskImportSuccess(`تعداد ${toPersianDigits(taskImportData.length)} تسک با موفقیت ${taskImportMode === 'REPLACE' ? 'جایگزین' : 'ادغام'} شدند.`);
+    setTaskImportSuccess(`تعداد ${toPersianDigits(taskImportData.length)} وظیفه با موفقیت ${taskImportMode === 'REPLACE' ? 'جایگزین' : 'ادغام'} شدند.`);
     setTaskImportData(null);
     setTaskImportFile(null);
     setTimeout(() => setTaskImportSuccess(null), 4000);
@@ -531,7 +531,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
             }`}
           >
             <Database className="w-4 h-4 text-teal-600" />
-            <span>بکاپ تسک‌ها</span>
+            <span>بکاپ وظیفه‌ها</span>
           </button>
 
           <button
@@ -611,7 +611,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                   <div className="text-sm font-black text-emerald-900">{toPersianDigits(goals.length)}</div>
                 </div>
                 <div className="bg-white p-2 rounded-xl border border-gray-100">
-                  <div className="text-[10px] text-gray-500 font-medium">وظایف و تسک‌ها</div>
+                  <div className="text-[10px] text-gray-500 font-medium">وظایف و وظیفه‌ها</div>
                   <div className="text-sm font-black text-emerald-900">{toPersianDigits(tasks.length)}</div>
                 </div>
                 <div className="bg-white p-2 rounded-xl border border-gray-100">
@@ -641,7 +641,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-gray-900">خروجی کامل از تمام اطلاعات برنامه (همه بخش‌ها)</h4>
-                      <p className="text-[10px] text-gray-500">شامل اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، عکس و پروفایل کاربری، زنگ‌های یادآور و تنظیمات</p>
+                      <p className="text-[10px] text-gray-500">شامل اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، عکس و پروفایل کاربری، زنگ‌های یادآور و تنظیمات</p>
                     </div>
                   </div>
                 </div>
@@ -817,7 +817,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                         <strong className="text-teal-950 font-black">{toPersianDigits(fullImportData.goals?.length || 0)}</strong>
                       </div>
                       <div className="bg-teal-50/70 p-2 rounded-xl">
-                        <span className="text-[10px] text-teal-800 block">تسک‌ها</span>
+                        <span className="text-[10px] text-teal-800 block">وظیفه‌ها</span>
                         <strong className="text-teal-950 font-black">{toPersianDigits(fullImportData.tasks?.length || 0)}</strong>
                       </div>
                       <div className="bg-teal-50/70 p-2 rounded-xl">
@@ -908,14 +908,14 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-black text-teal-950 flex items-center gap-2">
                     <Database className="w-4 h-4 text-teal-700" />
-                    <span>پشتیبان‌گیری سریع ویژه تسک‌ها و وظایف</span>
+                    <span>پشتیبان‌گیری سریع ویژه وظیفه‌ها و وظایف</span>
                   </h4>
                   <span className="text-[10px] font-bold bg-teal-200/70 text-teal-900 px-2 py-0.5 rounded-full">
-                    مجموع: {toPersianDigits(tasks.length)} تسک
+                    مجموع: {toPersianDigits(tasks.length)} وظیفه
                   </span>
                 </div>
                 <p className="text-[11px] text-teal-900/80 leading-relaxed">
-                  می‌توانید تنها از فهرست وظایف خود خروجی JSON بگیرید یا تسک‌های یک نسخه دیگر را بازگردانی و ادغام نمایید.
+                  می‌توانید تنها از فهرست وظایف خود خروجی JSON بگیرید یا وظیفه‌های یک نسخه دیگر را بازگردانی و ادغام نمایید.
                 </p>
               </div>
 
@@ -925,10 +925,10 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                   <div>
                     <h5 className="font-bold text-xs text-gray-900 flex items-center gap-1.5">
                       <Download className="w-3.5 h-3.5 text-teal-700" />
-                      <span>خروجی فایل یا کد JSON تسک‌ها</span>
+                      <span>خروجی فایل یا کد JSON وظیفه‌ها</span>
                     </h5>
                     <p className="text-[11px] text-gray-500 mt-0.5">
-                      حاوی تمام {toPersianDigits(tasks.length)} تسک جاری، تکرارشونده و بایگانی شده (بدون عادات یا اهداف)
+                      حاوی تمام {toPersianDigits(tasks.length)} وظیفه جاری، تکرارشونده و بایگانی شده (بدون عادات یا اهداف)
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -938,13 +938,13 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                       className="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                     >
                       <Download className="w-3.5 h-3.5" />
-                      <span>دانلود فایل تسک‌ها</span>
+                      <span>دانلود فایل وظیفه‌ها</span>
                     </button>
                     <button
                       type="button"
                       onClick={handleCopyTasksJsonToClipboard}
                       className="px-3 py-1.5 bg-white border border-teal-300 hover:bg-teal-50 text-teal-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                      title="کپی مستقیم ساختار JSON تسک‌ها"
+                      title="کپی مستقیم ساختار JSON وظیفه‌ها"
                     >
                       {isCopiedTaskJson ? (
                         <>
@@ -954,7 +954,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5 text-teal-700" />
-                          <span>کپی کد تسک‌ها</span>
+                          <span>کپی کد وظیفه‌ها</span>
                         </>
                       )}
                     </button>
@@ -968,10 +968,10 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                   <div>
                     <h5 className="font-bold text-xs text-gray-900 flex items-center gap-1.5">
                       <Upload className="w-3.5 h-3.5 text-teal-700" />
-                      <span>ورود و بازگردانی مجزای تسک‌ها (مستقل)</span>
+                      <span>ورود و بازگردانی مجزای وظیفه‌ها (مستقل)</span>
                     </h5>
                     <p className="text-[11px] text-gray-500 mt-0.5">
-                      فایل یا کد تسک‌ها را انتخاب کنید؛ سایر بخش‌ها (عادت‌ها، اهداف و دسته‌ها) کاملاً دست‌نخورده می‌مانند.
+                      فایل یا کد وظیفه‌ها را انتخاب کنید؛ سایر بخش‌ها (عادت‌ها، اهداف و دسته‌ها) کاملاً دست‌نخورده می‌مانند.
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -993,7 +993,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                       className="px-3.5 py-1.5 bg-white border border-teal-300 hover:bg-teal-50 text-teal-900 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs select-none"
                     >
                       <Upload className="w-3.5 h-3.5 text-teal-700" />
-                      <span>انتخاب فایل تسک‌ها</span>
+                      <span>انتخاب فایل وظیفه‌ها</span>
                     </label>
 
                     <button
@@ -1011,7 +1011,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                 {showTaskPasteBox && (
                   <div className="bg-teal-50/40 p-3 rounded-xl border border-teal-200 space-y-2 animate-fade-in">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-teal-950">کد JSON تسک‌ها را اینجا بچسبانید (Paste):</span>
+                      <span className="font-bold text-teal-950">کد JSON وظیفه‌ها را اینجا بچسبانید (Paste):</span>
                       <button
                         type="button"
                         onClick={async () => {
@@ -1062,7 +1062,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                         }}
                         className="px-4 py-1 bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer"
                       >
-                        بررسی و بارگذاری تسک‌ها
+                        بررسی و بارگذاری وظیفه‌ها
                       </button>
                     </div>
                   </div>
@@ -1087,10 +1087,10 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                     <div className="flex items-center justify-between text-xs flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-teal-950">
-                          تعداد تسک‌های آماده بازیابی: {toPersianDigits(taskImportData.length)} تسک
+                          تعداد وظیفه‌های آماده بازیابی: {toPersianDigits(taskImportData.length)} وظیفه
                         </span>
                         <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">
-                          فقط تسک‌ها (عادات و اهداف محفوظند)
+                          فقط وظیفه‌ها (عادات و اهداف محفوظند)
                         </span>
                       </div>
                       <span className="text-[10px] text-gray-500 font-mono">{taskImportFile?.name || 'ورودی متنی'}</span>
@@ -1109,7 +1109,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                         />
                         <div>
                           <span className="block text-xs">ترکیب و ادغام (پیشنهادی)</span>
-                          <span className="text-[10px] text-gray-500 font-normal">تسک‌های جدید افزوده شده و تسک‌های قبلی شما حذف نمی‌شوند.</span>
+                          <span className="text-[10px] text-gray-500 font-normal">وظیفه‌های جدید افزوده شده و وظیفه‌های قبلی شما حذف نمی‌شوند.</span>
                         </div>
                       </label>
                       <label className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${
@@ -1123,8 +1123,8 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                           className="mt-0.5 text-amber-600 focus:ring-amber-500"
                         />
                         <div>
-                          <span className="block text-xs">جایگزینی کامل لیست تسک‌ها</span>
-                          <span className="text-[10px] text-gray-500 font-normal">فقط تسک‌ها جایگزین می‌شوند؛ عادات و اهداف اصلاً پاک نمی‌شوند.</span>
+                          <span className="block text-xs">جایگزینی کامل لیست وظیفه‌ها</span>
+                          <span className="text-[10px] text-gray-500 font-normal">فقط وظیفه‌ها جایگزین می‌شوند؛ عادات و اهداف اصلاً پاک نمی‌شوند.</span>
                         </div>
                       </label>
                     </div>
@@ -1145,7 +1145,7 @@ export const UpdateAndBackupModal: React.FC<Props> = ({
                         onClick={handleConfirmTaskImport}
                         className="px-4 py-1.5 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs rounded-xl shadow-xs cursor-pointer active:scale-95"
                       >
-                        تایید و اعمال روی تسک‌ها
+                        تایید و اعمال روی وظیفه‌ها
                       </button>
                     </div>
                   </div>

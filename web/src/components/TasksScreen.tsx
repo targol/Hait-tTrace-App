@@ -107,7 +107,7 @@ export const TasksScreen: React.FC<Props> = ({
   const oneMonthAgoDate = addDaysJalali(today, -30);
   const oneMonthAgoStr = jalaliToFormattedString(oneMonthAgoDate);
 
-  const [activeTab, setActiveTab] = useState<FilterTab>('TODAY');
+  const [activeTab, setActiveTab] = useState<FilterTab>('ALL');
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
   const [selectedTaskYear, setSelectedTaskYear] = useState<number | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -323,7 +323,7 @@ export const TasksScreen: React.FC<Props> = ({
         {/* Header & Add Button */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">مدیریت تسک‌ها</h2>
+            <h2 className="text-lg font-bold text-gray-900">مدیریت وظیفه‌ها</h2>
             <p className="text-xs text-gray-500 mt-0.5">برنامه‌ریزی، اولویت‌بندی و بایگانی هوشمند وظایف</p>
           </div>
           <div className="flex items-center gap-2">
@@ -332,7 +332,7 @@ export const TasksScreen: React.FC<Props> = ({
                 type="button"
                 onClick={onOpenTasksBackup}
                 className="px-3 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="پشتیبان‌گیری و بازیابی کامل همه اطلاعات برنامه و تسک‌ها"
+                title="پشتیبان‌گیری و بازیابی کامل همه اطلاعات برنامه و وظیفه‌ها"
               >
                 <Database className="w-3.5 h-3.5 text-emerald-600" />
                 <span>پشتیبان‌گیری و بازیابی</span>
@@ -344,7 +344,7 @@ export const TasksScreen: React.FC<Props> = ({
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>تسک جدید</span>
+              <span>وظیفه جدید</span>
             </button>
           </div>
         </div>
@@ -354,7 +354,7 @@ export const TasksScreen: React.FC<Props> = ({
           <Search className="w-4 h-4 text-gray-400 absolute right-3.5 top-3" />
           <input
             type="text"
-            placeholder="جستجو در تسک‌ها و یادداشت‌ها..."
+            placeholder="جستجو در وظیفه‌ها و یادداشت‌ها..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pr-10 pl-4 py-2.5 bg-white rounded-xl border border-gray-200 text-xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-hidden transition-all shadow-2xs"
@@ -515,7 +515,7 @@ export const TasksScreen: React.FC<Props> = ({
         {/* Year Filter Pills for viewing past & current years */}
         {taskYears.length > 1 && (
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar pt-2 border-t border-gray-100">
-            <span className="text-[11px] font-bold text-gray-400 shrink-0 ml-1">سال تسک:</span>
+            <span className="text-[11px] font-bold text-gray-400 shrink-0 ml-1">سال وظیفه:</span>
             <button
               type="button"
               onClick={() => setSelectedTaskYear('ALL')}
@@ -559,13 +559,13 @@ export const TasksScreen: React.FC<Props> = ({
         <div className="bg-white border border-gray-200/80 rounded-2xl p-3 sm:p-3.5 shadow-2xs space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
             <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-              <span>نمای کلی تمام تسک‌ها</span>
+              <span>نمای کلی تمام وظیفه‌ها</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-extrabold">
-                مجموع: {toPersianDigits(tasks.length)} تسک
+                مجموع: {toPersianDigits(tasks.length)} وظیفه
               </span>
             </span>
             <span className="text-[11px] text-gray-500">
-              نمایش همه تسک‌های سیستم (شامل جاری، آتی، معوقه، تکرارشونده و بایگانی)
+              نمایش همه وظیفه‌های سیستم (شامل جاری، آتی، معوقه، تکرارشونده و بایگانی)
             </span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-1 text-[11px]">
@@ -582,7 +582,7 @@ export const TasksScreen: React.FC<Props> = ({
               onClick={() => setActiveTab('UPCOMING')}
               className="p-2 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 text-center hover:bg-blue-100/70 transition-colors cursor-pointer"
             >
-              <div className="text-[10px] text-blue-700">تسک‌های آتی</div>
+              <div className="text-[10px] text-blue-700">وظیفه‌های آتی</div>
               <div className="text-sm font-black">{toPersianDigits(upcomingCount)}</div>
             </button>
             <button
@@ -630,10 +630,10 @@ export const TasksScreen: React.FC<Props> = ({
             </div>
             <div>
               <p className="font-bold text-amber-950">
-                {toPersianDigits(archivedCount)} تسک تکمیل‌شده قدیمی به بایگانی منتقل شده‌اند
+                {toPersianDigits(archivedCount)} وظیفه تکمیل‌شده قدیمی به بایگانی منتقل شده‌اند
               </p>
               <p className="text-[11px] text-amber-800/80 mt-0.5">
-                تسک‌های تکمیل‌شده با قدمت بیش از ۱ ماه به صورت خودکار در بخش بایگانی قرار می‌گیرند تا لیست جاری خلوت بماند.
+                وظیفه‌های تکمیل‌شده با قدمت بیش از ۱ ماه به صورت خودکار در بخش بایگانی قرار می‌گیرند تا لیست جاری خلوت بماند.
               </p>
             </div>
           </div>
@@ -658,13 +658,13 @@ export const TasksScreen: React.FC<Props> = ({
               </div>
               <div>
                 <h3 className="text-sm font-extrabold text-gray-900 flex items-center gap-2">
-                  <span>بایگانی خودکار تسک‌ها</span>
+                  <span>بایگانی خودکار وظیفه‌ها</span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900 font-extrabold">
-                    {toPersianDigits(archivedCount)} تسک
+                    {toPersianDigits(archivedCount)} وظیفه
                   </span>
                 </h3>
                 <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">
-                  تسک‌های تکمیل‌شده با قدمت بیش از ۱ ماه به صورت خودکار به اینجا منتقل می‌شوند تا لیست‌های روزانه و فعال خلوت، سریع و متمرکز بمانند.
+                  وظیفه‌های تکمیل‌شده با قدمت بیش از ۱ ماه به صورت خودکار به اینجا منتقل می‌شوند تا لیست‌های روزانه و فعال خلوت، سریع و متمرکز بمانند.
                 </p>
               </div>
             </div>
@@ -673,7 +673,7 @@ export const TasksScreen: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => {
-                  if (window.confirm(`آیا از پاکسازی تمام ${toPersianDigits(archivedCount)} تسک موجود در بایگانی اطمینان دارید؟ این عملیات غیرقابل بازگشت است.`)) {
+                  if (window.confirm(`آیا از پاکسازی تمام ${toPersianDigits(archivedCount)} وظیفه موجود در بایگانی اطمینان دارید؟ این عملیات غیرقابل بازگشت است.`)) {
                     onClearArchivedTasks();
                   }
                 }}
@@ -716,9 +716,9 @@ export const TasksScreen: React.FC<Props> = ({
               <Archive className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-gray-800 text-sm">هیچ تسکی در بخش بایگانی وجود ندارد</h4>
+              <h4 className="font-bold text-gray-800 text-sm">هیچ وظیفه‌ای در بخش بایگانی وجود ندارد</h4>
               <p className="text-gray-500 max-w-sm mx-auto text-[11px] leading-relaxed">
-                تسک‌های تکمیل‌شده به محض اینکه ۳۰ روز از اتمام آنها بگذرد، به صورت خودکار به اینجا منتقل خواهند شد تا لیست‌های جاری همواره سبک و بدون شلوغی بمانند.
+                وظیفه‌های تکمیل‌شده به محض اینکه ۳۰ روز از اتمام آنها بگذرد، به صورت خودکار به اینجا منتقل خواهند شد تا لیست‌های جاری همواره سبک و بدون شلوغی بمانند.
               </p>
             </div>
           </div>
@@ -728,9 +728,9 @@ export const TasksScreen: React.FC<Props> = ({
               <Calendar className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-gray-800 text-sm">هیچ تسک آتی برنامه‌ریزی نشده است</h4>
+              <h4 className="font-bold text-gray-800 text-sm">هیچ وظیفه آتی برنامه‌ریزی نشده است</h4>
               <p className="text-gray-500 max-w-sm mx-auto text-[11px] leading-relaxed">
-                تسک‌هایی که تاریخ موعد آن‌ها برای فردا یا روزهای آینده تنظیم شود در این بخش قرار می‌گیرند.
+                وظیفه‌هایی که تاریخ موعد آن‌ها برای فردا یا روزهای آینده تنظیم شود در این بخش قرار می‌گیرند.
               </p>
             </div>
             <button
@@ -739,18 +739,18 @@ export const TasksScreen: React.FC<Props> = ({
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>ایجاد تسک با موعد آتی</span>
+              <span>ایجاد وظیفه با موعد آتی</span>
             </button>
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center text-xs text-gray-400 space-y-2">
-            <p>هیچ تسکی با فیلترهای انتخابی یافت نشد.</p>
+            <p>هیچ وظیفه‌ای با فیلترهای انتخابی یافت نشد.</p>
             <button
               type="button"
               onClick={onNewTask}
               className="text-emerald-700 font-bold hover:underline cursor-pointer"
             >
-              ایجاد تسک جدید
+              ایجاد وظیفه جدید
             </button>
           </div>
         )
@@ -777,7 +777,7 @@ export const TasksScreen: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => onToggleTask(t.id)}
-                      title={isArchived ? 'خروج از وضعیت تکمیل و بازگشت به تسک‌های فعال' : 'تغییر وضعیت انجام'}
+                      title={isArchived ? 'خروج از وضعیت تکمیل و بازگشت به وظیفه‌های فعال' : 'تغییر وضعیت انجام'}
                       className="cursor-pointer text-emerald-600 hover:text-emerald-700 transition-colors mt-0.5 shrink-0"
                     >
                       {t.isCompleted ? (
@@ -835,10 +835,16 @@ export const TasksScreen: React.FC<Props> = ({
                           </span>
                         )}
 
+                        {!t.isCompleted && !isArchived && t.startDate && compareJalaliDateStrings(todayStr, t.startDate) < 0 && (
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/90">
+                            شروع: {toPersianDigits(t.startDate)}
+                          </span>
+                        )}
+
                         {!t.isCompleted && !isArchived && isUpcomingJalaliDate(t.dueDate, todayStr) && (
                           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/90 flex items-center gap-1 shadow-2xs">
                             <Calendar className="w-3 h-3 text-blue-600" />
-                            <span>تسک آتی</span>
+                            <span>وظیفه آتی</span>
                           </span>
                         )}
 
@@ -898,7 +904,7 @@ export const TasksScreen: React.FC<Props> = ({
                         )}
 
                         {t.time && (
-                          <span className="flex items-center gap-1 text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md text-[10px]" title="زمان انجام تسک">
+                          <span className="flex items-center gap-1 text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md text-[10px]" title="زمان انجام وظیفه">
                             <Clock className="w-3 h-3 text-emerald-600" />
                             <span>انجام: {toPersianDigits(t.time)}</span>
                           </span>
@@ -948,7 +954,7 @@ export const TasksScreen: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => onRestoreTask(t.id)}
-                        title="بازگردانی به لیست تسک‌های جاری"
+                        title="بازگردانی به لیست وظیفه‌های جاری"
                         className="px-2.5 py-1.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 rounded-xl transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-bold shadow-2xs"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
@@ -962,7 +968,7 @@ export const TasksScreen: React.FC<Props> = ({
                         onClick={() => {
                           const todayHol = isDateHoliday(today);
                           if (todayHol.isHoliday) {
-                            const proceed = window.confirm(`توجه: امروز به دلیل «${todayHol.title}» در تقویم رسمی کشور تعطیل است.\nآیا مایل به شروع ساعت شنی تمرکز روی این تسک هستید؟`);
+                            const proceed = window.confirm(`توجه: امروز به دلیل «${todayHol.title}» در تقویم رسمی کشور تعطیل است.\nآیا مایل به شروع ساعت شنی تمرکز روی این وظیفه هستید؟`);
                             if (!proceed) return;
                           }
                           onOpenTimer(
@@ -1017,7 +1023,7 @@ export const TasksScreen: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => setTaskToTransfer(t)}
-                        title="انتقال یا بستن تسک (فصلی / سالانه)"
+                        title="انتقال یا بستن وظیفه (فصلی / سالانه)"
                         className="p-1.5 text-gray-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Repeat className="w-3.5 h-3.5" />
@@ -1038,7 +1044,7 @@ export const TasksScreen: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => onDuplicateTask(t)}
-                        title="کپی گرفتن و ویرایش تسک (داپلیکیت)"
+                        title="کپی گرفتن و ویرایش وظیفه (داپلیکیت)"
                         className="p-1.5 text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Copy className="w-3.5 h-3.5" />

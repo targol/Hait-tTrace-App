@@ -667,7 +667,7 @@ export const SettingsScreen: React.FC<Props> = ({
       await navigator.clipboard.writeText(JSON.stringify(backup, null, 2));
       setIsCopyingJson(true);
       setTimeout(() => setIsCopyingJson(false), 2500);
-      showNotification('متن کامل نسخه پشتیبان (شامل همه بخش‌ها: اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) در کلیپ‌بورد کپی شد.');
+      showNotification('متن کامل نسخه پشتیبان (شامل همه بخش‌ها: اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) در کلیپ‌بورد کپی شد.');
     } catch (err) {
       showNotification('خطا در کپی داده‌ها به کلیپ‌بورد.');
     }
@@ -1049,7 +1049,7 @@ export const SettingsScreen: React.FC<Props> = ({
               </span>
             </div>
             <div className="bg-blue-50/70 border border-blue-200/70 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-blue-800 block">تسک‌ها و عادات</span>
+              <span className="text-[10px] text-blue-800 block">وظیفه‌ها و عادات</span>
               <span className="text-sm font-bold text-blue-950 mt-0.5 block">
                 {toPersianDigits(tasks.length + habits.length)} مورد
               </span>
@@ -1541,7 +1541,7 @@ export const SettingsScreen: React.FC<Props> = ({
                 <span>بخش چهارم: دسته‌بندی‌های اهداف و گیاهان اختصاصی</span>
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                هر دسته‌بندی دارای رنگ و گیاه نمادین است که به زیرمجموعه‌ها، تسک‌ها و عادات ارث داده می‌شود.
+                هر دسته‌بندی دارای رنگ و گیاه نمادین است که به زیرمجموعه‌ها، وظیفه‌ها و عادات ارث داده می‌شود.
               </p>
             </div>
 
@@ -1608,7 +1608,7 @@ export const SettingsScreen: React.FC<Props> = ({
                         <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-400">
                           <span>{toPersianDigits(linkedGoals.length)} هدف</span>
                           <span>•</span>
-                          <span>{toPersianDigits(linkedTasks.length)} تسک</span>
+                          <span>{toPersianDigits(linkedTasks.length)} وظیفه</span>
                           <span>•</span>
                           <span>{toPersianDigits(linkedHabits.length)} عادت</span>
                         </div>
@@ -1682,7 +1682,7 @@ export const SettingsScreen: React.FC<Props> = ({
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200/80 font-semibold flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-blue-600" />
-                <span>{toPersianDigits(tasks.length)} تسک</span>
+                <span>{toPersianDigits(tasks.length)} وظیفه</span>
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200/80 font-semibold flex items-center gap-1">
                 <Sprout className="w-3 h-3 text-teal-600" />
@@ -1714,7 +1714,7 @@ export const SettingsScreen: React.FC<Props> = ({
                   </span>
                 </div>
                 <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">
-                  تمامی تغییرات شما بلافاصله ذخیره می‌شوند. در تهیه نسخه پشتیبان، ۱۰۰٪ اطلاعات برنامه (اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، عکس و پروفایل کاربری و تنظیمات یادآور) پشتیبانی می‌شود.
+                  تمامی تغییرات شما بلافاصله ذخیره می‌شوند. در تهیه نسخه پشتیبان، ۱۰۰٪ اطلاعات برنامه (اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، عکس و پروفایل کاربری و تنظیمات یادآور) پشتیبانی می‌شود.
                 </p>
               </div>
             </div>
@@ -1732,7 +1732,7 @@ export const SettingsScreen: React.FC<Props> = ({
                   <span>تهیه نسخه پشتیبان کامل از کل برنامه (Export)</span>
                 </div>
                 <p className="text-[11px] text-gray-600 leading-relaxed">
-                  خروجی کامل از تمام بخش‌های برنامه شامل ساختار درختی اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل کاربری (به همراه عکس) و تنظیمات یادآور.
+                  خروجی کامل از تمام بخش‌های برنامه شامل ساختار درختی اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل کاربری (به همراه عکس) و تنظیمات یادآور.
                 </p>
               </div>
 
@@ -1824,7 +1824,7 @@ export const SettingsScreen: React.FC<Props> = ({
                   <span>آپلود و بازگردانی کامل اطلاعات (Restore / Import)</span>
                 </div>
                 <p className="text-[11px] text-gray-600 leading-relaxed">
-                  فایل پشتیبان خود را بارگذاری کنید تا تمام بخش‌ها (اهداف، تسک‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) بازیابی شوند.
+                  فایل پشتیبان خود را بارگذاری کنید تا تمام بخش‌ها (اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) بازیابی شوند.
                 </p>
               </div>
 
@@ -1911,9 +1911,9 @@ export const SettingsScreen: React.FC<Props> = ({
             </span>
           </div>
           <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3">
-            <span className="font-bold text-amber-900 block mb-1">۳. برگ‌های تسک و عادت روزانه</span>
+            <span className="font-bold text-amber-900 block mb-1">۳. برگ‌های وظیفه و عادت روزانه</span>
             <span className="text-amber-800/80 text-[11px] leading-normal">
-              تسک‌ها و عادات هفتگی و روزانه که با هر تیک زدن، بذر را آبیاری کرده و به بار می‌نشانند.
+              وظیفه‌ها و عادات هفتگی و روزانه که با هر تیک زدن، بذر را آبیاری کرده و به بار می‌نشانند.
             </span>
           </div>
         </div>
@@ -2116,7 +2116,7 @@ export const SettingsScreen: React.FC<Props> = ({
             </p>
             {(categoryToDelete.linkedGoalsCount > 0 || categoryToDelete.linkedTasksCount > 0 || categoryToDelete.linkedHabitsCount > 0) && (
               <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-[11px] text-amber-800 leading-relaxed">
-                توجه: موارد متصل به این دسته ({categoryToDelete.linkedGoalsCount} هدف، {categoryToDelete.linkedTasksCount} تسک، {categoryToDelete.linkedHabitsCount} عادت) پس از حذف، به دسته‌بندی دیگر منتقل خواهند شد.
+                توجه: موارد متصل به این دسته ({categoryToDelete.linkedGoalsCount} هدف، {categoryToDelete.linkedTasksCount} وظیفه، {categoryToDelete.linkedHabitsCount} عادت) پس از حذف، به دسته‌بندی دیگر منتقل خواهند شد.
               </div>
             )}
             <div className="flex items-center justify-end gap-2 pt-2">
@@ -2191,7 +2191,7 @@ export const SettingsScreen: React.FC<Props> = ({
                     <span className="text-[9px] text-gray-500">فعلی: {toPersianDigits(goals.length)}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-blue-50/80 border border-blue-200 text-center">
-                    <span className="text-[10px] text-blue-800 block">تسک‌ها</span>
+                    <span className="text-[10px] text-blue-800 block">وظیفه‌ها</span>
                     <span className="text-sm font-black text-blue-950 mt-0.5 block">{toPersianDigits(restoreModal.counts.tasks)}</span>
                     <span className="text-[9px] text-gray-500">فعلی: {toPersianDigits(tasks.length)}</span>
                   </div>

@@ -61,7 +61,7 @@ export const SeasonGardenCard: React.FC<Props> = ({
         {/* Minimalist summary counts */}
         <div className="flex items-center justify-between text-[10px] text-gray-500 pt-0.5">
           <span>{toPersianDigits(summary.completedGoalsCount)}/{toPersianDigits(summary.goalsCount)} هدف</span>
-          <span>{toPersianDigits(summary.completedTasksCount)}/{toPersianDigits(summary.tasksCount)} تسک</span>
+          <span>{toPersianDigits(summary.completedTasksCount)}/{toPersianDigits(summary.tasksCount)} وظیفه</span>
           <span>{toPersianDigits(summary.habitWateringDaysCount)} بار آبیاری</span>
         </div>
       </div>
@@ -128,7 +128,7 @@ export const SeasonGardenCard: React.FC<Props> = ({
         </div>
 
         <div className="bg-white/80 rounded-lg p-1.5 border border-emerald-100/80">
-          <span className="text-[10px] text-gray-500 block">تسک‌ها</span>
+          <span className="text-[10px] text-gray-500 block">وظیفه‌ها</span>
           <strong className="text-gray-900 font-extrabold text-[11px]">
             {toPersianDigits(summary.completedTasksCount)} از {toPersianDigits(summary.tasksCount)}
           </strong>

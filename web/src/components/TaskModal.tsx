@@ -89,7 +89,7 @@ export const TaskModal: React.FC<Props> = ({
     return { year: p[0] || today.year, month: p[1] || today.month, day: p[2] || today.day };
   });
 
-  // Start date state (تاریخ شروع یا فعال شدن تسک)
+  // Start date state (تاریخ شروع یا فعال شدن وظیفه)
   const initialHasStartDate = Boolean(task && task.startDate && task.startDate.trim() !== '');
   const [hasStartDate, setHasStartDate] = useState(initialHasStartDate);
   const initialStartDateVal = (task && task.startDate) ? task.startDate : jalaliToFormattedString(today);
@@ -194,7 +194,7 @@ export const TaskModal: React.FC<Props> = ({
       setCategoryId(categories[0]?.id || 'cat-work');
       setGoalId(null);
       setIsInheritedFromGoal(false);
-      // تسک جدید: به طور پیش‌فرض موعد خالی می‌ماند تا پایان سال در نظر گرفته شود و در همه روزها دیده شود
+      // وظیفه جدید: به طور پیش‌فرض موعد خالی می‌ماند تا پایان سال در نظر گرفته شود و در همه روزها دیده شود
       setHasDueDate(false);
       setDateParts({ year: today.year, month: today.month, day: today.day });
       setHasStartDate(false);
@@ -267,7 +267,7 @@ export const TaskModal: React.FC<Props> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setErrorMessage('لطفاً عنوان تسک را وارد نمایید.');
+      setErrorMessage('لطفاً عنوان وظیفه را وارد نمایید.');
       return;
     }
 
@@ -278,13 +278,13 @@ export const TaskModal: React.FC<Props> = ({
         const dueStr = `${dateParts.year}/${dateParts.month.toString().padStart(2, '0')}/${dateParts.day.toString().padStart(2, '0')}`;
         const todayStr = jalaliToFormattedString(today);
         if (compareJalaliDateStrings(dueStr, todayStr) < 0) {
-          setErrorMessage(`امکان تعریف تسک جدید برای تاریخ گذشته (${toPersianDigits(dueStr)}) وجود ندارد.`);
+          setErrorMessage(`امکان تعریف وظیفه جدید برای تاریخ گذشته (${toPersianDigits(dueStr)}) وجود ندارد.`);
           return;
         }
       }
       if (monthOfYear !== null && isMonthPast(today.year, monthOfYear, today)) {
         const mName = PERSIAN_MONTHS[monthOfYear - 1] || 'انتخاب‌شده';
-        setErrorMessage(`امکان تعریف تسک جدید برای ماه سپری‌شده (${mName}) وجود ندارد.`);
+        setErrorMessage(`امکان تعریف وظیفه جدید برای ماه سپری‌شده (${mName}) وجود ندارد.`);
         return;
       }
     }
@@ -364,13 +364,13 @@ export const TaskModal: React.FC<Props> = ({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-gray-900">
-                {isActuallyDuplicate ? 'ایجاد کپی جدید از تسک' : task ? 'ویرایش تسک' : 'افزودن تسک جدید'}
+                {isActuallyDuplicate ? 'ایجاد کپی جدید از وظیفه' : task ? 'ویرایش وظیفه' : 'افزودن وظیفه جدید'}
               </h3>
               <p className="text-[11px] text-gray-500">
                 {isActuallyDuplicate
-                  ? 'یک تسک مستقل با مشخصات کپی شده ایجاد می‌شود'
+                  ? 'یک وظیفه مستقل با مشخصات کپی شده ایجاد می‌شود'
                   : task
-                  ? 'ویرایش اطلاعات، تاریخ و یادآور تسک'
+                  ? 'ویرایش اطلاعات، تاریخ و یادآور وظیفه'
                   : 'تعریف وظیفه جدید، زمانبندی و اتصال به اهداف'}
               </p>
             </div>
@@ -381,7 +381,7 @@ export const TaskModal: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={handleDuplicateCurrentTask}
-                title="ایجاد نسخه کپی از این تسک برای ویرایش و ذخیره به عنوان تسک جدید"
+                title="ایجاد نسخه کپی از این وظیفه برای ویرایش و ذخیره به عنوان وظیفه جدید"
                 className="px-2.5 py-1 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <Copy className="w-3.5 h-3.5 text-emerald-600" />
@@ -405,7 +405,7 @@ export const TaskModal: React.FC<Props> = ({
             {isActuallyDuplicate && (
               <div className="bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs px-3 py-2.5 rounded-xl flex items-center gap-2 shadow-2xs">
                 <Copy className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold">در حال ایجاد نسخه کپی هستید؛ این تسک به عنوان یک تسک کاملاً جدید ذخیره می‌شود و تسک قبلی بدون تغییر خواهد ماند.</span>
+                <span className="font-semibold">در حال ایجاد نسخه کپی هستید؛ این وظیفه به عنوان یک وظیفه کاملاً جدید ذخیره می‌شود و وظیفه قبلی بدون تغییر خواهد ماند.</span>
               </div>
             )}
 
@@ -421,7 +421,7 @@ export const TaskModal: React.FC<Props> = ({
               <div className="flex items-center justify-between">
                 <label className="font-bold text-gray-900 flex items-center gap-1.5 text-xs">
                   <CheckSquare className="w-4 h-4 text-emerald-600" />
-                  <span>عنوان وظیفه (تسک) *</span>
+                  <span>عنوان وظیفه *</span>
                 </label>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md border border-emerald-200">
                   الزامی
@@ -504,7 +504,7 @@ export const TaskModal: React.FC<Props> = ({
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                <span>تسک‌های فرعی (قدم‌ها)</span>
+                <span>وظیفه‌های فرعی (قدم‌ها)</span>
               </label>
               <div className="space-y-1 mb-1.5">
                 {subtasks.map(s => (
@@ -532,7 +532,7 @@ export const TaskModal: React.FC<Props> = ({
                 <span>پیش‌نیاز (اختیاری)</span>
               </label>
               {candidatePrereqs.length === 0 ? (
-                <p className="text-[11px] text-gray-400">تسک دیگری برای انتخاب وجود ندارد.</p>
+                <p className="text-[11px] text-gray-400">وظیفه دیگری برای انتخاب وجود ندارد.</p>
               ) : (
                 <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
                   {candidatePrereqs.map(t => (
@@ -549,7 +549,7 @@ export const TaskModal: React.FC<Props> = ({
                   ))}
                 </div>
               )}
-              <p className="text-[10px] text-gray-400 mt-1">این تسک بعد از انجام تسک‌های انتخاب‌شده قابل انجام است.</p>
+              <p className="text-[10px] text-gray-400 mt-1">این وظیفه بعد از انجام وظیفه‌های انتخاب‌شده قابل انجام است.</p>
             </div>
 
             <div>
@@ -557,7 +557,7 @@ export const TaskModal: React.FC<Props> = ({
                 <span>همراه با (انجام هم‌زمان)</span>
               </label>
               {candidatePrereqs.length === 0 ? (
-                <p className="text-[11px] text-gray-400">تسک دیگری برای انتخاب وجود ندارد.</p>
+                <p className="text-[11px] text-gray-400">وظیفه دیگری برای انتخاب وجود ندارد.</p>
               ) : (
                 <div className="max-h-28 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
                   {allTasks.filter(t => t.id !== task?.id && !t.isArchived).map(t => (
@@ -587,7 +587,7 @@ export const TaskModal: React.FC<Props> = ({
                 onChange={(e) => handleGoalChange(e.target.value ? e.target.value : null)}
                 className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-emerald-500 outline-hidden font-medium"
               >
-                <option value="">بدون هدف (مستقل / تسک سریع)</option>
+                <option value="">بدون هدف (مستقل / وظیفه سریع)</option>
                 
                 {/* 🎯 اهداف سالانه */}
                 {goals.filter(g => g.period === 'ANNUAL').length > 0 && (
@@ -681,7 +681,7 @@ export const TaskModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Month, Week and Day micro-scheduling (ماه، هفته و روز برای تسک‌های خرد - با امکان خالی بودن) */}
+          {/* Month, Week and Day micro-scheduling (ماه، هفته و روز برای وظیفه‌های خرد - با امکان خالی بودن) */}
           <div className="p-3 bg-emerald-50/40 rounded-xl border border-emerald-100 space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold text-gray-700">
               <span className="flex items-center gap-1">
@@ -747,7 +747,7 @@ export const TaskModal: React.FC<Props> = ({
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>زمان انجام تسک (ساعت شروع یا اجرا)</span>
+                <span>زمان انجام وظیفه (ساعت شروع یا اجرا)</span>
               </label>
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] text-gray-500">{hasTime ? 'دارای ساعت انجام' : 'بدون ساعت مشخص'}</span>
@@ -778,17 +778,17 @@ export const TaskModal: React.FC<Props> = ({
                   }}
                   className="w-full px-3 py-2 rounded-xl border border-emerald-200 bg-white text-xs font-medium"
                 />
-                <p className="text-[10px] text-gray-500 mt-1">ساعت برنامه‌ریزی‌شده برای آغاز یا اجرای این تسک</p>
+                <p className="text-[10px] text-gray-500 mt-1">ساعت برنامه‌ریزی‌شده برای آغاز یا اجرای این وظیفه</p>
               </div>
             )}
           </div>
 
-          {/* تاریخ شروع تسک (اختیاری: فعال شدن از تاریخی به بعد) */}
+          {/* تاریخ شروع وظیفه (اختیاری: فعال شدن از تاریخی به بعد) */}
           <div className="bg-sky-50/60 p-3.5 rounded-xl border border-sky-100/80 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                <span className="text-xs font-semibold text-sky-950">تاریخ شروع تسک (نمایش از این تاریخ به بعد)</span>
+                <span className="text-xs font-semibold text-sky-950">تاریخ شروع وظیفه (نمایش از این تاریخ به بعد)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] text-gray-500">{hasStartDate ? 'شروع معین' : 'بلافاصله (از امروز)'}</span>
@@ -804,7 +804,7 @@ export const TaskModal: React.FC<Props> = ({
             {hasStartDate ? (
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-sky-800 font-medium">تسک از این تاریخ در کارتابل فعال و دیده می‌شود:</span>
+                  <span className="text-[11px] text-sky-800 font-medium">وظیفه از این تاریخ در کارتابل فعال و دیده می‌شود:</span>
                   <div className="flex gap-1 text-[11px]">
                     <button
                       type="button"
@@ -869,17 +869,17 @@ export const TaskModal: React.FC<Props> = ({
               </div>
             ) : (
               <p className="text-[11px] text-gray-500 leading-relaxed">
-                تسک نیاز به انتظار ندارد و از همین امروز در دسته‌بندی و کارتابل فعال است. اگر می‌خواهید این تسک تنها پس از یک تاریخ خاص شروع شود، تیک بالا را فعال کنید.
+                وظیفه نیاز به انتظار ندارد و از همین امروز در دسته‌بندی و کارتابل فعال است. اگر می‌خواهید این وظیفه تنها پس از یک تاریخ خاص شروع شود، تیک بالا را فعال کنید.
               </p>
             )}
           </div>
 
-          {/* مهلت نهایی اتمام تسک (زمان نهایی که باید تموم بشه) */}
+          {/* مهلت نهایی اتمام وظیفه (زمان نهایی که باید تموم بشه) */}
           <div className="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-100/80 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-xs font-semibold text-emerald-950">مهلت نهایی اتمام تسک</span>
+                <span className="text-xs font-semibold text-emerald-950">مهلت نهایی اتمام وظیفه</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] text-gray-500">{hasDueDate ? 'مهلت مشخص' : 'پیش‌فرض: پایان سال'}</span>
@@ -907,7 +907,7 @@ export const TaskModal: React.FC<Props> = ({
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-600 leading-relaxed">
-                  چون مهلت خاصی تعیین نشده، مهلت به صورت پیش‌فرض تا <strong>پایان سال {toPersianDigits(today.year)}</strong> منظور می‌شود و این تسک <strong>در همه روزها</strong> در کارتابل امروز دیده خواهد شد.
+                  چون مهلت خاصی تعیین نشده، مهلت به صورت پیش‌فرض تا <strong>پایان سال {toPersianDigits(today.year)}</strong> منظور می‌شود و این وظیفه <strong>در همه روزها</strong> در کارتابل امروز دیده خواهد شد.
                 </p>
               </div>
             ) : (

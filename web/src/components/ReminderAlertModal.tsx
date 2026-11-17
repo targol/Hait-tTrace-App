@@ -100,7 +100,7 @@ export const ReminderAlertModal: React.FC<Props> = ({
                   {isEventMode
                     ? `${eventMeta?.icon} ${eventMeta?.label}`
                     : holidayNotice
-                    ? '🗓️ اطلاع‌رسانی تسک در روز تعطیل'
+                    ? '🗓️ اطلاع‌رسانی وظیفه در روز تعطیل'
                     : '🔔 یادآور و آلارم جوانه'}
                 </span>
                 {repeatNotice && (
@@ -114,8 +114,8 @@ export const ReminderAlertModal: React.FC<Props> = ({
                 {isEventMode
                   ? 'زمان یادآور رویداد تقویم فرا رسید!'
                   : holidayNotice
-                  ? 'پیش‌اعلام تسک در روز تعطیل رسمی'
-                  : 'زمان انجام تسک فرا رسید!'}
+                  ? 'پیش‌اعلام وظیفه در روز تعطیل رسمی'
+                  : 'زمان انجام وظیفه فرا رسید!'}
               </h3>
             </div>
           </div>
@@ -130,7 +130,7 @@ export const ReminderAlertModal: React.FC<Props> = ({
                 <strong className="text-xs font-black block">توجه: امروز تعطیل رسمی است!</strong>
                 <p className="text-[11px] text-rose-800">
                   مناسبت امروز: <span className="font-bold underline decoration-rose-300">{holidayNotice}</span>. این
-                  تسک برای امروز برنامه‌ریزی شده است.
+                  وظیفه برای امروز برنامه‌ریزی شده است.
                 </p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export const ReminderAlertModal: React.FC<Props> = ({
                 className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold rounded-2xl shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer text-sm"
               >
                 <Check className="w-4 h-4" />
-                <span>انجام شد (ثبت تکمیل تسک)</span>
+                <span>انجام شد (ثبت تکمیل وظیفه)</span>
               </button>
             ) : null}
 

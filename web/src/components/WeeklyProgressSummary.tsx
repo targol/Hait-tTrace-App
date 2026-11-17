@@ -389,7 +389,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
           <div className="flex items-center justify-between text-emerald-800 font-medium">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-sm bg-emerald-600 inline-block" />
-              <span>تسک‌های انجام‌شده:</span>
+              <span>وظیفه‌های انجام‌شده:</span>
             </span>
             <span className="font-bold font-mono tabular-nums">{toPersianDigits(raw.tasksDone)}</span>
           </div>
@@ -533,7 +533,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
         {/* Completed Tasks */}
         <div className="bg-emerald-50/70 border border-emerald-200/70 rounded-2xl p-3.5 space-y-1 transition-all hover:border-emerald-300">
           <div className="flex items-center justify-between text-emerald-800 text-xs font-semibold">
-            <span>تسک‌های تکمیل‌شده</span>
+            <span>وظیفه‌های تکمیل‌شده</span>
             <div className="p-1.5 bg-emerald-100/90 text-emerald-800 rounded-xl">
               <CheckCircle2 className="w-4 h-4" />
             </div>
@@ -542,7 +542,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
             {toPersianDigits(totalTasksDone)}
           </div>
           <div className="text-[11px] text-emerald-700/80 font-medium">
-            تسک به سرانجام رسیده
+            وظیفه به سرانجام رسیده
           </div>
         </div>
 
@@ -590,7 +590,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
             {bestDay ? (
               <span className="flex items-baseline gap-1">
                 <span>{bestDay.dayName}</span>
-                <span className="text-xs font-mono font-normal text-indigo-700">({toPersianDigits(bestDay.totalActivities)} کار)</span>
+                <span className="text-xs font-mono font-normal text-indigo-700">({toPersianDigits(bestDay.totalActivities)} مورد)</span>
               </span>
             ) : (
               <span className="text-gray-400 text-xs font-normal">داده‌ای ثبت نشده</span>
@@ -608,7 +608,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-emerald-800 font-bold">
               <span className="w-3 h-3 rounded-md bg-emerald-500 inline-block shadow-2xs" />
-              <span>تسک‌های انجام‌شده</span>
+              <span>وظیفه‌های انجام‌شده</span>
             </span>
             <span className="flex items-center gap-1.5 text-amber-800 font-bold">
               <span className="w-3 h-3 rounded-md bg-amber-400 inline-block shadow-2xs" />
@@ -617,7 +617,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
           </div>
 
           <span className="text-[11px] text-gray-400 hidden sm:inline">
-            کلیک روی هر ستون: نمایش کارهای آن روز
+            کلیک روی هر ستون: نمایش وظیفه‌های آن روز
           </span>
         </div>
 
@@ -670,7 +670,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
 
                 <Bar 
                   dataKey="tasksDone" 
-                  name="تسک‌ها"
+                  name="وظیفه‌ها"
                   fill="#10B981" 
                   stackId={chartMode === 'STACKED' ? 'weeklyStack' : undefined}
                   radius={chartMode === 'STACKED' ? [0, 0, 0, 0] : [6, 6, 0, 0]} 
@@ -775,7 +775,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
                   جزئیات اقدامات روز {activeSelectedDay.dayName} ({toPersianDigits(activeSelectedDay.dateStr)})
                 </h4>
                 <p className="text-[10px] text-emerald-700 font-medium">
-                  {toPersianDigits(activeSelectedDay.tasksDone)} تسک تکمیل‌شده · {toPersianDigits(activeSelectedDay.habitsDone)} عادت ثبت‌شده
+                  {toPersianDigits(activeSelectedDay.tasksDone)} وظیفه تکمیل‌شده · {toPersianDigits(activeSelectedDay.habitsDone)} عادت ثبت‌شده
                   {activeSelectedDay.focusMinutes > 0 && ` · ${toPersianDigits(activeSelectedDay.focusMinutes)} دقیقه تمرکز`}
                 </p>
               </div>
@@ -795,7 +795,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
             <div className="space-y-1.5">
               <span className="text-[11px] font-black text-emerald-900 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>تسک‌های انجام‌شده ({toPersianDigits(activeSelectedDay.completedTasksList.length)})</span>
+                <span>وظیفه‌های انجام‌شده ({toPersianDigits(activeSelectedDay.completedTasksList.length)})</span>
               </span>
 
               {activeSelectedDay.completedTasksList.length > 0 ? (
@@ -822,7 +822,7 @@ export const WeeklyProgressSummary: React.FC<WeeklyProgressSummaryProps> = ({
                 </div>
               ) : (
                 <div className="p-3 bg-white/70 rounded-xl border border-dashed border-gray-200 text-center text-gray-400 text-xs">
-                  هیچ تسکی در این روز ثبت نهایی نشده است.
+                  هیچ وظیفه‌ای در این روز ثبت نهایی نشده است.
                 </div>
               )}
             </div>

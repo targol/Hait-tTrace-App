@@ -223,7 +223,7 @@ export const TransferPeriodItemsModal: React.FC<Props> = ({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-gray-900">
-                انتقال تسک‌ها و عادات به دوره بعدی
+                انتقال وظیفه‌ها و عادات به دوره بعدی
               </h3>
               <p className="text-[11px] text-gray-500">
                 انتقال اقدامات باقیمانده به هدف دوره جدید با انتخاب هدف مقصد
@@ -315,13 +315,13 @@ export const TransferPeriodItemsModal: React.FC<Props> = ({
             <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-xl space-y-2.5">
               <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
                 <Archive className="w-4 h-4 text-amber-700" />
-                <span>بستن تسک‌های دوره و پایان فصل</span>
+                <span>بستن وظیفه‌های دوره و پایان فصل</span>
               </div>
               <p className="text-[11px] text-amber-800 leading-relaxed">
-                تسک‌های تکمیل‌نشده این فصل بسته می‌شوند و سوابق آن‌ها در تاریخچه همین هدف محفوظ می‌ماند. این تسک‌ها به فصل بعدی منتقل نخواهند شد.
+                وظیفه‌های تکمیل‌نشده این فصل بسته می‌شوند و سوابق آن‌ها در تاریخچه همین هدف محفوظ می‌ماند. این وظیفه‌ها به فصل بعدی منتقل نخواهند شد.
               </p>
               <div className="text-[11px] font-semibold text-gray-700 bg-white/80 p-2.5 rounded-lg border border-amber-200">
-                تعداد تسک‌های آماده بستن: <span className="font-bold text-amber-900">{toPersianDigits(pendingTasks.length)} تسک</span>
+                تعداد وظیفه‌های آماده بستن: <span className="font-bold text-amber-900">{toPersianDigits(pendingTasks.length)} وظیفه</span>
               </div>
             </div>
           ) : (
@@ -422,7 +422,7 @@ export const TransferPeriodItemsModal: React.FC<Props> = ({
                   <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 text-amber-700 mt-0.5" />
                     <p className="text-[11px] leading-relaxed">
-                      هدفی برای این دسته در {targetTab === 'SEASONAL' ? sourcePeriodInfo.nextName : 'اهداف سالانه'} یافت نشد. می‌توانید با عنوان زیر هدف جدید ایجاد کنید تا تسک‌ها و عادات به آن منتقل شوند:
+                      هدفی برای این دسته در {targetTab === 'SEASONAL' ? sourcePeriodInfo.nextName : 'اهداف سالانه'} یافت نشد. می‌توانید با عنوان زیر هدف جدید ایجاد کنید تا وظیفه‌ها و عادات به آن منتقل شوند:
                     </p>
                   </div>
 
@@ -464,13 +464,13 @@ export const TransferPeriodItemsModal: React.FC<Props> = ({
                   className="w-4 h-4 text-emerald-600 rounded"
                 />
                 <EntityIcon type="TASK" size="xs" showBackground={false} />
-                <span>انتقال تسک‌های انجام‌نشده ({toPersianDigits(pendingTasks.length)})</span>
+                <span>انتقال وظیفه‌های انجام‌نشده ({toPersianDigits(pendingTasks.length)})</span>
               </label>
             </div>
 
             {pendingTasks.length === 0 ? (
               <div className="p-2.5 bg-gray-50 rounded-xl text-gray-400 text-[11px] text-center border border-gray-100">
-                همه تسک‌های این هدف تکمیل شده‌اند.
+                همه وظیفه‌های این هدف تکمیل شده‌اند.
               </div>
             ) : (
               <div className="space-y-1 max-h-28 overflow-y-auto pr-1">
@@ -541,7 +541,7 @@ export const TransferPeriodItemsModal: React.FC<Props> = ({
             {targetTab === 'CLOSE' ? (
               <>
                 <Archive className="w-4 h-4" />
-                <span>بستن و خاتمه تسک‌های این دوره ({toPersianDigits(pendingTasks.length)})</span>
+                <span>بستن و خاتمه وظیفه‌های این دوره ({toPersianDigits(pendingTasks.length)})</span>
               </>
             ) : (
               <>

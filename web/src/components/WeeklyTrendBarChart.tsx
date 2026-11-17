@@ -125,7 +125,7 @@ export const WeeklyTrendBarChart: React.FC<Props> = ({ tasks, habits }) => {
           <div className="flex items-center justify-between gap-3 text-emerald-800">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
-              <span>تسک‌های انجام‌شده:</span>
+              <span>وظیفه‌های انجام‌شده:</span>
             </span>
             <span className="font-bold">{toPersianDigits(dataItem.tasksDone)}</span>
           </div>
@@ -153,10 +153,10 @@ export const WeeklyTrendBarChart: React.FC<Props> = ({ tasks, habits }) => {
         <div>
           <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-emerald-600" />
-            <span>روند هفتگی تکمیل عادت‌ها و تسک‌ها (نمودار ستونی)</span>
+            <span>روند هفتگی تکمیل عادت‌ها و وظیفه‌ها (نمودار ستونی)</span>
           </h3>
           <p className="text-[11px] text-gray-500 mt-0.5">
-            مقایسه روزانه عملکرد تسک‌ها و پیوستگی عادات در طول هفته
+            مقایسه روزانه عملکرد وظیفه‌ها و پیوستگی عادات در طول هفته
           </p>
         </div>
 
@@ -194,9 +194,9 @@ export const WeeklyTrendBarChart: React.FC<Props> = ({ tasks, habits }) => {
             <CheckCircle className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[10px] text-gray-500 block leading-tight">تسک‌های هفته</span>
+            <span className="text-[10px] text-gray-500 block leading-tight">وظیفه‌های هفته</span>
             <span className="text-sm font-extrabold text-emerald-950 block leading-tight">
-              {toPersianDigits(totalWeekTasks)} تسک
+              {toPersianDigits(totalWeekTasks)} وظیفه
             </span>
           </div>
         </div>
@@ -266,7 +266,7 @@ export const WeeklyTrendBarChart: React.FC<Props> = ({ tasks, habits }) => {
               wrapperStyle={{ paddingBottom: '12px', fontSize: '11px' }}
               formatter={(value) => (
                 <span className="text-gray-700 font-medium px-1">
-                  {value === 'tasksDone' ? 'تسک‌های انجام‌شده' : 'عادت‌های انجام‌شده'}
+                  {value === 'tasksDone' ? 'وظیفه‌های انجام‌شده' : 'عادت‌های انجام‌شده'}
                 </span>
               )}
             />

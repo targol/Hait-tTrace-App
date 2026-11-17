@@ -468,7 +468,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
           exactPercent: m.percent,
           percentage: m.percent,
           color: g.colorHex || cat?.colorHex || PALETTE[idx % PALETTE.length],
-          subText: `${toPersianDigits(m.percent)}٪ پیشرفت (${toPersianDigits(m.completedTasks)} از ${toPersianDigits(m.totalTasks)} تسک)`,
+          subText: `${toPersianDigits(m.percent)}٪ پیشرفت (${toPersianDigits(m.completedTasks)} از ${toPersianDigits(m.totalTasks)} وظیفه)`,
           goal: g,
           metrics: m
         };
@@ -639,7 +639,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
               <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                 <span>
-                  تحلیل هوشمند تجمعی بر اساس تسک‌های خرد، پیوستگی عادات و گام‌های کلیدی سال {toPersianDigits(selectedYear)}
+                  تحلیل هوشمند تجمعی بر اساس وظیفه‌های خرد، پیوستگی عادات و گام‌های کلیدی سال {toPersianDigits(selectedYear)}
                 </span>
               </p>
             </div>
@@ -736,14 +736,14 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
         {/* KPI 3: Supporting Tasks Completed */}
         <div className="bg-amber-50/50 rounded-2xl p-4 border border-amber-100 flex flex-col justify-between">
           <div className="flex items-center justify-between text-xs text-amber-800 mb-1">
-            <span className="font-semibold">تسک‌های تحقق‌یافته</span>
+            <span className="font-semibold">وظیفه‌های تحقق‌یافته</span>
             <Flame className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-amber-950 font-mono">
-            {toPersianDigits(overallAnnualMetrics.completedLinkedTasks)} <span className="text-xs font-normal text-amber-700">تسک</span>
+            {toPersianDigits(overallAnnualMetrics.completedLinkedTasks)} <span className="text-xs font-normal text-amber-700">وظیفه</span>
           </div>
           <p className="text-[11px] text-amber-700/80 mt-1">
-            از {toPersianDigits(overallAnnualMetrics.totalLinkedTasks)} تسک پشتیبان اهداف
+            از {toPersianDigits(overallAnnualMetrics.totalLinkedTasks)} وظیفه پشتیبان اهداف
           </p>
         </div>
 
@@ -775,7 +775,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
               هنوز هدفی برای سال {toPersianDigits(selectedYear)} تعریف نشده است
             </h4>
             <p className="text-xs text-gray-500 max-w-md mx-auto">
-              با ایجاد اهداف سالانه در تب «اهداف» و اتصال تسک‌ها و عادات به آن‌ها، روند پیشرفت تجمعی و خطی باغچه شما در طول ماه‌ها به‌صورت زنده ترسیم می‌شود.
+              با ایجاد اهداف سالانه در تب «اهداف» و اتصال وظیفه‌ها و عادات به آن‌ها، روند پیشرفت تجمعی و خطی باغچه شما در طول ماه‌ها به‌صورت زنده ترسیم می‌شود.
             </p>
           </div>
           {onNavigateToGoals && (
@@ -1121,7 +1121,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
                 <span>وضعیت پیشرفت و عملکرد هر هدف سالانه</span>
               </h4>
               <span className="text-[11px] text-gray-400">
-                بر اساس داده‌های واقعی تسک‌ها و عادات ثبت‌شده
+                بر اساس داده‌های واقعی وظیفه‌ها و عادات ثبت‌شده
               </span>
             </div>
 
@@ -1193,7 +1193,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
                     <div className="pt-3 mt-3 border-t border-emerald-100/60 flex items-center justify-between text-[11px] text-gray-600">
                       <span className="flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>{toPersianDigits(metrics.completedTasks)} از {toPersianDigits(metrics.totalTasks)} تسک انجام‌شده</span>
+                        <span>{toPersianDigits(metrics.completedTasks)} از {toPersianDigits(metrics.totalTasks)} وظیفه انجام‌شده</span>
                       </span>
 
                       {metrics.linkedHabitsCount > 0 && (
@@ -1229,7 +1229,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
               {laggingGoal && laggingGoal.metrics.percent < 40 && (
                 <p className="text-gray-600 text-[11px]">
                   💡 <span className="font-semibold text-amber-800">توصیه باغبانی:</span> برای هدف{' '}
-                  <span className="font-bold text-gray-900">«{laggingGoal.goal.title}»</span> تعریف ۲ تا ۳ تسک خرد هفتگی یا پیوند یک عادت روزانه موجب تسریع چشمگیر در روند رشد آن خواهد شد.
+                  <span className="font-bold text-gray-900">«{laggingGoal.goal.title}»</span> تعریف ۲ تا ۳ وظیفه خرد هفتگی یا پیوند یک عادت روزانه موجب تسریع چشمگیر در روند رشد آن خواهد شد.
                 </p>
               )}
             </div>

@@ -102,7 +102,7 @@ export const GoalProgressModal: React.FC<Props> = ({
           {/* Auto Calculation Preview */}
           <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
             <div>
-              <span className="text-gray-500 block">درصد محاسبه‌شده خودکار (تسک‌ها و عادات):</span>
+              <span className="text-gray-500 block">درصد محاسبه‌شده خودکار (وظیفه‌ها و عادات):</span>
               <span className="font-bold text-emerald-800 text-sm mt-0.5 inline-block">
                 {toPersianDigits(autoProgress)}٪
               </span>

@@ -240,7 +240,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                 <span className="text-emerald-700">{toPersianDigits(currentYear)}</span>
               </h2>
               <p className="text-[11px] text-gray-500 font-medium">
-                تقویم رسمی شمسی ایران همراه با تعطیلات رسمی و وضعیت تسک‌ها
+                تقویم رسمی شمسی ایران همراه با تعطیلات رسمی و وضعیت وظیفه‌ها
               </p>
             </div>
           </div>
@@ -291,12 +291,12 @@ export const PersianCalendarScreen: React.FC<Props> = ({
             </span>
             <span className="flex items-center gap-1.5 font-medium text-amber-700">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
-              <span>دارای تسک / برنامه</span>
+              <span>دارای وظیفه / برنامه</span>
             </span>
           </div>
 
           <div className="text-gray-400 text-[10px]">
-            با کلیک روی هر روز، تسک‌ها، رویدادها و تعطیلات آن روز نمایش داده می‌شود
+            با کلیک روی هر روز، وظیفه‌ها، رویدادها و تعطیلات آن روز نمایش داده می‌شود
           </div>
         </div>
 
@@ -387,7 +387,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                         }`}
                       >
                         <span>{toPersianDigits(cell.doneTaskCount)}/{toPersianDigits(cell.taskCount)}</span>
-                        <span className="hidden sm:inline">تسک</span>
+                        <span className="hidden sm:inline">وظیفه</span>
                       </span>
                     )}
 
@@ -428,7 +428,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
               )}
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              {toPersianDigits(selectedEvents.length)} رویداد تقویم • {toPersianDigits(selectedTasks.length)} تسک • {toPersianDigits(selectedHabits.length)} عادت
+              {toPersianDigits(selectedEvents.length)} رویداد تقویم • {toPersianDigits(selectedTasks.length)} وظیفه • {toPersianDigits(selectedHabits.length)} عادت
             </p>
           </div>
 
@@ -449,7 +449,7 @@ export const PersianCalendarScreen: React.FC<Props> = ({
                 onClick={() => onNewTaskWithDate(selectedDateStr)}
                 className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer"
               >
-                + تسک جدید
+                + وظیفه جدید
               </button>
             )}
           </div>
@@ -589,13 +589,13 @@ export const PersianCalendarScreen: React.FC<Props> = ({
           <h4 className="text-xs font-bold text-gray-700 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <CalendarIcon className="w-3.5 h-3.5 text-emerald-600" />
-              <span>تسک‌های این روز ({toPersianDigits(selectedTasks.filter(t => t.isCompleted).length)} از {toPersianDigits(selectedTasks.length)} انجام شده)</span>
+              <span>وظیفه‌های این روز ({toPersianDigits(selectedTasks.filter(t => t.isCompleted).length)} از {toPersianDigits(selectedTasks.length)} انجام شده)</span>
             </span>
           </h4>
 
           {selectedTasks.length === 0 ? (
             <div className="p-5 text-center text-xs text-gray-500 bg-gray-50/70 rounded-xl border border-dashed border-gray-200">
-              هیچ تسکی برای تاریخ {toPersianDigits(selectedDateStr)} ثبت نشده است.
+              هیچ وظیفه‌ای برای تاریخ {toPersianDigits(selectedDateStr)} ثبت نشده است.
             </div>
           ) : (
             <div className="space-y-2">

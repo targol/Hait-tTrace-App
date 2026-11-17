@@ -40,7 +40,7 @@ export function sendBrowserNotification(
 
   try {
     const notification = new Notification(title, {
-      body: options.body || 'زمان رسیدگی به این تسک مهم فرا رسیده است.',
+      body: options.body || 'زمان رسیدگی به این وظیفه مهم فرا رسیده است.',
       icon: options.icon || '/favicon.ico',
       tag: options.tag || `javaneh-task-${Date.now()}`,
       badge: '/favicon.ico',
@@ -301,8 +301,8 @@ export function triggerReminderAlarm(
     : `یادآور جوانه: ${task.title}`;
   
   const bodyText = holidayNotice
-    ? `امروز (${holidayNotice}) است! تسک شما در ساعت ${task.time || task.reminderTime || ''} شروع می‌شود.`
-    : (task.notes ? `${task.notes}\nزمان: ${task.time || ''}` : `موعد این تسک مهم فرا رسیده است.`);
+    ? `امروز (${holidayNotice}) است! وظیفه شما در ساعت ${task.time || task.reminderTime || ''} شروع می‌شود.`
+    : (task.notes ? `${task.notes}\nزمان: ${task.time || ''}` : `موعد این وظیفه مهم فرا رسیده است.`);
 
   sendBrowserNotification(title, {
     body: bodyText,

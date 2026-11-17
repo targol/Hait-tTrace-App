@@ -225,7 +225,7 @@ export const GardenVisual: React.FC<Props> = ({
   let scopeLabel = '';
 
   if (timeScope === 'DAY') {
-    scopeLabel = 'پیشرفت کارهای امروز';
+    scopeLabel = 'پیشرفت وظیفه‌های امروز';
     // Only daily habits for today
     const dailyHabitsToday = habits.filter(h => !h.isClosed && h.frequency === 'DAILY' && (!h.targetDaysOfWeek || h.targetDaysOfWeek.length === 0 || h.targetDaysOfWeek.includes(currentDayOfWeek)));
     const todayTasks = (tasks || []).filter(t => t.dueDate === todayStr || t.repeatType === 'DAILY' || (!t.dueDate && !t.isCompleted));
@@ -741,9 +741,9 @@ export const GardenVisual: React.FC<Props> = ({
                 </div>
 
                 <div className="bg-emerald-50/70 border border-emerald-200/70 rounded-lg p-2 text-center">
-                  <span className="text-[10px] text-gray-500 block">تسک‌های فصل</span>
+                  <span className="text-[10px] text-gray-500 block">وظیفه‌های فصل</span>
                   <strong className="text-emerald-950 text-xs font-extrabold mt-0.5 block">
-                    {toPersianDigits(seasonSummary.completedTasksCount)} از {toPersianDigits(seasonSummary.tasksCount)} تسک
+                    {toPersianDigits(seasonSummary.completedTasksCount)} از {toPersianDigits(seasonSummary.tasksCount)} وظیفه
                   </strong>
                 </div>
 
@@ -777,7 +777,7 @@ export const GardenVisual: React.FC<Props> = ({
                 </div>
 
                 <div className="bg-emerald-50/70 border border-emerald-200/70 rounded-lg p-2 text-center">
-                  <span className="text-[10px] text-gray-500 block">تسک‌های انجام‌شده</span>
+                  <span className="text-[10px] text-gray-500 block">وظیفه‌های انجام‌شده</span>
                   <strong className="text-emerald-950 text-xs font-extrabold mt-0.5 block">
                     {toPersianDigits(yearSummary.completedTasksCount)} از {toPersianDigits(yearSummary.totalTasksCount)}
                   </strong>
@@ -900,7 +900,7 @@ export const GardenVisual: React.FC<Props> = ({
                         ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
                         : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
                     }`}>
-                      {flower.kind === 'HABIT' ? 'عادت' : 'تسک'}
+                      {flower.kind === 'HABIT' ? 'عادت' : 'وظیفه'}
                     </span>
                     <span className="text-[8px] text-emerald-600 font-medium flex items-center gap-0.5">
                       <Check className="w-2 h-2 text-emerald-600" />
@@ -918,7 +918,7 @@ export const GardenVisual: React.FC<Props> = ({
                   : 'هنوز گلی در این بازه ثبت نشده است 🌱'}
               </p>
               <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
-                با تیک زدن هر تسک یا ثبت هر عادت، گل اختصاصی آن جداگانه در این باغچه خواهد رویید!
+                با تیک زدن هر وظیفه یا ثبت هر عادت، گل اختصاصی آن جداگانه در این باغچه خواهد رویید!
               </p>
             </div>
           )}

@@ -236,7 +236,7 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
             <span>تنظیمات سیستم یادآور، اعلان مرورگر و آلارم صوتی</span>
           </h3>
           <p className="text-xs text-gray-500 mt-0.5">
-            انتخاب موسیقی‌های ملایم بدون کلام برای یادآوری تسک‌های مهم، تنظیم بلندی صدا و افزودن آهنگ‌های دلخواه.
+            انتخاب موسیقی‌های ملایم بدون کلام برای یادآوری وظیفه‌های مهم، تنظیم بلندی صدا و افزودن آهنگ‌های دلخواه.
           </p>
         </div>
 
@@ -309,7 +309,7 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
                   ? 'مجوز اعلان مرورگر فعال است. یادآورها به صورت بنر و پنجره پاپ‌آپ اعلام می‌شوند.'
                   : notifPermission === 'denied'
                   ? 'اعلان‌ها مسدود شده‌اند. برای دریافت، از علامت قفل در نوار آدرس مرورگر مجوز را باز کنید.'
-                  : 'برای دریافت اعلان خودکار تسک‌های مهم، نیاز به تایید دسترسی اعلان مرورگر است.'}
+                  : 'برای دریافت اعلان خودکار وظیفه‌های مهم، نیاز به تایید دسترسی اعلان مرورگر است.'}
               </span>
             </div>
           </div>
@@ -345,7 +345,7 @@ export const ReminderAlarmSettings: React.FC<Props> = ({
               </div>
               <div>
                 <span className="text-xs font-bold text-amber-950 block">فواصل یادآوری هوشمند و تعویق (Smart Snooze)</span>
-                <span className="text-[11px] text-amber-800/80 block">مدیریت فواصل اعلان‌های محلی در صورت تعویق یا رسیدگی نکردن به تسک</span>
+                <span className="text-[11px] text-amber-800/80 block">مدیریت فواصل اعلان‌های محلی در صورت تعویق یا رسیدگی نکردن به وظیفه</span>
               </div>
             </div>
             <span className="text-[11px] font-semibold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200">

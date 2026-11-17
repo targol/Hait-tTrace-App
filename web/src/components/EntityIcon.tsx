@@ -42,8 +42,8 @@ export const ENTITY_CONFIG: Record<EntityType, EntityConfig> = {
     badgeText: 'text-indigo-800',
   },
   TASK: {
-    label: 'تسک اجرایی',
-    shortLabel: 'تسک',
+    label: 'وظیفه اجرایی',
+    shortLabel: 'وظیفه',
     icon: CheckSquare,
     colorHex: '#0284c7', // Sky 600
     textColor: 'text-sky-600',

@@ -564,7 +564,7 @@ export const AnnualGoalWizardModal: React.FC<Props> = ({
                   )}
 
                   <p className="text-[10px] text-gray-400 leading-relaxed">
-                    تعریف هدف برای سال‌های گذشته مجاز نیست. اطلاعات، تسک‌ها و اهداف سال‌های قبل در بخش آرشیو و فیلتر سال‌ها قابل مشاهده هستند.
+                    تعریف هدف برای سال‌های گذشته مجاز نیست. اطلاعات، وظیفه‌ها و اهداف سال‌های قبل در بخش آرشیو و فیلتر سال‌ها قابل مشاهده هستند.
                   </p>
                 </div>
               </div>
@@ -839,7 +839,7 @@ export const AnnualGoalWizardModal: React.FC<Props> = ({
           {step === 3 && (
             <div className="space-y-4 animate-fade-in">
               <p className="text-gray-600 leading-relaxed">
-                هر هدف بزرگ برای آغاز، به یک تسک اولیه در تقویم و یک عادت مداوم نیاز دارد:
+                هر هدف بزرگ برای آغاز، به یک وظیفه اولیه در تقویم و یک عادت مداوم نیاز دارد:
               </p>
 
               {/* Target Goal Attachment Selector */}
@@ -875,7 +875,7 @@ export const AnnualGoalWizardModal: React.FC<Props> = ({
                       className="w-4 h-4 text-sky-600 rounded cursor-pointer"
                     />
                     <EntityIcon type="TASK" size="xs" showBackground={false} />
-                    <span>تعریف اولین اقدام اجرایی (تسک اولیه)</span>
+                    <span>تعریف اولین اقدام اجرایی (وظیفه اولیه)</span>
                   </label>
                   <EntityBadge type="TASK" size="xs" />
                 </div>

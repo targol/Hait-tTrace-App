@@ -41,7 +41,7 @@ export interface Goal {
   manualProgress?: number | null; // درصد پیشرفت دستی تعیین‌شده توسط کاربر (۰ تا ۱۰۰)
   isManualProgressActive?: boolean; // آیا پیشرفت دستی ملاک است یا محاسبه خودکار
   continuesGoalId?: string | null; // هدف قبلی که این هدف در ادامه آن است (پاییز در ادامه زمستان/تابستان)
-  originTaskId?: string | null; // تسکی که این هدف در ادامه یا بر پایه آن تعریف شده
+  originTaskId?: string | null; // وظیفه‌ای که این هدف در ادامه یا بر پایه آن تعریف شده
   history: GoalHistoryEntry[];
   createdAt: string;
 }
@@ -65,13 +65,13 @@ export interface AppTask {
   createdAt?: string;
   categoryId: string;
   goalId?: string | null;
-  startDate?: string | null; // "1403/07/15" - تاریخ شروع یا نمایش تسک (در صورت تعیین، تسک قبل از این تاریخ فعال نمی‌شود)
-  dueDate: string; // "1403/07/15" یا خالی برای تسک بدون موعد معین (پیش‌فرض پایان سال)
-  time?: string | null; // "14:30" - زمان/ساعت انجام تسک
-  deadlineTime?: string | null; // "18:00" - زمان نهایی پایان تسک (اختیاری)
+  startDate?: string | null; // "1403/07/15" - تاریخ شروع یا نمایش وظیفه (در صورت تعیین، وظیفه قبل از این تاریخ فعال نمی‌شود)
+  dueDate: string; // "1403/07/15" یا خالی برای وظیفه بدون موعد معین (پیش‌فرض پایان سال)
+  time?: string | null; // "14:30" - زمان/ساعت انجام وظیفه
+  deadlineTime?: string | null; // "18:00" - زمان نهایی پایان وظیفه (اختیاری)
   reminderMinutesBefore?: number | null;
-  isImportant?: boolean; // علامت‌گذاری به عنوان تسک مهم
-  reminderEnabled?: boolean; // یادآور فعال برای این تسک
+  isImportant?: boolean; // علامت‌گذاری به عنوان وظیفه مهم
+  reminderEnabled?: boolean; // یادآور فعال برای این وظیفه
   reminderTime?: string | null; // ساعت مشخص یادآور مثلا "14:30"
   reminderDate?: string | null; // تاریخ مشخص یادآور مثلا "1403/07/15"
   customAlarmSound?: string | null; // شناسه زنگ اختصاصی یا پیش‌فرض
@@ -95,13 +95,13 @@ export interface AppTask {
   completedAt?: string | null;
   isArchived?: boolean; // آیا به بخش بایگانی منتقل شده است
   isTransferredToNextSeason?: boolean; // آیا به فصل بعدی منتقل شده است
-  transferredToGoalId?: string | null; // هدفی که تسک به آن منتقل یا وابسته شده
+  transferredToGoalId?: string | null; // هدفی که وظیفه به آن منتقل یا وابسته شده
   transferredToSeasonIndex?: number | null; // شاخص فصل مقصد (۰: بهار، ۱: تابستان، ۲: پاییز، ۳: زمستان)
-  originSeasonalTaskId?: string | null; // شناسه تسک مبدأ در صورت انتقال
-  dependsOn?: string[]; // شناسه تسک‌های پیش‌نیاز (اختیاری)
-  linkedWith?: string[]; // شناسه تسک‌هایی که باید همراه/هم‌زمان با این تسک انجام شوند
+  originSeasonalTaskId?: string | null; // شناسه وظیفه مبدأ در صورت انتقال
+  dependsOn?: string[]; // شناسه وظیفه‌های پیش‌نیاز (اختیاری)
+  linkedWith?: string[]; // شناسه وظیفه‌هایی که باید همراه/هم‌زمان با این وظیفه انجام شوند
   priority?: 'HIGH' | 'MEDIUM' | 'LOW'; // اولویت: مهم، متوسط، عادی
-  subtasks?: { id: string; title: string; done: boolean }[]; // تسک‌های فرعی (قدم‌ها)
+  subtasks?: { id: string; title: string; done: boolean }[]; // وظیفه‌های فرعی (قدم‌ها)
 }
 
 export type HabitFrequency = 'DAILY' | 'WEEKLY';

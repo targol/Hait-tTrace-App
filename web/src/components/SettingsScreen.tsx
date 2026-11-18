@@ -34,6 +34,8 @@ import {
   isSystemDarkMode, 
   setupThemeListeners, 
   THEME_STORAGE_KEYS,
+  applyColorTheme,
+  normalizeThemeId,
   DEFAULT_DARK_MODE_SCHEDULE,
   isTimeInSchedule
 } from '../services/themeService';
@@ -173,18 +175,6 @@ export const THEME_PALETTES: ColorThemeItem[] = [
     description: 'تم اصیل و امضای تصویری برنامه جوانه، نماد رشد مداوم و انگیزه روزانه'
   },
   {
-    id: 'teal',
-    name: 'فیروزه‌ای خلیج',
-    subtitle: 'آرامش اقیانوس و زلالی ذهن',
-    primaryHex: '#0D9488',
-    accentHex: '#06B6D4',
-    gradientHeader: 'from-teal-900 via-teal-800 to-cyan-900',
-    badgeClass: 'bg-teal-50 text-teal-800 border-teal-200',
-    activeRing: 'ring-teal-500',
-    emoji: '🌊',
-    description: 'رنگ‌های خنک و آرام‌بخش برای تمرکز عمیق، کاهش اضطراب و آرامش کارها'
-  },
-  {
     id: 'blue',
     name: 'آبی آسمان',
     subtitle: 'افق روشن و انگیزه پایدار',
@@ -195,18 +185,6 @@ export const THEME_PALETTES: ColorThemeItem[] = [
     activeRing: 'ring-blue-500',
     emoji: '☁️',
     description: 'رنگ کلاسیک برنامه‌ریزی حرفه‌ای، بهره‌وری اداری و نظم ذهنی دقیق'
-  },
-  {
-    id: 'indigo',
-    name: 'نیلی شبانه',
-    subtitle: 'تمرکز عمیق و تفکر هوشمندانه',
-    primaryHex: '#4F46E5',
-    accentHex: '#6366F1',
-    gradientHeader: 'from-indigo-950 via-indigo-900 to-purple-950',
-    badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-    activeRing: 'ring-indigo-500',
-    emoji: '🌌',
-    description: 'رنگ مدرن و متمرکز، مناسب ساعت‌های مطالعه، پژوهش و غرقگی فکری'
   },
   {
     id: 'purple',
@@ -244,18 +222,6 @@ export const THEME_PALETTES: ColorThemeItem[] = [
     emoji: '🌹',
     description: 'پرشور و چشم‌گیر، مناسب ایجاد تحول و انرژی مضاعف در پیگیری پروژه‌ها'
   },
-  {
-    id: 'slate',
-    name: 'سنگی مینیمال',
-    subtitle: 'سکوت بصری و سادگی مدرن',
-    primaryHex: '#475569',
-    accentHex: '#64748B',
-    gradientHeader: 'from-slate-900 via-slate-800 to-zinc-900',
-    badgeClass: 'bg-slate-100 text-slate-800 border-slate-300',
-    activeRing: 'ring-slate-500',
-    emoji: '🪨',
-    description: 'بدون شلوغی و حواس‌پرتی، انتخابی ایده‌آل برای طرفداران مینیمالیسم خالص'
-  }
 ];
 
 const PRESET_COLORS = [
@@ -323,7 +289,7 @@ export const SettingsScreen: React.FC<Props> = ({
 
   // Color Theme State
   const [selectedThemeId, setSelectedThemeId] = useState<string>(() => {
-    return userProfile?.themeColor || localStorage.getItem('javaneh_theme_color') || 'emerald';
+    return normalizeThemeId(userProfile?.themeColor || localStorage.getItem('javaneh_theme_color'));
   });
 
   // Appearance & Display Preferences with System & Schedule Auto-Dark Mode
@@ -431,8 +397,7 @@ export const SettingsScreen: React.FC<Props> = ({
   const handleApplyTheme = (themeId: string) => {
     setSelectedThemeId(themeId);
     try {
-      localStorage.setItem('javaneh_theme_color', themeId);
-      document.documentElement.setAttribute('data-app-theme', themeId);
+      applyColorTheme(themeId);
     } catch {}
 
     if (onSaveUserProfile) {

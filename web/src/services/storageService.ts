@@ -140,7 +140,7 @@ export function applyRestoredAppPreferences(
     const themeColor = prefs?.themeColor || userProfile?.themeColor;
     if (themeColor) {
       localStorage.setItem('javaneh_theme_color', themeColor);
-      document.documentElement.setAttribute('data-app-theme', themeColor);
+      document.documentElement.setAttribute('data-app-theme', ['emerald','blue','purple','amber','rose'].includes(themeColor) ? themeColor : themeColor === 'indigo' ? 'blue' : 'emerald');
     }
     const darkPref = prefs?.darkModePreference || userProfile?.darkModePreference;
     if (darkPref) {

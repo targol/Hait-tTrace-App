@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { initThemeOnStartup } from './services/themeService';
+import { initThemeOnStartup, applyColorTheme } from './services/themeService';
 import './index.css';
 
 // 🌐 Register Service Worker only on top-level HTTP(S) web origins (skip in Android file:// APK WebView and preview iframes)
@@ -21,6 +21,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
 // 🌓 Immediately apply theme (system, schedule, or manual) to avoid flash
 try {
   initThemeOnStartup();
+  try { applyColorTheme(localStorage.getItem('javaneh_theme_color')); } catch {}
 } catch {}
 
 // 🛡️ Global Exception Catcher for Android WebView and Mobile Browsers

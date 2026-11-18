@@ -207,3 +207,22 @@ export function setupThemeListeners(
     }
   };
 }
+
+export const COLOR_THEME_IDS = ['emerald', 'blue', 'purple', 'amber', 'rose'] as const;
+
+/** Maps old/removed theme ids to the nearest remaining one. */
+export function normalizeThemeId(id?: string | null): string {
+  if (!id) return 'emerald';
+  if ((COLOR_THEME_IDS as readonly string[]).includes(id)) return id;
+  if (id === 'indigo') return 'blue';
+  return 'emerald'; // teal, slate, unknown
+}
+
+export function applyColorTheme(id?: string | null): string {
+  const theme = normalizeThemeId(id);
+  try {
+    document.documentElement.setAttribute('data-app-theme', theme);
+    localStorage.setItem(THEME_STORAGE_KEYS.THEME_COLOR, theme);
+  } catch {}
+  return theme;
+}

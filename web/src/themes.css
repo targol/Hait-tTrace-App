@@ -1,0 +1,53 @@
+/* Color themes: remap the app's primary (emerald) palette. Generated from Tailwind's default palettes. */
+html[data-app-theme='blue'] {
+  --color-emerald-50: oklch(97% 0.014 254.604);
+  --color-emerald-100: oklch(93.2% 0.032 255.585);
+  --color-emerald-200: oklch(88.2% 0.059 254.128);
+  --color-emerald-300: oklch(80.9% 0.105 251.813);
+  --color-emerald-400: oklch(70.7% 0.165 254.624);
+  --color-emerald-500: oklch(62.3% 0.214 259.815);
+  --color-emerald-600: oklch(54.6% 0.245 262.881);
+  --color-emerald-700: oklch(48.8% 0.243 264.376);
+  --color-emerald-800: oklch(42.4% 0.199 265.638);
+  --color-emerald-900: oklch(37.9% 0.146 265.522);
+  --color-emerald-950: oklch(28.2% 0.091 267.935);
+}
+html[data-app-theme='purple'] {
+  --color-emerald-50: oklch(97.7% 0.014 308.299);
+  --color-emerald-100: oklch(94.6% 0.033 307.174);
+  --color-emerald-200: oklch(90.2% 0.063 306.703);
+  --color-emerald-300: oklch(82.7% 0.119 306.383);
+  --color-emerald-400: oklch(71.4% 0.203 305.504);
+  --color-emerald-500: oklch(62.7% 0.265 303.9);
+  --color-emerald-600: oklch(55.8% 0.288 302.321);
+  --color-emerald-700: oklch(49.6% 0.265 301.924);
+  --color-emerald-800: oklch(43.8% 0.218 303.724);
+  --color-emerald-900: oklch(38.1% 0.176 304.987);
+  --color-emerald-950: oklch(29.1% 0.149 302.717);
+}
+html[data-app-theme='amber'] {
+  --color-emerald-50: oklch(98.7% 0.022 95.277);
+  --color-emerald-100: oklch(96.2% 0.059 95.617);
+  --color-emerald-200: oklch(92.4% 0.12 95.746);
+  --color-emerald-300: oklch(87.9% 0.169 91.605);
+  --color-emerald-400: oklch(82.8% 0.189 84.429);
+  --color-emerald-500: oklch(76.9% 0.188 70.08);
+  --color-emerald-600: oklch(66.6% 0.179 58.318);
+  --color-emerald-700: oklch(55.5% 0.163 48.998);
+  --color-emerald-800: oklch(47.3% 0.137 46.201);
+  --color-emerald-900: oklch(41.4% 0.112 45.904);
+  --color-emerald-950: oklch(27.9% 0.077 45.635);
+}
+html[data-app-theme='rose'] {
+  --color-emerald-50: oklch(96.9% 0.015 12.422);
+  --color-emerald-100: oklch(94.1% 0.03 12.58);
+  --color-emerald-200: oklch(89.2% 0.058 10.001);
+  --color-emerald-300: oklch(81% 0.117 11.638);
+  --color-emerald-400: oklch(71.2% 0.194 13.428);
+  --color-emerald-500: oklch(64.5% 0.246 16.439);
+  --color-emerald-600: oklch(58.6% 0.253 17.585);
+  --color-emerald-700: oklch(51.4% 0.222 16.935);
+  --color-emerald-800: oklch(45.5% 0.188 13.697);
+  --color-emerald-900: oklch(41% 0.159 10.272);
+  --color-emerald-950: oklch(27.1% 0.105 12.094);
+}

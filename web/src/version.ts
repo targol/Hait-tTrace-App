@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.10.0',
-  currentVersionCode: 300,
-  versionCode: 300,
+  currentVersion: '2.10.1',
+  currentVersionCode: 301,
+  versionCode: 301,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.10.1',
+    versionCode: 301,
+    releaseDate: '۱۴۰۵/۰۸/۲۷',
+    gregorianDate: '2026-11-18',
+    title: 'لوگوی جدید، تم‌های رنگی واقعی، رفع عکس پروفایل',
+    highlights: [
+      'لوگوی تازه (جوانهٔ دوبرگ) برای آیکن برنامه و وب',
+      'تم‌های رنگی حالا واقعاً رنگ کل برنامه را عوض می‌کنند؛ تعداد تم‌ها به ۵ تم متمایز کم شد',
+      'عکس جدید پروفایل دیگر با داده‌های قدیمی بازیابی‌شده جایگزین نمی‌شود'
+    ],
+    changes: []
+  },
   {
     version: '2.10.0',
     versionCode: 300,

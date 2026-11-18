@@ -124,6 +124,21 @@ import { PlantIcon } from './components/PlantIcon';
 
 export type MainTab = 'TODAY' | 'TASKS' | 'HABITS' | 'GOALS' | 'CALENDAR' | 'REPORTS' | 'SETTINGS' | 'NOTEBOOK';
 
+/**
+ * Merges a recovered (older) profile under the current one: any field the user has
+ * already changed from the default (e.g. a new avatar) always wins over recovered data.
+ */
+function mergeRecoveredProfile(current: UserProfile | undefined, recovered: UserProfile): UserProfile {
+  const merged: Record<string, any> = { ...DEFAULT_USER_PROFILE, ...recovered };
+  const defaults = DEFAULT_USER_PROFILE as Record<string, any>;
+  Object.entries((current || {}) as Record<string, any>).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && value !== defaults[key]) {
+      merged[key] = value;
+    }
+  });
+  return merged as UserProfile;
+}
+
 export const App: React.FC = () => {
   const today = useMemo(() => getTodayJalali(), []);
   const todayStr = useMemo(() => jalaliToFormattedString(today), [today]);
@@ -246,10 +261,7 @@ export const App: React.FC = () => {
           setCalendarEvents(prev => mergeEntitiesById(localRecovered.calendarEvents!, prev));
         }
         if (localRecovered.userProfile && localRecovered.userProfile.name) {
-          setUserProfile(prev => {
-            if (prev?.name && prev.name !== DEFAULT_USER_PROFILE.name) return prev;
-            return { ...DEFAULT_USER_PROFILE, ...prev, ...localRecovered.userProfile };
-          });
+          setUserProfile(prev => mergeRecoveredProfile(prev, localRecovered.userProfile!));
         }
         if (localRecovered.reminderSettings) {
           setReminderSettings(prev => ({ ...DEFAULT_REMINDER_SETTINGS, ...localRecovered.reminderSettings, ...prev }));
@@ -278,7 +290,7 @@ export const App: React.FC = () => {
           setCalendarEvents(prev => mergeEntitiesById(serverData.calendarEvents!, prev));
         }
         if (serverData.userProfile && serverData.userProfile.name) {
-          setUserProfile(prev => (prev?.name && prev.name !== DEFAULT_USER_PROFILE.name) ? prev : serverData.userProfile!);
+          setUserProfile(prev => mergeRecoveredProfile(prev, serverData.userProfile!));
         }
         if (serverData.reminderSettings) {
           setReminderSettings(prev => prev || serverData.reminderSettings!);

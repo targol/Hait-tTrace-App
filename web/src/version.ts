@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.9.1',
-  currentVersionCode: 291,
-  versionCode: 291,
+  currentVersion: '2.10.0',
+  currentVersionCode: 300,
+  versionCode: 300,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,20 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.10.0',
+    versionCode: 300,
+    releaseDate: '۱۴۰۵/۰۸/۲۷',
+    gregorianDate: '2026-11-18',
+    title: 'یکی شدن وظیفه و عادت، فرم ساده‌تر',
+    highlights: [
+      'عادت همان وظیفهٔ تکرارشونده است: در فرم وظیفه «هر روز» یا «روزهای هفته» را بزنید',
+      'تب جدا برای عادت‌ها حذف شد؛ داخل «وظیفه‌ها» بخش «تکرارشونده (عادت‌ها)» هست',
+      'فرم وظیفه ساده شد و موارد کم‌کاربرد زیر «گزینه‌های بیشتر» رفت',
+      'همهٔ عادت‌ها و سابقهٔ آن‌ها حفظ می‌شود'
+    ],
+    changes: []
+  },
   {
     version: '2.9.1',
     versionCode: 291,

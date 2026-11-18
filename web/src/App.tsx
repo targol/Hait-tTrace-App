@@ -92,7 +92,6 @@ import { SettingsScreen } from './components/SettingsScreen';
 
 // Modals
 import { TaskModal } from './components/TaskModal';
-import { HabitModal } from './components/HabitModal';
 import { GoalModal } from './components/GoalModal';
 import { AnnualGoalWizardModal } from './components/AnnualGoalWizardModal';
 import { GoalDetailHistoryModal } from './components/GoalDetailHistoryModal';
@@ -159,6 +158,7 @@ export const App: React.FC = () => {
 
   // Navigation
   const [activeTab, setActiveTab] = useState<MainTab>('TODAY');
+  const [tasksView, setTasksView] = useState<'LIST' | 'RECURRING'>('LIST');
 
   // PWA Install prompt & status
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -1324,8 +1324,7 @@ export const App: React.FC = () => {
   // Nav Items
   const navItems = [
     { id: 'TODAY' as MainTab, label: 'امروز', icon: Sun },
-    { id: 'TASKS' as MainTab, label: 'وظایف', icon: CheckSquare, badge: tasks.filter(t => !t.isCompleted && !t.isArchived).length },
-    { id: 'HABITS' as MainTab, label: 'عادت‌ها', icon: RotateCw, badge: habits.filter(h => !h.isClosed && !h.completionHistory?.[todayStr]).length },
+    { id: 'TASKS' as MainTab, label: 'وظیفه‌ها', icon: CheckSquare, badge: tasks.filter(t => !t.isCompleted && !t.isArchived).length + habits.filter(h => !h.isClosed && !h.completionHistory?.[todayStr]).length },
     { id: 'GOALS' as MainTab, label: 'اهداف', icon: Target },
     { id: 'REPORTS' as MainTab, label: 'گزارشات', icon: BarChart3 },
     { id: 'NOTEBOOK' as MainTab, label: 'دفتر', icon: BookOpen },
@@ -1475,7 +1474,7 @@ export const App: React.FC = () => {
             onToggleHabitDate={handleToggleHabitDate}
             onOpenTimer={handleOpenTimer}
             onOpenNewTask={() => handleNewTask()}
-            onOpenNewHabit={() => handleNewHabit()}
+            onOpenNewHabit={() => handleNewTask()}
             onDuplicateTask={handleDuplicateTask}
             onEditTask={handleEditTask}
             onUpdateSubtasks={handleUpdateSubtasks}
@@ -1488,7 +1487,20 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'TASKS' && (
+        {(activeTab === 'TASKS' || activeTab === 'HABITS') && (
+          <div className="flex gap-1.5 mb-3 p-1 bg-white rounded-xl border border-gray-200">
+            {([['LIST', 'وظیفه‌ها'], ['RECURRING', 'تکرارشونده (عادت‌ها)']] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setTasksView(v)}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${tasksView === v ? 'bg-emerald-600 text-white' : 'text-gray-600'}`}
+              >{label}</button>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'TASKS' && tasksView === 'LIST' && (
           <TasksScreen
             tasks={tasks}
             categories={categories}
@@ -1514,7 +1526,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'HABITS' && (
+        {(activeTab === 'HABITS' || (activeTab === 'TASKS' && tasksView === 'RECURRING')) && (
           <HabitsScreen
             habits={habits}
             categories={categories}
@@ -1523,7 +1535,7 @@ export const App: React.FC = () => {
             onDeleteHabit={handleDeleteHabit}
             onEditHabit={handleEditHabit}
             onDuplicateHabit={handleDuplicateHabit}
-            onNewHabit={handleNewHabit}
+            onNewHabit={() => handleNewTask()}
             onOpenTimer={handleOpenTimer}
             onToggleCloseHabit={handleToggleCloseHabit}
           />
@@ -1689,6 +1701,7 @@ export const App: React.FC = () => {
       <TaskModal
         isOpen={isTaskModalOpen}
         task={editingTask}
+        onSaveHabit={handleSaveHabit}
         categories={categories}
         goals={goals}
         allTasks={tasks}
@@ -1701,17 +1714,20 @@ export const App: React.FC = () => {
         onSave={handleSaveTask}
       />
 
-      <HabitModal
+      <TaskModal
         isOpen={isHabitModalOpen}
         habit={editingHabit}
+        onSaveHabit={handleSaveHabit}
         categories={categories}
         goals={goals}
+        allTasks={tasks}
+        reminderSettings={reminderSettings}
         isDuplicate={isDuplicateHabitMode}
         onClose={() => {
           setIsHabitModalOpen(false);
           setEditingHabit(null);
         }}
-        onSave={handleSaveHabit}
+        onSave={handleSaveTask}
       />
 
       <GoalModal

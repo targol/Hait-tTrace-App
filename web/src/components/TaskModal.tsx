@@ -1,6 +1,6 @@
 import { PRIORITIES, priorityOf, TaskPriority } from '../utils/priority';
 import React, { useState, useEffect, useRef } from 'react';
-import { AppTask, Category, Goal, ReminderSettings, AlarmSoundItem } from '../types';
+import { AppTask, Category, Goal, Habit, ReminderSettings, AlarmSoundItem } from '../types';
 import { 
   getTodayJalali, 
   jalaliToFormattedString, 
@@ -22,6 +22,9 @@ import { getNotificationPermission, requestNotificationPermission, isNotificatio
 interface Props {
   isOpen: boolean;
   task?: AppTask | null;
+  habit?: Habit | null;
+  onSaveHabit?: (habit: Habit) => void;
+  todayStr?: string;
   categories: Category[];
   goals: Goal[];
   allTasks?: AppTask[];
@@ -33,7 +36,9 @@ interface Props {
 
 export const TaskModal: React.FC<Props> = ({
   isOpen,
-  task,
+  task: taskProp,
+  habit,
+  onSaveHabit,
   categories,
   goals,
   allTasks = [],
@@ -43,6 +48,14 @@ export const TaskModal: React.FC<Props> = ({
   onSave,
 }) => {
   const today = getTodayJalali();
+  const task: AppTask | null | undefined = React.useMemo(() => habit ? ({
+    id: habit.id, title: habit.title, notes: habit.notes || '', categoryId: habit.categoryId, goalId: habit.goalId || null,
+    dueDate: '', time: habit.time || null, repeatType: habit.frequency === 'DAILY' ? 'DAILY' : 'WEEKLY',
+    repeatDaysOfWeek: habit.targetDaysOfWeek || [], timerSecondsTarget: (habit.timerMinutes || 0) * 60, timerSecondsElapsed: 0, isCompleted: false,
+  } as AppTask) : taskProp, [habit, taskProp]);
+  const isExistingTask = !!taskProp && allTasks.some(t => t.id === taskProp.id);
+  const [showMore, setShowMore] = useState(false);
+  const [weekDays, setWeekDays] = useState<number[]>(task?.repeatType === 'WEEKLY' && task.repeatDaysOfWeek?.length ? task.repeatDaysOfWeek : [getDayOfWeek(today)]);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const bodyContainerRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(task?.title || '');
@@ -115,6 +128,7 @@ export const TaskModal: React.FC<Props> = ({
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>('default');
 
   const [repeatType, setRepeatType] = useState<AppTask['repeatType']>(task?.repeatType || 'NONE');
+  const isRepeating = repeatType === 'DAILY' || repeatType === 'WEEKLY';
   const [timerMinutes, setTimerMinutes] = useState(task ? Math.floor(task.timerSecondsTarget / 60) : 25);
   
   // Micro-scheduling: monthOfYear, weekOfMonth, dayOfWeek (now optional/nullable)
@@ -184,6 +198,8 @@ export const TaskModal: React.FC<Props> = ({
       setReminderTime(task.reminderTime || '');
       setCustomAlarmSound(task.customAlarmSound || reminderSettings?.selectedSoundId || 'serenity');
       setRepeatType(task.repeatType || 'NONE');
+      setWeekDays(task.repeatType === 'WEEKLY' && task.repeatDaysOfWeek?.length ? task.repeatDaysOfWeek : [getDayOfWeek(today)]);
+      setShowMore(false);
       setTimerMinutes(Math.floor((task.timerSecondsTarget || 1500) / 60));
       setMonthOfYear(task.monthOfYear ?? null);
       setWeekOfMonth(task.weekOfMonth ?? null);
@@ -209,6 +225,8 @@ export const TaskModal: React.FC<Props> = ({
       setReminderTime('');
       setCustomAlarmSound(reminderSettings?.selectedSoundId || 'serenity');
       setRepeatType('NONE');
+      setWeekDays([getDayOfWeek(today)]);
+      setShowMore(false);
       setTimerMinutes(25);
       setMonthOfYear(null);
       setWeekOfMonth(null);
@@ -309,6 +327,35 @@ export const TaskModal: React.FC<Props> = ({
       taskId = `task-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     }
 
+    if (isRepeating && onSaveHabit && (habit || !isExistingTask || isActuallyDuplicate)) {
+      const days = repeatType === 'DAILY' ? [0, 1, 2, 3, 4, 5, 6] : (weekDays.length ? weekDays : [getDayOfWeek(today)]);
+      const base = habit || null;
+      onSaveHabit({
+        id: base ? base.id : `habit_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        title: title.trim(),
+        notes: notes.trim(),
+        categoryId,
+        goalId: goalId || null,
+        time: hasTime ? time : null,
+        timerMinutes,
+        frequency: repeatType === 'DAILY' ? 'DAILY' : 'WEEKLY',
+        targetDaysOfWeek: days,
+        targetCountPerWeek: base?.targetCountPerWeek,
+        exemptHolidays: base?.exemptHolidays ?? false,
+        exemptWeekends: base?.exemptWeekends ?? false,
+        plantType: base?.plantType || 'بونسای',
+        completionHistory: base?.completionHistory || {},
+        dailyProgressHistory: base?.dailyProgressHistory,
+        dailyElapsedSeconds: base?.dailyElapsedSeconds,
+        focusSessions: base?.focusSessions,
+        createdAt: base?.createdAt || jalaliToFormattedString(today),
+        isClosed: base?.isClosed,
+        closedAt: base?.closedAt,
+      });
+      onClose();
+      return;
+    }
+
     const newTask: AppTask = {
       id: taskId,
       title: title.trim(),
@@ -331,7 +378,7 @@ export const TaskModal: React.FC<Props> = ({
       customAlarmSound,
       lastNotifiedAt: isActuallyDuplicate ? null : (task?.lastNotifiedAt || null),
       repeatType,
-      repeatDaysOfWeek: repeatType === 'DAILY' ? [0, 1, 2, 3, 4, 5, 6] : (dayOfWeek !== null ? [dayOfWeek] : [getDayOfWeek(today)]),
+      repeatDaysOfWeek: repeatType === 'DAILY' ? [0, 1, 2, 3, 4, 5, 6] : repeatType === 'WEEKLY' ? (weekDays.length ? weekDays : [getDayOfWeek(today)]) : (dayOfWeek !== null ? [dayOfWeek] : [getDayOfWeek(today)]),
       monthOfYear: monthOfYear ?? null,
       weekOfMonth: weekOfMonth ?? null,
       dayOfWeek: dayOfWeek ?? null,
@@ -364,12 +411,12 @@ export const TaskModal: React.FC<Props> = ({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-gray-900">
-                {isActuallyDuplicate ? 'ایجاد کپی جدید از وظیفه' : task ? 'ویرایش وظیفه' : 'افزودن وظیفه جدید'}
+                {isActuallyDuplicate ? 'ایجاد کپی جدید از وظیفه' : (isExistingTask || !!habit?.title) ? 'ویرایش وظیفه' : 'افزودن وظیفه جدید'}
               </h3>
               <p className="text-[11px] text-gray-500">
                 {isActuallyDuplicate
                   ? 'یک وظیفه مستقل با مشخصات کپی شده ایجاد می‌شود'
-                  : task
+                  : (isExistingTask || !!habit?.title)
                   ? 'ویرایش اطلاعات، تاریخ و یادآور وظیفه'
                   : 'تعریف وظیفه جدید، زمانبندی و اتصال به اهداف'}
               </p>
@@ -442,17 +489,6 @@ export const TaskModal: React.FC<Props> = ({
               />
             </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">توضیحات و یادداشت</label>
-            <textarea
-              rows={2}
-              placeholder="جزئیات، لینک‌ها یا نکات مهم..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-hidden transition-all text-xs"
-            />
-          </div>
-
           {/* Priority */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">اولویت</label>
@@ -476,405 +512,43 @@ export const TaskModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Category & Goal */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center justify-between">
-                <span className="flex items-center gap-1">
-                  <Folder className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>دسته‌بندی</span>
-                </span>
-                {isInheritedFromGoal && (
-                  <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1 rounded-sm">ارث‌بری از هدف</span>
-                )}
-              </label>
-              <select
-                value={categoryId}
-                onChange={(e) => {
-                  setCategoryId(e.target.value);
-                  setIsInheritedFromGoal(false);
-                }}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-emerald-500 outline-hidden"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.title}</option>
-                ))}
-              </select>
+          {/* Repeat (a repeating task is a habit) */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1">
+              <Repeat className="w-3.5 h-3.5 text-emerald-600" />
+              <span>تکرار</span>
+            </label>
+            <div className="flex gap-1.5">
+              {([['NONE', 'یک‌بار'], ['DAILY', 'هر روز'], ['WEEKLY', 'روزهای هفته']] as const)
+                .filter(([v]) => !(habit && v === 'NONE'))
+                .map(([v, label]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setRepeatType(v)}
+                  className={`flex-1 py-2 rounded-xl border text-xs font-bold cursor-pointer ${repeatType === v ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-700 border-gray-200'}`}
+                >{label}</button>
+              ))}
+              {repeatType === 'MONTHLY' && <span className="flex-1 py-2 rounded-xl border text-xs font-bold text-center bg-emerald-600 text-white border-emerald-600">ماهانه</span>}
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                <span>وظیفه‌های فرعی (قدم‌ها)</span>
-              </label>
-              <div className="space-y-1 mb-1.5">
-                {subtasks.map(s => (
-                  <div key={s.id} className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1">
-                    <input type="checkbox" checked={s.done} onChange={e => setSubtasks(prev => prev.map(x => x.id === s.id ? { ...x, done: e.target.checked } : x))} />
-                    <span className={`flex-1 text-xs ${s.done ? 'line-through text-gray-400' : ''}`}>{s.title}</span>
-                    <button type="button" onClick={() => setSubtasks(prev => prev.filter(x => x.id !== s.id))} className="text-rose-500 text-xs cursor-pointer px-1">×</button>
-                  </div>
+            {repeatType === 'WEEKLY' && (
+              <div className="flex gap-1 mt-2">
+                {['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'].map((n, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setWeekDays(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i].sort())}
+                    className={`flex-1 py-1.5 rounded-lg border text-xs font-bold cursor-pointer ${weekDays.includes(i) ? 'bg-emerald-100 text-emerald-800 border-emerald-400' : 'bg-white text-gray-500 border-gray-200'}`}
+                  >{n}</button>
                 ))}
               </div>
-              <div className="flex gap-1.5">
-                <input
-                  value={subInput}
-                  onChange={e => setSubInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); const v = subInput.trim(); if (v) { setSubtasks(prev => [...prev, { id: 'st_' + Date.now().toString(36) + prev.length, title: v, done: false }]); setSubInput(''); } } }}
-                  placeholder="یک قدم بنویسید و Enter بزنید"
-                  className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-xs"
-                />
-                <button type="button" onClick={() => { const v = subInput.trim(); if (v) { setSubtasks(prev => [...prev, { id: 'st_' + Date.now().toString(36) + prev.length, title: v, done: false }]); setSubInput(''); } }} className="px-3 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">افزودن</button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                <span>پیش‌نیاز (اختیاری)</span>
-              </label>
-              {candidatePrereqs.length === 0 ? (
-                <p className="text-[11px] text-gray-400">وظیفه دیگری برای انتخاب وجود ندارد.</p>
-              ) : (
-                <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
-                  {candidatePrereqs.map(t => (
-                    <label key={t.id} className="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-emerald-50/50">
-                      <input
-                        type="checkbox"
-                        checked={dependsOn.includes(t.id)}
-                        onChange={(e) =>
-                          setDependsOn(prev => e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id))
-                        }
-                      />
-                      <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-              <p className="text-[10px] text-gray-400 mt-1">این وظیفه بعد از انجام وظیفه‌های انتخاب‌شده قابل انجام است.</p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                <span>همراه با (انجام هم‌زمان)</span>
-              </label>
-              {candidatePrereqs.length === 0 ? (
-                <p className="text-[11px] text-gray-400">وظیفه دیگری برای انتخاب وجود ندارد.</p>
-              ) : (
-                <div className="max-h-28 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
-                  {allTasks.filter(t => t.id !== task?.id && !t.isArchived).map(t => (
-                    <label key={t.id} className="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-emerald-50/50">
-                      <input
-                        type="checkbox"
-                        checked={linkedWith.includes(t.id)}
-                        onChange={(e) =>
-                          setLinkedWith(prev => e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id))
-                        }
-                      />
-                      <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-              <p className="text-[10px] text-gray-400 mt-1">هنگام انجام یکی، می‌توانید دیگری را هم انجام‌شده کنید.</p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                <Target className="w-3.5 h-3.5 text-emerald-600" />
-                <span>اتصال به هدف</span>
-              </label>
-              <select
-                value={goalId || ''}
-                onChange={(e) => handleGoalChange(e.target.value ? e.target.value : null)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-emerald-500 outline-hidden font-medium"
-              >
-                <option value="">بدون هدف (مستقل / وظیفه سریع)</option>
-                
-                {/* 🎯 اهداف سالانه */}
-                {goals.filter(g => g.period === 'ANNUAL').length > 0 && (
-                  <optgroup label="🎯 اهداف سالانه (مستقیم)">
-                    {goals
-                      .filter(g => g.period === 'ANNUAL')
-                      .map((g) => {
-                        const isPast = isYearPast(g.year || today.year, today);
-                        return (
-                          <option key={g.id} value={g.id} disabled={isPast}>
-                            {isPast ? '⛔ [پایان یافته] ' : ''}🎯 سال {toPersianDigits(g.year)}: {g.title}
-                          </option>
-                        );
-                      })}
-                  </optgroup>
-                )}
-
-                {/* 🌱 اهداف فصلی تفکیک‌شده با آیکون فصل */}
-                {goals.filter(g => g.period === 'SEASONAL').length > 0 && (
-                  <optgroup label="🌱 اهداف فصلی (۴ فصل سال)">
-                    {goals
-                      .filter(g => g.period === 'SEASONAL')
-                      .map((g) => {
-                        const sIdx = g.seasonIndex ?? 0;
-                        const isPast = isSeasonPast(g.year || today.year, sIdx, today);
-                        const sIcons = ['🌸', '☀️', '🍂', '❄️'];
-                        const sNames = ['بهار', 'تابستان', 'پاییز', 'زمستان'];
-                        const icon = sIcons[sIdx] || '🌱';
-                        const name = sNames[sIdx] || 'فصل';
-                        const parent = g.parentId ? goals.find(p => p.id === g.parentId) : undefined;
-                        const parentText = parent ? ` [ذیل ${parent.title}]` : '';
-                        return (
-                          <option key={g.id} value={g.id} disabled={isPast}>
-                            {isPast ? '⛔ [پایان یافته] ' : ''}{icon} فصل {name} {toPersianDigits(g.year)}: {g.title}{parentText}
-                          </option>
-                        );
-                      })}
-                  </optgroup>
-                )}
-
-                {/* 📅 اهداف ماهانه */}
-                {goals.filter(g => g.period === 'MONTHLY').length > 0 && (
-                  <optgroup label="📅 اهداف ماهانه">
-                    {goals
-                      .filter(g => g.period === 'MONTHLY')
-                      .map((g) => {
-                        const mIdx = g.monthIndex ? g.monthIndex - 1 : 0;
-                        const isPast = isMonthPast(g.year || today.year, mIdx + 1, today);
-                        const mName = PERSIAN_MONTHS[mIdx] || 'ماه';
-                        return (
-                          <option key={g.id} value={g.id} disabled={isPast}>
-                            {isPast ? '⛔ [پایان یافته] ' : ''}📅 ماه {mName} {toPersianDigits(g.year)}: {g.title}
-                          </option>
-                        );
-                      })}
-                  </optgroup>
-                )}
-              </select>
-
-              {/* Selected Goal Explanatory Tag */}
-              {goalId && (() => {
-                const selGoal = goals.find(g => g.id === goalId);
-                if (!selGoal) return null;
-                const isSeasonal = selGoal.period === 'SEASONAL';
-                const sIdx = selGoal.seasonIndex ?? 0;
-                const sIcons = ['🌸', '☀️', '🍂', '❄️'];
-                const sNames = ['بهار', 'تابستان', 'پاییز', 'زمستان'];
-                const parent = selGoal.parentId ? goals.find(p => p.id === selGoal.parentId) : undefined;
-
-                return (
-                  <div className="mt-1.5 p-2 rounded-lg bg-emerald-50/70 border border-emerald-200 text-[11px] text-emerald-950 flex items-center justify-between gap-1">
-                    <span className="flex items-center gap-1 font-semibold truncate">
-                      <span>{isSeasonal ? sIcons[sIdx] : selGoal.period === 'ANNUAL' ? '🎯' : '📅'}</span>
-                      <span>
-                        {isSeasonal
-                          ? `متصل به هدف فصلی: فصل ${sNames[sIdx]}`
-                          : selGoal.period === 'ANNUAL'
-                          ? 'متصل به هدف کل سال (سالانه)'
-                          : 'متصل به هدف ماهانه'}
-                      </span>
-                      {parent && <span className="text-gray-500 font-normal truncate">({parent.title})</span>}
-                    </span>
-                    {isSeasonal && (
-                      <span className="text-[10px] bg-emerald-200/70 text-emerald-900 px-1.5 py-0.2 rounded font-bold shrink-0">
-                        فصل {sNames[sIdx]}
-                      </span>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-
-          {/* Month, Week and Day micro-scheduling (ماه، هفته و روز برای وظیفه‌های خرد - با امکان خالی بودن) */}
-          <div className="p-3 bg-emerald-50/40 rounded-xl border border-emerald-100 space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-gray-700">
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                <span>زمان‌بندی خرد (ماه / هفته / روز)</span>
-              </span>
-              <span className="text-[10px] text-gray-500 font-normal">اختیاری (می‌تواند خالی باشد)</span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="block text-[11px] font-medium text-gray-600 mb-1">ماه</label>
-                <select
-                  value={monthOfYear !== null ? monthOfYear : ''}
-                  onChange={(e) => setMonthOfYear(e.target.value === '' ? null : parseInt(e.target.value, 10))}
-                  className="w-full px-2 py-1.5 rounded-lg border border-gray-200 text-xs bg-white focus:border-emerald-500"
-                >
-                  <option value="">(همه / بدون ماه)</option>
-                  {PERSIAN_MONTHS.map((m, idx) => (
-                    <option key={idx + 1} value={idx + 1}>{m}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-medium text-gray-600 mb-1">هفته ماه</label>
-                <select
-                  value={weekOfMonth !== null ? weekOfMonth : ''}
-                  onChange={(e) => setWeekOfMonth(e.target.value === '' ? null : parseInt(e.target.value, 10))}
-                  className="w-full px-2 py-1.5 rounded-lg border border-gray-200 text-xs bg-white focus:border-emerald-500"
-                >
-                  <option value="">(بدون هفته مشخص)</option>
-                  <option value={1}>هفته اول</option>
-                  <option value={2}>هفته دوم</option>
-                  <option value={3}>هفته سوم</option>
-                  <option value={4}>هفته چهارم</option>
-                  <option value={5}>هفته پنجم</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-medium text-gray-600 mb-1">روز هفته</label>
-                <select
-                  value={dayOfWeek !== null ? dayOfWeek : ''}
-                  onChange={(e) => setDayOfWeek(e.target.value === '' ? null : parseInt(e.target.value, 10))}
-                  className="w-full px-2 py-1.5 rounded-lg border border-gray-200 text-xs bg-white focus:border-emerald-500"
-                >
-                  <option value="">(بدون روز مشخص)</option>
-                  <option value={0}>شنبه</option>
-                  <option value={1}>یکشنبه</option>
-                  <option value={2}>دوشنبه</option>
-                  <option value={3}>سه‌شنبه</option>
-                  <option value={4}>چهارشنبه</option>
-                  <option value={5}>پنج‌شنبه</option>
-                  <option value={6}>جمعه</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* زمان انجام (ساعت شروع یا اجرا) */}
-          <div className="bg-emerald-50/40 p-3.5 rounded-xl border border-emerald-100/80">
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>زمان انجام وظیفه (ساعت شروع یا اجرا)</span>
-              </label>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-gray-500">{hasTime ? 'دارای ساعت انجام' : 'بدون ساعت مشخص'}</span>
-                <input
-                  type="checkbox"
-                  checked={hasTime}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setHasTime(checked);
-                    if (checked && !reminderTime) {
-                      setReminderTime(time);
-                    }
-                  }}
-                  className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                />
-              </div>
-            </div>
-            {hasTime && (
-              <div className="mt-2">
-                <input
-                  type="time"
-                  value={time}
-                  onChange={(e) => {
-                    setTime(e.target.value);
-                    if (!reminderTime || reminderTime === time) {
-                      setReminderTime(e.target.value);
-                    }
-                  }}
-                  className="w-full px-3 py-2 rounded-xl border border-emerald-200 bg-white text-xs font-medium"
-                />
-                <p className="text-[10px] text-gray-500 mt-1">ساعت برنامه‌ریزی‌شده برای آغاز یا اجرای این وظیفه</p>
-              </div>
+            )}
+            {isRepeating && !habit && !isExistingTask && (
+              <p className="text-[10px] text-gray-500 mt-1.5">وظیفهٔ تکرارشونده در بخش «تکرارشونده» لیست وظیفه‌ها و در جدول عادت‌های دفتر ثبت می‌شود.</p>
             )}
           </div>
 
-          {/* تاریخ شروع وظیفه (اختیاری: فعال شدن از تاریخی به بعد) */}
-          <div className="bg-sky-50/60 p-3.5 rounded-xl border border-sky-100/80 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                <span className="text-xs font-semibold text-sky-950">تاریخ شروع وظیفه (نمایش از این تاریخ به بعد)</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-gray-500">{hasStartDate ? 'شروع معین' : 'بلافاصله (از امروز)'}</span>
-                <input
-                  type="checkbox"
-                  checked={hasStartDate}
-                  onChange={(e) => setHasStartDate(e.target.checked)}
-                  className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
-                />
-              </div>
-            </div>
-
-            {hasStartDate ? (
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-sky-800 font-medium">وظیفه از این تاریخ در کارتابل فعال و دیده می‌شود:</span>
-                  <div className="flex gap-1 text-[11px]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStartDateParts({ year: today.year, month: today.month, day: today.day });
-                      }}
-                      className="px-2 py-0.5 bg-white border border-sky-200 text-sky-800 rounded-md hover:bg-sky-100 cursor-pointer"
-                    >
-                      امروز
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const tomorrow = addDaysJalali(today, 1);
-                        setStartDateParts({ year: tomorrow.year, month: tomorrow.month, day: tomorrow.day });
-                      }}
-                      className="px-2 py-0.5 bg-white border border-sky-200 text-sky-800 rounded-md hover:bg-sky-100 cursor-pointer"
-                    >
-                      فردا
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setHasStartDate(false)}
-                      className="px-2 py-0.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-md hover:bg-rose-100 cursor-pointer"
-                    >
-                      بدون شروع خاص
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <select
-                    value={startDateParts.day}
-                    onChange={(e) => setStartDateParts({ ...startDateParts, day: parseInt(e.target.value, 10) })}
-                    className="px-2 py-1.5 rounded-lg border border-sky-200 bg-white"
-                  >
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                      <option key={d} value={d}>روز {toPersianDigits(d)}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={startDateParts.month}
-                    onChange={(e) => setStartDateParts({ ...startDateParts, month: parseInt(e.target.value, 10) })}
-                    className="px-2 py-1.5 rounded-lg border border-sky-200 bg-white"
-                  >
-                    {PERSIAN_MONTHS.map((m, idx) => (
-                      <option key={idx + 1} value={idx + 1}>{m}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={startDateParts.year}
-                    onChange={(e) => setStartDateParts({ ...startDateParts, year: parseInt(e.target.value, 10) })}
-                    className="px-2 py-1.5 rounded-lg border border-sky-200 bg-white"
-                  >
-                    {[today.year, today.year + 1].map((y) => (
-                      <option key={y} value={y}>{toPersianDigits(y)}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            ) : (
-              <p className="text-[11px] text-gray-500 leading-relaxed">
-                وظیفه نیاز به انتظار ندارد و از همین امروز در دسته‌بندی و کارتابل فعال است. اگر می‌خواهید این وظیفه تنها پس از یک تاریخ خاص شروع شود، تیک بالا را فعال کنید.
-              </p>
-            )}
-          </div>
-
-          {/* مهلت نهایی اتمام وظیفه (زمان نهایی که باید تموم بشه) */}
+          {!isRepeating && (
           <div className="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-100/80 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
@@ -1026,6 +700,364 @@ export const TaskModal: React.FC<Props> = ({
               </div>
             )}
           </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Folder className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>دسته‌بندی</span>
+                </span>
+                {isInheritedFromGoal && (
+                  <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1 rounded-sm">ارث‌بری از هدف</span>
+                )}
+              </label>
+              <select
+                value={categoryId}
+                onChange={(e) => {
+                  setCategoryId(e.target.value);
+                  setIsInheritedFromGoal(false);
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-emerald-500 outline-hidden"
+              >
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                <Target className="w-3.5 h-3.5 text-emerald-600" />
+                <span>اتصال به هدف</span>
+              </label>
+              <select
+                value={goalId || ''}
+                onChange={(e) => handleGoalChange(e.target.value ? e.target.value : null)}
+                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white focus:border-emerald-500 outline-hidden font-medium"
+              >
+                <option value="">بدون هدف (مستقل / وظیفه سریع)</option>
+                
+                {/* 🎯 اهداف سالانه */}
+                {goals.filter(g => g.period === 'ANNUAL').length > 0 && (
+                  <optgroup label="🎯 اهداف سالانه (مستقیم)">
+                    {goals
+                      .filter(g => g.period === 'ANNUAL')
+                      .map((g) => {
+                        const isPast = isYearPast(g.year || today.year, today);
+                        return (
+                          <option key={g.id} value={g.id} disabled={isPast}>
+                            {isPast ? '⛔ [پایان یافته] ' : ''}🎯 سال {toPersianDigits(g.year)}: {g.title}
+                          </option>
+                        );
+                      })}
+                  </optgroup>
+                )}
+
+                {/* 🌱 اهداف فصلی تفکیک‌شده با آیکون فصل */}
+                {goals.filter(g => g.period === 'SEASONAL').length > 0 && (
+                  <optgroup label="🌱 اهداف فصلی (۴ فصل سال)">
+                    {goals
+                      .filter(g => g.period === 'SEASONAL')
+                      .map((g) => {
+                        const sIdx = g.seasonIndex ?? 0;
+                        const isPast = isSeasonPast(g.year || today.year, sIdx, today);
+                        const sIcons = ['🌸', '☀️', '🍂', '❄️'];
+                        const sNames = ['بهار', 'تابستان', 'پاییز', 'زمستان'];
+                        const icon = sIcons[sIdx] || '🌱';
+                        const name = sNames[sIdx] || 'فصل';
+                        const parent = g.parentId ? goals.find(p => p.id === g.parentId) : undefined;
+                        const parentText = parent ? ` [ذیل ${parent.title}]` : '';
+                        return (
+                          <option key={g.id} value={g.id} disabled={isPast}>
+                            {isPast ? '⛔ [پایان یافته] ' : ''}{icon} فصل {name} {toPersianDigits(g.year)}: {g.title}{parentText}
+                          </option>
+                        );
+                      })}
+                  </optgroup>
+                )}
+
+                {/* 📅 اهداف ماهانه */}
+                {goals.filter(g => g.period === 'MONTHLY').length > 0 && (
+                  <optgroup label="📅 اهداف ماهانه">
+                    {goals
+                      .filter(g => g.period === 'MONTHLY')
+                      .map((g) => {
+                        const mIdx = g.monthIndex ? g.monthIndex - 1 : 0;
+                        const isPast = isMonthPast(g.year || today.year, mIdx + 1, today);
+                        const mName = PERSIAN_MONTHS[mIdx] || 'ماه';
+                        return (
+                          <option key={g.id} value={g.id} disabled={isPast}>
+                            {isPast ? '⛔ [پایان یافته] ' : ''}📅 ماه {mName} {toPersianDigits(g.year)}: {g.title}
+                          </option>
+                        );
+                      })}
+                  </optgroup>
+                )}
+              </select>
+
+              {/* Selected Goal Explanatory Tag */}
+              {goalId && (() => {
+                const selGoal = goals.find(g => g.id === goalId);
+                if (!selGoal) return null;
+                const isSeasonal = selGoal.period === 'SEASONAL';
+                const sIdx = selGoal.seasonIndex ?? 0;
+                const sIcons = ['🌸', '☀️', '🍂', '❄️'];
+                const sNames = ['بهار', 'تابستان', 'پاییز', 'زمستان'];
+                const parent = selGoal.parentId ? goals.find(p => p.id === selGoal.parentId) : undefined;
+
+                return (
+                  <div className="mt-1.5 p-2 rounded-lg bg-emerald-50/70 border border-emerald-200 text-[11px] text-emerald-950 flex items-center justify-between gap-1">
+                    <span className="flex items-center gap-1 font-semibold truncate">
+                      <span>{isSeasonal ? sIcons[sIdx] : selGoal.period === 'ANNUAL' ? '🎯' : '📅'}</span>
+                      <span>
+                        {isSeasonal
+                          ? `متصل به هدف فصلی: فصل ${sNames[sIdx]}`
+                          : selGoal.period === 'ANNUAL'
+                          ? 'متصل به هدف کل سال (سالانه)'
+                          : 'متصل به هدف ماهانه'}
+                      </span>
+                      {parent && <span className="text-gray-500 font-normal truncate">({parent.title})</span>}
+                    </span>
+                    {isSeasonal && (
+                      <span className="text-[10px] bg-emerald-200/70 text-emerald-900 px-1.5 py-0.2 rounded font-bold shrink-0">
+                        فصل {sNames[sIdx]}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowMore(v => !v)}
+            className="w-full py-2 rounded-xl border border-dashed border-gray-300 text-xs font-bold text-gray-600 cursor-pointer"
+          >{showMore ? 'بستن گزینه‌های بیشتر ▴' : 'گزینه‌های بیشتر (ساعت، شروع، یادآور، پیش‌نیاز، قدم‌ها) ▾'}</button>
+
+          {showMore && (
+          <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">توضیحات و یادداشت</label>
+            <textarea
+              rows={2}
+              placeholder="جزئیات، لینک‌ها یا نکات مهم..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full px-3.5 py-2 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-hidden transition-all text-xs"
+            />
+          </div>
+
+          {/* زمان انجام (ساعت شروع یا اجرا) */}
+          <div className="bg-emerald-50/40 p-3.5 rounded-xl border border-emerald-100/80">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                <span>زمان انجام وظیفه (ساعت شروع یا اجرا)</span>
+              </label>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-gray-500">{hasTime ? 'دارای ساعت انجام' : 'بدون ساعت مشخص'}</span>
+                <input
+                  type="checkbox"
+                  checked={hasTime}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setHasTime(checked);
+                    if (checked && !reminderTime) {
+                      setReminderTime(time);
+                    }
+                  }}
+                  className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                />
+              </div>
+            </div>
+            {hasTime && (
+              <div className="mt-2">
+                <input
+                  type="time"
+                  value={time}
+                  onChange={(e) => {
+                    setTime(e.target.value);
+                    if (!reminderTime || reminderTime === time) {
+                      setReminderTime(e.target.value);
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-emerald-200 bg-white text-xs font-medium"
+                />
+                <p className="text-[10px] text-gray-500 mt-1">ساعت برنامه‌ریزی‌شده برای آغاز یا اجرای این وظیفه</p>
+              </div>
+            )}
+          </div>
+
+          {/* تاریخ شروع وظیفه (اختیاری: فعال شدن از تاریخی به بعد) */}
+          <div className="bg-sky-50/60 p-3.5 rounded-xl border border-sky-100/80 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                <span className="text-xs font-semibold text-sky-950">تاریخ شروع وظیفه (نمایش از این تاریخ به بعد)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-gray-500">{hasStartDate ? 'شروع معین' : 'بلافاصله (از امروز)'}</span>
+                <input
+                  type="checkbox"
+                  checked={hasStartDate}
+                  onChange={(e) => setHasStartDate(e.target.checked)}
+                  className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {hasStartDate ? (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-sky-800 font-medium">وظیفه از این تاریخ در کارتابل فعال و دیده می‌شود:</span>
+                  <div className="flex gap-1 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStartDateParts({ year: today.year, month: today.month, day: today.day });
+                      }}
+                      className="px-2 py-0.5 bg-white border border-sky-200 text-sky-800 rounded-md hover:bg-sky-100 cursor-pointer"
+                    >
+                      امروز
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const tomorrow = addDaysJalali(today, 1);
+                        setStartDateParts({ year: tomorrow.year, month: tomorrow.month, day: tomorrow.day });
+                      }}
+                      className="px-2 py-0.5 bg-white border border-sky-200 text-sky-800 rounded-md hover:bg-sky-100 cursor-pointer"
+                    >
+                      فردا
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHasStartDate(false)}
+                      className="px-2 py-0.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-md hover:bg-rose-100 cursor-pointer"
+                    >
+                      بدون شروع خاص
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <select
+                    value={startDateParts.day}
+                    onChange={(e) => setStartDateParts({ ...startDateParts, day: parseInt(e.target.value, 10) })}
+                    className="px-2 py-1.5 rounded-lg border border-sky-200 bg-white"
+                  >
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={d}>روز {toPersianDigits(d)}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={startDateParts.month}
+                    onChange={(e) => setStartDateParts({ ...startDateParts, month: parseInt(e.target.value, 10) })}
+                    className="px-2 py-1.5 rounded-lg border border-sky-200 bg-white"
+                  >
+                    {PERSIAN_MONTHS.map((m, idx) => (
+                      <option key={idx + 1} value={idx + 1}>{m}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={startDateParts.year}
+                    onChange={(e) => setStartDateParts({ ...startDateParts, year: parseInt(e.target.value, 10) })}
+                    className="px-2 py-1.5 rounded-lg border border-sky-200 bg-white"
+                  >
+                    {[today.year, today.year + 1].map((y) => (
+                      <option key={y} value={y}>{toPersianDigits(y)}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[11px] text-gray-500 leading-relaxed">
+                وظیفه نیاز به انتظار ندارد و از همین امروز در دسته‌بندی و کارتابل فعال است. اگر می‌خواهید این وظیفه تنها پس از یک تاریخ خاص شروع شود، تیک بالا را فعال کنید.
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>وظیفه‌های فرعی (قدم‌ها)</span>
+              </label>
+              <div className="space-y-1 mb-1.5">
+                {subtasks.map(s => (
+                  <div key={s.id} className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1">
+                    <input type="checkbox" checked={s.done} onChange={e => setSubtasks(prev => prev.map(x => x.id === s.id ? { ...x, done: e.target.checked } : x))} />
+                    <span className={`flex-1 text-xs ${s.done ? 'line-through text-gray-400' : ''}`}>{s.title}</span>
+                    <button type="button" onClick={() => setSubtasks(prev => prev.filter(x => x.id !== s.id))} className="text-rose-500 text-xs cursor-pointer px-1">×</button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-1.5">
+                <input
+                  value={subInput}
+                  onChange={e => setSubInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); const v = subInput.trim(); if (v) { setSubtasks(prev => [...prev, { id: 'st_' + Date.now().toString(36) + prev.length, title: v, done: false }]); setSubInput(''); } } }}
+                  placeholder="یک قدم بنویسید و Enter بزنید"
+                  className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-xs"
+                />
+                <button type="button" onClick={() => { const v = subInput.trim(); if (v) { setSubtasks(prev => [...prev, { id: 'st_' + Date.now().toString(36) + prev.length, title: v, done: false }]); setSubInput(''); } }} className="px-3 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">افزودن</button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>پیش‌نیاز (اختیاری)</span>
+              </label>
+              {candidatePrereqs.length === 0 ? (
+                <p className="text-[11px] text-gray-400">وظیفه دیگری برای انتخاب وجود ندارد.</p>
+              ) : (
+                <div className="max-h-32 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
+                  {candidatePrereqs.map(t => (
+                    <label key={t.id} className="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-emerald-50/50">
+                      <input
+                        type="checkbox"
+                        checked={dependsOn.includes(t.id)}
+                        onChange={(e) =>
+                          setDependsOn(prev => e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id))
+                        }
+                      />
+                      <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              <p className="text-[10px] text-gray-400 mt-1">این وظیفه بعد از انجام وظیفه‌های انتخاب‌شده قابل انجام است.</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <span>همراه با (انجام هم‌زمان)</span>
+              </label>
+              {candidatePrereqs.length === 0 ? (
+                <p className="text-[11px] text-gray-400">وظیفه دیگری برای انتخاب وجود ندارد.</p>
+              ) : (
+                <div className="max-h-28 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100 bg-white">
+                  {allTasks.filter(t => t.id !== task?.id && !t.isArchived).map(t => (
+                    <label key={t.id} className="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-emerald-50/50">
+                      <input
+                        type="checkbox"
+                        checked={linkedWith.includes(t.id)}
+                        onChange={(e) =>
+                          setLinkedWith(prev => e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id))
+                        }
+                      />
+                      <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              <p className="text-[10px] text-gray-400 mt-1">هنگام انجام یکی، می‌توانید دیگری را هم انجام‌شده کنید.</p>
+            </div>
+          </div>
 
             {/* Smart Reminder & Notification Box */}
             <div className="pt-2 border-t border-emerald-200/60">
@@ -1086,129 +1118,28 @@ export const TaskModal: React.FC<Props> = ({
                     </div>
                   </div>
 
-                  {/* Alarm Sound Picker with Preview */}
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-700 mb-1 flex items-center justify-between">
-                      <span className="flex items-center gap-1">
-                        <Volume2 className="w-3 h-3 text-emerald-600" />
-                        <span>نغمه آلارم (موسیقی ملایم بدون کلام)</span>
-                      </span>
-                      {reminderSettings?.customSounds && reminderSettings.customSounds.length > 0 && (
-                        <span className="text-[10px] text-teal-700">شامل زنگ‌های شخصی شما</span>
-                      )}
-                    </label>
-
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={customAlarmSound}
-                        onChange={(e) => setCustomAlarmSound(e.target.value)}
-                        className="flex-1 px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs bg-white"
-                      >
-                        <optgroup label="نغمه‌های ملایم آرامش‌بخش (پیش‌فرض)">
-                          {PRESET_ALARM_SOUNDS.map((s) => (
-                            <option key={s.id} value={s.id}>
-                              🎵 {s.title} - {s.description}
-                            </option>
-                          ))}
-                        </optgroup>
-                        {reminderSettings?.customSounds && reminderSettings.customSounds.length > 0 && (
-                          <optgroup label="زنگ‌های سفارشی شما">
-                            {reminderSettings.customSounds.map((cs) => (
-                              <option key={cs.id} value={cs.id}>
-                                ⭐ {cs.title} (سفارشی)
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                      </select>
-
-                      <button
-                        type="button"
-                        onClick={() => handleToggleSoundPreview(customAlarmSound)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer shrink-0 ${
-                          playingSoundId === customAlarmSound
-                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                            : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800'
-                        }`}
-                        title="پخش یا قطع پیش‌نمایش صدا"
-                      >
-                        {playingSoundId === customAlarmSound ? (
-                          <>
-                            <Square className="w-3 h-3 fill-amber-800" />
-                            <span>توقف</span>
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-3 h-3 fill-emerald-800" />
-                            <span>تست صدا</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Browser Notification Permission Status Check */}
-                  <div className="pt-1">
-                    {notifPermission === 'granted' ? (
-                      <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
-                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>مجوز اعلان مرورگر فعال است و یادآور در زمان مقرر اعلام خواهد شد.</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between gap-2 text-[11px] text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-200">
-                        <div className="flex items-center gap-1.5">
-                          <Bell className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                          <span>برای دریافت اعلان مرورگر، دسترسی اعلان را تایید نمایید.</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleRequestPermission}
-                          className="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-md transition-colors cursor-pointer text-[10px] shrink-0"
-                        >
-                          فعال‌سازی مجوز اعلان
-                        </button>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
 
-          {/* Repeat & Focus timer target */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                <Repeat className="w-3.5 h-3.5 text-emerald-600" />
-                <span>تکرار</span>
-              </label>
-              <select
-                value={repeatType}
-                onChange={(e) => setRepeatType(e.target.value as AppTask['repeatType'])}
-                className="w-full px-3 py-1.5 rounded-xl border border-gray-200 text-xs bg-white"
-              >
-                <option value="NONE">بدون تکرار</option>
-                <option value="DAILY">هر روز</option>
-                <option value="WEEKLY">هفتگی</option>
-                <option value="MONTHLY">ماهانه</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>هدف تمرکز (دقیقه)</span>
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="240"
-                step="5"
-                value={timerMinutes}
-                onChange={(e) => setTimerMinutes(parseInt(e.target.value, 10) || 0)}
-                className="w-full px-3 py-1.5 rounded-xl border border-gray-200 text-xs bg-white"
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5 text-emerald-600" />
+              <span>هدف تمرکز (دقیقه)</span>
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="240"
+              step="5"
+              value={timerMinutes}
+              onChange={(e) => setTimerMinutes(parseInt(e.target.value, 10) || 0)}
+              className="w-full px-3 py-1.5 rounded-xl border border-gray-200 text-xs bg-white"
+            />
           </div>
+          </div>
+          )}
+
         </div>
 
         {/* Sticky Footer - Always Visible at the bottom */}
@@ -1225,7 +1156,7 @@ export const TaskModal: React.FC<Props> = ({
             className="flex-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold transition-all shadow-sm text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Check className="w-4 h-4" />
-            <span>{task && !isActuallyDuplicate ? 'ذخیره تغییرات' : 'افزودن وظیفه'}</span>
+            <span>{(isExistingTask || !!habit?.title) && !isActuallyDuplicate ? 'ذخیره تغییرات' : 'افزودن وظیفه'}</span>
           </button>
         </div>
       </form>

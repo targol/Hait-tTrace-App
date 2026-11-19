@@ -616,16 +616,7 @@ export const GoalsScreen: React.FC<Props> = ({
               onClick={onOpenAnnualWizard}
               className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>طراحی هدف سالانه</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNewGoal(null, 'ANNUAL')}
-              className="px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl border border-gray-200 flex items-center gap-1 transition-colors cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 text-emerald-600" />
+              <Plus className="w-3.5 h-3.5" />
               <span>هدف جدید</span>
             </button>
           </div>
@@ -845,7 +836,7 @@ export const GoalsScreen: React.FC<Props> = ({
               className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition-colors cursor-pointer shadow-xs shrink-0 flex items-center gap-1"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>هدف‌گذاری سالانه و فصلی</span>
+              <span>هدف جدید</span>
             </button>
           </div>
 
@@ -1168,7 +1159,7 @@ export const GoalsScreen: React.FC<Props> = ({
             className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <Sparkles className="w-4 h-4" />
-            <span>شروع تعریف هدف</span>
+            <span>هدف جدید</span>
           </button>
         </div>
       ) : filteredTopLevelGoals.length === 0 ? (

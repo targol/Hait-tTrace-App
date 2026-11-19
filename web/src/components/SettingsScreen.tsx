@@ -1541,7 +1541,6 @@ export const SettingsScreen: React.FC<Props> = ({
               const linkedGoals = goals.filter(g => g.categoryId === cat.id);
               const linkedTasks = tasks.filter(t => t.categoryId === cat.id);
               const linkedHabits = habits.filter(h => h.categoryId === cat.id);
-              const plantObj = ALL_PLANT_TYPES.find(p => p.id === cat.plantType) || ALL_PLANT_TYPES[0];
 
               return (
                 <div
@@ -1559,7 +1558,7 @@ export const SettingsScreen: React.FC<Props> = ({
                           color: cat.colorHex,
                         }}
                       >
-                        {renderIcon(cat.iconName, 'w-4 h-4')}
+                        <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: cat.colorHex }} />
                       </div>
                       <div>
                         <h4 className="text-xs sm:text-sm font-bold text-gray-900 flex items-center gap-1.5">
@@ -1601,19 +1600,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
 
                   {/* Plant details card */}
-                  <div className="bg-emerald-50/50 rounded-lg p-2 flex items-center justify-between gap-2 border border-emerald-100/60">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <PlantIcon type={cat.plantType} size="sm" />
-                      <div className="min-w-0">
-                        <span className="text-[11px] font-bold text-emerald-950 block truncate">
-                          گیاه نمادین: {cat.plantType || 'بونسای'}
-                        </span>
-                        <span className="text-[10px] text-emerald-800/80 block truncate">
-                          {plantObj.description}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               );
             })}
@@ -1905,7 +1891,7 @@ export const SettingsScreen: React.FC<Props> = ({
                   color: catColor,
                 }}
               >
-                {renderIcon(catIconName, 'w-4 h-4')}
+                <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: catColor }} />
               </div>
               <h3 className="text-base font-bold text-emerald-950">
                 {editingCategory ? 'ویرایش دسته‌بندی' : 'افزودن دسته‌بندی جدید'}
@@ -1961,68 +1947,6 @@ export const SettingsScreen: React.FC<Props> = ({
                 </div>
               </div>
 
-              {/* Plant Picker for this category */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1">
-                  <Sprout className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>انتخاب گیاه نمادین این دسته‌بندی</span>
-                </label>
-                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-gray-200 rounded-xl bg-gray-50/50">
-                  {ALL_PLANT_TYPES.map((plant) => {
-                    const isSelected = catPlantType === plant.id;
-                    return (
-                      <button
-                        key={plant.id}
-                        type="button"
-                        onClick={() => setCatPlantType(plant.id)}
-                        className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-emerald-50 border-emerald-500 shadow-xs ring-2 ring-emerald-500/20'
-                            : 'bg-white border-gray-200 hover:border-emerald-200'
-                        }`}
-                      >
-                        <PlantIcon type={plant.id} size="sm" />
-                        <span className="text-[10px] font-bold text-emerald-950 truncate w-full block">
-                          {plant.id}
-                        </span>
-                        <span className="text-[9px] text-gray-400 truncate w-full block">
-                          {plant.description.split('،')[0]}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Icon Picker */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5">
-                  انتخاب آیکون نمایشی
-                </label>
-                <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-1 border border-gray-200 rounded-xl bg-gray-50/50">
-                  {AVAILABLE_ICONS.map((item) => {
-                    const IconComp = item.icon;
-                    const isSelected = catIconName === item.name;
-                    return (
-                      <button
-                        key={item.name}
-                        type="button"
-                        onClick={() => setCatIconName(item.name)}
-                        className={`p-2 rounded-lg border transition-all cursor-pointer flex items-center gap-1 text-[11px] ${
-                          isSelected
-                            ? 'bg-emerald-600 text-white border-emerald-700 shadow-xs'
-                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-100'
-                        }`}
-                        title={item.label}
-                      >
-                        <IconComp className="w-3.5 h-3.5" />
-                        <span className="text-[10px]">{item.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Live Preview of Category Badge */}
               <div className="bg-gray-50 rounded-xl p-3 border border-gray-200 flex items-center justify-between">
                 <span className="text-[11px] text-gray-500">پیش‌نمایش برچسب:</span>
@@ -2035,12 +1959,8 @@ export const SettingsScreen: React.FC<Props> = ({
                       borderColor: `${catColor}40`,
                     }}
                   >
-                    {renderIcon(catIconName, 'w-3.5 h-3.5')}
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: catColor }} />
                     <span>{catTitle || 'عنوان دسته‌بندی'}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-900 bg-white border border-emerald-200 px-2 py-0.5 rounded-lg">
-                    <PlantIcon type={catPlantType} size="xs" />
-                    <span>{catPlantType}</span>
                   </span>
                 </div>
               </div>

@@ -7,7 +7,7 @@ import {
   toPersianDigits, 
   toLatinDigits, 
   PERSIAN_MONTHS, 
-  addDaysJalali, 
+  addDaysJalali, getDaysInJalaliMonth, 
   isSeasonPast, 
   isMonthPast, 
   isYearPast,
@@ -55,6 +55,7 @@ export const TaskModal: React.FC<Props> = ({
   } as AppTask) : taskProp, [habit, taskProp]);
   const isExistingTask = !!taskProp && allTasks.some(t => t.id === taskProp.id);
   const [showMore, setShowMore] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [weekDays, setWeekDays] = useState<number[]>(task?.repeatType === 'WEEKLY' && task.repeatDaysOfWeek?.length ? task.repeatDaysOfWeek : [getDayOfWeek(today)]);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const bodyContainerRef = useRef<HTMLDivElement>(null);
@@ -550,153 +551,112 @@ export const TaskModal: React.FC<Props> = ({
 
           {!isRepeating && (
           <div className="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-100/80 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-xs font-semibold text-emerald-950">مهلت نهایی اتمام وظیفه</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-gray-500">{hasDueDate ? 'مهلت مشخص' : 'پیش‌فرض: پایان سال'}</span>
-                <input
-                  type="checkbox"
-                  checked={hasDueDate}
-                  onChange={(e) => setHasDueDate(e.target.checked)}
-                  className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                />
-              </div>
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-xs font-semibold text-emerald-950">مهلت اتمام</span>
+              {hasDueDate && (
+                <span className="text-[11px] text-emerald-800 mr-auto">
+                  {toPersianDigits(`${dateParts.year}/${String(dateParts.month).padStart(2, '0')}/${String(dateParts.day).padStart(2, '0')}`)}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {([
+                ['امروز', () => addDaysJalali(today, 0)],
+                ['فردا', () => addDaysJalali(today, 1)],
+                ['پایان هفته', () => addDaysJalali(today, (6 - getDayOfWeek(today) + 7) % 7)],
+                ['پایان ماه', () => ({ year: today.year, month: today.month, day: getDaysInJalaliMonth(today.year, today.month) })],
+                ['پایان فصل', () => { const m = Math.ceil(today.month / 3) * 3; return { year: today.year, month: m, day: getDaysInJalaliMonth(today.year, m) }; }],
+                ['پایان سال', () => ({ year: today.year, month: 12, day: getDaysInJalaliMonth(today.year, 12) })],
+              ] as [string, () => { year: number; month: number; day: number }][]).map(([label, calc]) => {
+                const t = calc();
+                const active = hasDueDate && !showDatePicker && dateParts.year === t.year && dateParts.month === t.month && dateParts.day === t.day;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => { setDateParts({ year: t.year, month: t.month, day: t.day }); setHasDueDate(true); setShowDatePicker(false); }}
+                    className={`px-2.5 py-1.5 rounded-lg border text-[11px] font-bold cursor-pointer ${active ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-emerald-800 border-emerald-200'}`}
+                  >{label}</button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => { setHasDueDate(true); setShowDatePicker(v => !v); }}
+                className={`px-2.5 py-1.5 rounded-lg border text-[11px] font-bold cursor-pointer ${showDatePicker ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-emerald-800 border-emerald-200'}`}
+              >انتخاب تاریخ</button>
+              <button
+                type="button"
+                onClick={() => { setHasDueDate(false); setShowDatePicker(false); }}
+                className={`px-2.5 py-1.5 rounded-lg border text-[11px] font-bold cursor-pointer ${!hasDueDate ? 'bg-gray-700 text-white border-gray-700' : 'bg-white text-gray-600 border-gray-200'}`}
+              >بدون مهلت</button>
             </div>
 
-            {!hasDueDate ? (
-              <div className="p-3 bg-white/90 border border-dashed border-emerald-300/80 rounded-xl space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
-                    <span>🎯 مهلت پیش‌فرض: پایان سال {toPersianDigits(today.year)}</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setHasDueDate(true)}
-                    className="text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 transition-colors cursor-pointer"
-                  >
-                    تعیین تاریخ معین
-                  </button>
-                </div>
-                <p className="text-[11px] text-gray-600 leading-relaxed">
-                  چون مهلت خاصی تعیین نشده، مهلت به صورت پیش‌فرض تا <strong>پایان سال {toPersianDigits(today.year)}</strong> منظور می‌شود و این وظیفه <strong>در همه روزها</strong> در کارتابل امروز دیده خواهد شد.
-                </p>
+            {hasDueDate && showDatePicker && (
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <select
+                  value={dateParts.day}
+                  onChange={(e) => setDateParts({ ...dateParts, day: parseInt(e.target.value, 10) })}
+                  className="px-2 py-1.5 rounded-lg border border-emerald-200 bg-white"
+                >
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                    <option key={d} value={d}>روز {toPersianDigits(d)}</option>
+                  ))}
+                </select>
+                <select
+                  value={dateParts.month}
+                  onChange={(e) => setDateParts({ ...dateParts, month: parseInt(e.target.value, 10) })}
+                  className="px-2 py-1.5 rounded-lg border border-emerald-200 bg-white"
+                >
+                  {PERSIAN_MONTHS.map((m, idx) => (
+                    <option key={idx + 1} value={idx + 1}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={dateParts.year}
+                  onChange={(e) => setDateParts({ ...dateParts, year: parseInt(e.target.value, 10) })}
+                  className="px-2 py-1.5 rounded-lg border border-emerald-200 bg-white"
+                >
+                  {[today.year, today.year + 1].map((y) => (
+                    <option key={y} value={y}>{toPersianDigits(y)}</option>
+                  ))}
+                </select>
               </div>
-            ) : (
-              <div className="space-y-2.5 pt-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-emerald-800 font-medium">تاریخ سررسید نهایی:</span>
-                  <div className="flex gap-1 text-[11px]">
-                    <button
-                      type="button"
-                      onClick={() => handleQuickDate(0)}
-                      className="px-2 py-0.5 bg-white border border-emerald-200 text-emerald-800 rounded-md hover:bg-emerald-100 cursor-pointer"
-                    >
-                      امروز
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleQuickDate(1)}
-                      className="px-2 py-0.5 bg-white border border-emerald-200 text-emerald-800 rounded-md hover:bg-emerald-100 cursor-pointer"
-                    >
-                      فردا
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDateParts({ year: today.year, month: 12, day: 29 });
-                      }}
-                      className="px-2 py-0.5 bg-white border border-emerald-200 text-emerald-800 rounded-md hover:bg-emerald-100 cursor-pointer"
-                    >
-                      پایان سال
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setHasDueDate(false)}
-                      className="px-2 py-0.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-md hover:bg-rose-100 cursor-pointer"
-                      title="حذف مهلت مشخص و بازگشت به پیش‌فرض پایان سال"
-                    >
-                      بدون موعد (پایان سال)
-                    </button>
-                  </div>
+            )}
+
+            {!hasDueDate && (
+              <p className="text-[11px] text-gray-500">بدون مهلت، وظیفه تا پایان سال {toPersianDigits(today.year)} باز می‌ماند.</p>
+            )}
+
+            {hasDueDate && (() => {
+              const check = isDateHoliday({ year: dateParts.year, month: dateParts.month, day: dateParts.day });
+              return check.isHoliday ? (
+                <div className="p-2 bg-rose-50 border border-rose-200 rounded-lg flex items-center gap-2 text-rose-900 text-[11px]">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>این تاریخ تعطیل است: {check.title}</span>
                 </div>
+              ) : null;
+            })()}
 
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <select
-                    value={dateParts.day}
-                    onChange={(e) => setDateParts({ ...dateParts, day: parseInt(e.target.value, 10) })}
-                    className="px-2 py-1.5 rounded-lg border border-emerald-200 bg-white"
-                  >
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                      <option key={d} value={d}>روز {toPersianDigits(d)}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={dateParts.month}
-                    onChange={(e) => setDateParts({ ...dateParts, month: parseInt(e.target.value, 10) })}
-                    className="px-2 py-1.5 rounded-lg border border-emerald-200 bg-white"
-                  >
-                    {PERSIAN_MONTHS.map((m, idx) => (
-                      <option key={idx + 1} value={idx + 1}>{m}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={dateParts.year}
-                    onChange={(e) => setDateParts({ ...dateParts, year: parseInt(e.target.value, 10) })}
-                    className="px-2 py-1.5 rounded-lg border border-emerald-200 bg-white"
-                  >
-                    {[today.year, today.year + 1].map((y) => (
-                      <option key={y} value={y}>{toPersianDigits(y)}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Iranian Holiday Warning if selected date is holiday */}
-                {(() => {
-                  const check = isDateHoliday({ year: dateParts.year, month: dateParts.month, day: dateParts.day });
-                  if (check.isHoliday) {
-                    return (
-                      <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-900 text-xs">
-                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                        <div>
-                          <span className="font-bold">توجه: این تاریخ تعطیل رسمی است!</span>
-                          <span className="text-[11px] text-rose-700 block mt-0.5">
-                            مناسبت: {check.title}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
-
-                {/* ساعت پایان مهلت نهایی */}
-                <div className="pt-2 border-t border-emerald-200/50">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] text-gray-700 font-medium">ساعت پایان مهلت (اختیاری):</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] text-gray-500">{hasDeadlineTime ? 'دارد' : 'ندارد'}</span>
-                      <input
-                        type="checkbox"
-                        checked={hasDeadlineTime}
-                        onChange={(e) => setHasDeadlineTime(e.target.checked)}
-                        className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                      />
-                    </div>
-                  </div>
-                  {hasDeadlineTime && (
-                    <input
-                      type="time"
-                      value={deadlineTime}
-                      onChange={(e) => setDeadlineTime(e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-lg border border-emerald-200 bg-white text-xs font-medium"
-                    />
-                  )}
-                </div>
+            {hasDueDate && (
+              <div className="flex items-center gap-2 pt-1">
+                <label className="flex items-center gap-1.5 text-[11px] text-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={hasDeadlineTime}
+                    onChange={(e) => setHasDeadlineTime(e.target.checked)}
+                    className="rounded text-emerald-600 cursor-pointer"
+                  />
+                  <span>ساعت پایان</span>
+                </label>
+                {hasDeadlineTime && (
+                  <input
+                    type="time"
+                    value={deadlineTime}
+                    onChange={(e) => setDeadlineTime(e.target.value)}
+                    className="px-2 py-1 rounded-lg border border-emerald-200 bg-white text-xs"
+                  />
+                )}
               </div>
             )}
           </div>

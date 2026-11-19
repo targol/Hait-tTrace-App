@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.10.1',
-  currentVersionCode: 301,
-  versionCode: 301,
+  currentVersion: '2.11.0',
+  currentVersionCode: 310,
+  versionCode: 310,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,20 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.11.0',
+    versionCode: 310,
+    releaseDate: '۱۴۰۵/۰۸/۲۸',
+    gregorianDate: '2026-11-19',
+    title: 'گزارش زمان، مهلت سریع، هدف تک‌مسیره',
+    highlights: [
+      'گزارش «انجام‌شده‌ها و زمان صرف‌شده» برای روز، ماه و سال (انجام شد/نشد + زمان ساعت شنی)',
+      'مهلت اتمام: امروز، فردا، پایان هفته، ماه، فصل، سال یا انتخاب تاریخ',
+      'ساخت هدف از یک دکمهٔ «هدف جدید»',
+      'گیاه و آیکن دسته‌بندی‌ها حذف شد؛ فقط رنگ دسته نمایش داده می‌شود'
+    ],
+    changes: []
+  },
   {
     version: '2.10.1',
     versionCode: 301,

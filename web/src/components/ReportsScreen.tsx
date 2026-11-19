@@ -31,6 +31,7 @@ import { HabitWeeklyDisciplineChart } from './HabitWeeklyDisciplineChart';
 import { HabitMonthCategoryPieChart } from './HabitMonthCategoryPieChart';
 import { WeeklyTrendBarChart } from './WeeklyTrendBarChart';
 import { AnnualGoalsProgressChart } from './AnnualGoalsProgressChart';
+import { TimeReport } from './TimeReport';
 
 interface Props {
   tasks: AppTask[];
@@ -354,7 +355,10 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
   }).sort((a, b) => b.rate - a.rate);
 
   // Focus Minutes
-  const totalFocusSeconds = tasks.reduce((sum, t) => sum + (t.timerSecondsElapsed || 0), 0);
+  const sessionSeconds = (list?: { durationSeconds?: number }[]) => (list || []).reduce((a, x) => a + (x.durationSeconds || 0), 0);
+  const totalFocusSeconds =
+    tasks.reduce((sum, t) => sum + Math.max(sessionSeconds(t.focusSessions), 0), 0) +
+    habits.reduce((sum, h) => sum + Math.max(sessionSeconds(h.focusSessions), 0), 0);
   const totalFocusMinutes = Math.round(totalFocusSeconds / 60);
 
   const getCategory = (catId?: string) => categories.find(c => c.id === catId);
@@ -421,6 +425,8 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
           </button>
         </div>
       </div>
+
+      <TimeReport tasks={tasks} habits={habits} categories={categories} />
 
       {/* Overview Top Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -770,7 +776,6 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
                         </div>
 
                         <h4 className="text-xs sm:text-sm font-bold text-gray-900 mt-1.5 flex items-center gap-2">
-                          {goal.plantType && <PlantIcon type={goal.plantType} size="xs" />}
                           <span>{goal.title}</span>
                         </h4>
                       </div>
@@ -894,9 +899,6 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
               key={r.habit.id}
               className="bg-white rounded-xl border border-gray-200 p-3 flex items-center gap-3 hover:border-emerald-300 transition-colors shadow-xs"
             >
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-200/80">
-                <PlantIcon type={r.habit.plantType} size="sm" />
-              </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center">

@@ -463,7 +463,6 @@ export const GoalModal: React.FC<Props> = ({
                         ({categories.find(c => c.id === parentGoal.categoryId)?.title || 'دسته'})
                       </span>
                     )}
-                    {parentGoal.plantType && <PlantIcon type={parentGoal.plantType} size="xs" />}
                   </div>
                 </div>
               )}
@@ -593,9 +592,6 @@ export const GoalModal: React.FC<Props> = ({
                         style={{ backgroundColor: isSelected ? '#ffffff' : c.colorHex }}
                       />
                       <span>{c.title}</span>
-                      {c.plantType && (
-                        <span className="text-[10px] opacity-80">({c.plantType})</span>
-                      )}
                       {isSelected && <Check className="w-3 h-3 text-white mr-0.5" />}
                     </button>
                   );
@@ -815,30 +811,6 @@ export const GoalModal: React.FC<Props> = ({
               </select>
             </div>
           )}
-
-          {/* Plant Mascot */}
-          <div>
-            <label className="block font-semibold text-gray-700 mb-1 flex items-center gap-1">
-              <Sprout className="w-3.5 h-3.5 text-emerald-600" />
-              <span>گیاه یا درخت نمادین این هدف در باغچه</span>
-            </label>
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
-                <PlantIcon type={plantType} size="sm" />
-              </div>
-              <select
-                value={plantType}
-                onChange={(e) => setPlantType(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-xs bg-white"
-              >
-                {ALL_PLANT_TYPES.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
           {/* Additional Description */}
           <div>

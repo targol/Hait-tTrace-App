@@ -1001,9 +1001,6 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                           className="bg-white rounded-xl border border-amber-200 p-3 flex items-center justify-between shadow-2xs hover:border-amber-300 transition-colors"
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-                              <PlantIcon type={habit.plantType} size="xs" />
-                            </div>
                             <div className="min-w-0">
                               <p className="text-xs font-bold text-gray-900 truncate">
                                 {habit.title}
@@ -1035,9 +1032,6 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0">
-                              <PlantIcon type={habit.plantType} size="xs" />
-                            </div>
                             <div className="min-w-0">
                               <p className="text-xs font-bold text-gray-800 truncate">
                                 {habit.title}
@@ -1131,7 +1125,6 @@ export const HabitWeeklyDisciplineChart: React.FC<Props> = ({
                     {/* Habit Title & Icon */}
                     <td className="py-2.5 pr-2">
                       <div className="flex items-center gap-2 min-w-[130px]">
-                        <PlantIcon type={habit.plantType} size="xs" />
                         <span className="font-bold text-gray-800 truncate max-w-[140px] sm:max-w-[200px]">
                           {habit.title}
                         </span>

@@ -975,6 +975,16 @@ export const AnnualGoalWizardModal: React.FC<Props> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {step < 3 && (
+              <button
+                type="button"
+                disabled={!annualTitle.trim()}
+                onClick={handleFinish}
+                className="px-3 py-2 rounded-xl border border-emerald-300 text-emerald-700 disabled:opacity-40 font-bold text-xs cursor-pointer"
+              >
+                ثبت همین حالا
+              </button>
+            )}
             {step < 3 ? (
               <button
                 type="button"
@@ -993,7 +1003,7 @@ export const AnnualGoalWizardModal: React.FC<Props> = ({
                 className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>ثبت و ایجاد ساختار هدف</span>
+                <span>ثبت هدف</span>
               </button>
             )}
           </div>

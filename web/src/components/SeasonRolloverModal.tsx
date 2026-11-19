@@ -130,7 +130,6 @@ export const SeasonRolloverModal: React.FC<Props> = ({
                 {linkedHabits.map((habit) => (
                   <div key={habit.id} className="p-2 rounded-lg bg-emerald-50/40 border border-emerald-100 flex items-center justify-between">
                     <div className="flex items-center gap-1.5 truncate max-w-[280px]">
-                      <PlantIcon type={habit.plantType} size="xs" />
                       <span className="font-medium text-gray-900 truncate">{habit.title}</span>
                     </div>
                     <span className="text-[10px] text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">

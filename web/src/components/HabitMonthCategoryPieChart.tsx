@@ -716,11 +716,6 @@ export const HabitMonthCategoryPieChart: React.FC<Props> = ({
                             <span className="text-xs sm:text-sm font-bold text-gray-900 truncate">
                               {stat.categoryTitle}
                             </span>
-                            {stat.plantType && (
-                              <div className="hidden sm:inline-block shrink-0">
-                                <PlantIcon type={stat.plantType} size="xs" />
-                              </div>
-                            )}
                           </div>
                           <span className="text-[10px] text-gray-400 font-medium">
                             {toPersianDigits(stat.distinctHabitsCount)} عادت فعال
@@ -793,7 +788,6 @@ export const HabitMonthCategoryPieChart: React.FC<Props> = ({
                                   className="flex items-center justify-between gap-2 p-1.5 bg-white rounded-xl border border-gray-200/60"
                                 >
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <PlantIcon type={habit.plantType} size="xs" />
                                     <div className="min-w-0">
                                       <span className="font-bold text-gray-800 truncate block text-[11px] sm:text-xs">
                                         {habit.title}

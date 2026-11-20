@@ -1,3 +1,4 @@
+import { priorityOf, priorityInfo } from '../utils/priority';
 import React, { useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { AppTask, CalendarEvent, Category, Goal, Habit } from '../types';
@@ -425,9 +426,18 @@ export const NotebookScreen: React.FC<Props> = ({ tasks, goals, habits, categori
                     </button>
                   ))}
                   {ts.map(t => (
-                    <div key={t.id} className="flex items-center gap-2 text-[11px] w-full">
+                    <div key={t.id} className="w-full">
+                    <div className="flex items-center gap-2 text-[11px] w-full">
                       <button type="button" aria-label="انجام شد" onClick={() => onToggleTask(t.id)} className={`w-4 h-4 rounded-full border shrink-0 cursor-pointer ${t.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
-                      <button type="button" onClick={() => onOpenTask(t)} className={`flex-1 text-right cursor-pointer ${t.isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}`}>{t.title}</button>
+                      <button type="button" onClick={() => onOpenTask(t)} className={`flex-1 text-right cursor-pointer ${t.isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}`}>{priorityInfo(priorityOf(t)) && <span className="inline-block w-2 h-2 rounded-full ml-1" style={{ background: priorityInfo(priorityOf(t))!.color }} />}{t.title}</button>
+                    </div>
+                    {t.subtasks && t.subtasks.length > 0 && (
+                      <div className="mr-6 mt-0.5 space-y-0.5 border-r-2 border-emerald-200 pr-2">
+                        {t.subtasks.map(st => (
+                          <p key={st.id} className={`text-[10px] ${st.done ? 'line-through text-gray-400' : 'text-gray-600'}`}>{st.done ? '✓' : '○'} {st.title}</p>
+                        ))}
+                      </div>
+                    )}
                     </div>
                   ))}
                   <input

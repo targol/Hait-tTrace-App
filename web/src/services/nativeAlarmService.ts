@@ -105,6 +105,32 @@ export function planAlarms(tasks: AppTask[], now = new Date()): PlannedAlarm[] {
 
 let lastSignature = '';
 
+export const TIMER_NOTIFICATION_ID = 999001;
+
+export async function scheduleTimerEnd(at: Date, title: string): Promise<void> {
+  if (!isCapacitorNative()) return;
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    let perm = await LocalNotifications.checkPermissions();
+    if (perm.display !== 'granted') perm = await LocalNotifications.requestPermissions();
+    if (perm.display !== 'granted') return;
+    await LocalNotifications.cancel({ notifications: [{ id: TIMER_NOTIFICATION_ID }] });
+    await LocalNotifications.schedule({
+      notifications: [{ id: TIMER_NOTIFICATION_ID, title: 'ساعت شنی تمام شد', body: title, schedule: { at, allowWhileIdle: true } }],
+    });
+  } catch (err) {
+    console.warn('Timer notification failed:', err);
+  }
+}
+
+export async function cancelTimerEnd(): Promise<void> {
+  if (!isCapacitorNative()) return;
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    await LocalNotifications.cancel({ notifications: [{ id: TIMER_NOTIFICATION_ID }] });
+  } catch {}
+}
+
 export async function syncNativeAlarms(tasks: AppTask[], enabled = true): Promise<void> {
   if (!isCapacitorNative()) return;
   try {
@@ -119,8 +145,9 @@ export async function syncNativeAlarms(tasks: AppTask[], enabled = true): Promis
       if (perm.display !== 'granted') return;
     }
     const pending = await LocalNotifications.getPending();
-    if (pending.notifications.length) {
-      await LocalNotifications.cancel({ notifications: pending.notifications.map(n => ({ id: n.id })) });
+    const toCancel = pending.notifications.filter(n => n.id !== TIMER_NOTIFICATION_ID);
+    if (toCancel.length) {
+      await LocalNotifications.cancel({ notifications: toCancel.map(n => ({ id: n.id })) });
     }
     if (planned.length) {
       await LocalNotifications.schedule({

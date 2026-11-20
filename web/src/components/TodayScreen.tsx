@@ -1,4 +1,5 @@
 import { SubtaskList } from './SubtaskList';
+import { priorityOf, priorityInfo } from '../utils/priority';
 import React, { useState, useMemo } from 'react';
 import { AppTask, Habit, Category, PlantState, Goal, UserProfile, CalendarEvent } from '../types';
 import { TransferTaskModal } from './TransferTaskModal';
@@ -627,9 +628,9 @@ export const TodayScreen: React.FC<Props> = ({
                         </button>
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-gray-900 truncate flex items-center gap-1.5">
-                            {t.isImportant && (
-                              <span className="shrink-0 p-0.5 rounded-xs bg-amber-100 text-amber-600" title="وظیفه مهم">
-                                <Star className="w-3 h-3 fill-amber-500" />
+                            {priorityInfo(priorityOf(t)) && (
+                              <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-white" style={{ background: priorityInfo(priorityOf(t))!.color }}>
+                                {priorityInfo(priorityOf(t))!.label}
                               </span>
                             )}
                             <span>{t.title}</span>

@@ -17,6 +17,15 @@ import {
 import { taskOccursOn } from '../services/nativeAlarmService';
 import { loadNotebook, saveNotebook } from '../services/notebookService';
 
+const SubLines: React.FC<{ t: AppTask }> = ({ t }) =>
+  t.subtasks && t.subtasks.length > 0 ? (
+    <div className="mr-6 mb-1 space-y-0.5 border-r-2 border-emerald-200 pr-2">
+      {t.subtasks.map(st => (
+        <p key={st.id} className={`text-[10px] ${st.done ? 'line-through text-gray-400' : 'text-gray-600'}`}>{st.done ? '✓' : '○'} {st.title}</p>
+      ))}
+    </div>
+  ) : null;
+
 interface Props {
   tasks: AppTask[];
   calendarEvents: CalendarEvent[];
@@ -101,10 +110,13 @@ export const DayPlanner: React.FC<Props> = ({ tasks, calendarEvents, onToggleTas
                 <div className="rounded-xl bg-gray-50 p-2">
                   <p className="text-[10px] font-bold text-gray-500 mb-1">بدون ساعت</p>
                   {noTime.map(t => (
-                    <button key={t.id} type="button" onClick={() => onToggleTask(t.id)} className="flex items-center gap-2 text-xs w-full text-right py-0.5 cursor-pointer">
+                    <React.Fragment key={t.id}>
+                    <button type="button" onClick={() => onToggleTask(t.id)} className="flex items-center gap-2 text-xs w-full text-right py-0.5 cursor-pointer">
                       <span className={`w-3.5 h-3.5 rounded-full border shrink-0 ${t.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
                       <span className={t.isCompleted ? 'line-through text-gray-400' : ''}>{t.title}</span>
                     </button>
+                    <SubLines t={t} />
+                    </React.Fragment>
                   ))}
                 </div>
               )}
@@ -121,11 +133,14 @@ export const DayPlanner: React.FC<Props> = ({ tasks, calendarEvents, onToggleTas
                           <div key={e.id} className="rounded-lg bg-sky-50 border border-sky-200 px-2 py-1 text-[11px] text-sky-800 font-bold">{e.title}{e.time ? ` • ${toPersianDigits(e.time)}` : ''}</div>
                         ))}
                         {here.map(t => (
-                          <button key={t.id} type="button" onClick={() => onToggleTask(t.id)} className="flex items-center gap-2 w-full text-right rounded-lg border px-2 py-1 text-[11px] cursor-pointer" style={{ borderColor: t.isCompleted ? '#e5e7eb' : GREEN + '88', background: t.isCompleted ? '#f9fafb' : '#f0fdf4' }}>
+                          <React.Fragment key={t.id}>
+                          <button type="button" onClick={() => onToggleTask(t.id)} className="flex items-center gap-2 w-full text-right rounded-lg border px-2 py-1 text-[11px] cursor-pointer" style={{ borderColor: t.isCompleted ? '#e5e7eb' : GREEN + '88', background: t.isCompleted ? '#f9fafb' : '#f0fdf4' }}>
                             <span className={`w-3.5 h-3.5 rounded-full border shrink-0 ${t.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
                             <span className={`flex-1 ${t.isCompleted ? 'line-through text-gray-400' : 'text-gray-900 font-bold'}`}>{t.title}</span>
                             <span className="text-[10px] text-gray-500">{toPersianDigits(t.time || '')}{t.deadlineTime ? ` تا ${toPersianDigits(t.deadlineTime)}` : ''}</span>
                           </button>
+                          <SubLines t={t} />
+                          </React.Fragment>
                         ))}
                         {ends.map(t => (
                           <div key={t.id + 'e'} className="text-[10px] text-rose-600 font-bold px-2">⌛ پایان مهلت: {t.title}</div>
@@ -152,6 +167,7 @@ export const DayPlanner: React.FC<Props> = ({ tasks, calendarEvents, onToggleTas
                       return (
                         <div key={t.id} className="rounded-xl border border-gray-200 p-2">
                           <p className="text-xs font-bold text-gray-900 mb-1.5">{t.title}</p>
+                          <SubLines t={t} />
                           <div className="flex gap-1.5">
                             <button type="button" onClick={() => onToggleTask(t.id)} className="flex-1 py-1 rounded-lg text-[11px] font-bold text-white cursor-pointer" style={{ background: GREEN }}>انجام شد</button>
                             {!recurring && (

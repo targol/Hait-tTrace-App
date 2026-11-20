@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.11.0',
-  currentVersionCode: 310,
-  versionCode: 310,
+  currentVersion: '2.11.1',
+  currentVersionCode: 311,
+  versionCode: 311,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,20 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.11.1',
+    versionCode: 311,
+    releaseDate: '۱۴۰۵/۰۸/۲۹',
+    gregorianDate: '2026-11-20',
+    title: 'رفع باگ‌های ساعت شنی، قدم‌ها و اولویت',
+    highlights: [
+      'ساعت شنی با خاموش شدن صفحه یا رفتن به پس‌زمینه درست می‌شمارد و در پایان اعلان می‌دهد',
+      'صفحهٔ توقف ساعت شنی ساده و متناسب با گوشی شد',
+      'قدم‌های هر وظیفه همیشه باز و در «امروز»، «دفتر» و برنامهٔ ساعتی دیده می‌شوند',
+      'برچسب اولویت (مهم/متوسط/عادی) در صفحهٔ امروز و دفتر هم نمایش داده می‌شود'
+    ],
+    changes: []
+  },
   {
     version: '2.11.0',
     versionCode: 310,

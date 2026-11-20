@@ -10,7 +10,7 @@ interface Props {
 
 /** Compact checklist under a task card: collapsed shows progress, expanded shows tick-able items. */
 export const SubtaskList: React.FC<Props> = ({ task, onChange }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const subs = task.subtasks || [];
   if (subs.length === 0) return null;
   const done = subs.filter(s => s.done).length;
@@ -25,7 +25,7 @@ export const SubtaskList: React.FC<Props> = ({ task, onChange }) => {
         {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
       </button>
       {open && (
-        <div className="mt-1 space-y-0.5">
+        <div className="mt-1.5 space-y-1 border-r-2 border-emerald-200 pr-2 mr-1">
           {subs.map(s => (
             <button
               key={s.id}

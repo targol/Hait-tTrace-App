@@ -824,7 +824,6 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
                         }`}
                         title={g.title}
                       >
-                        {g.plantType && <PlantIcon type={g.plantType} size="xs" />}
                         <span className="truncate">{g.title}</span>
                       </button>
                     );
@@ -1166,7 +1165,6 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
                           </div>
 
                           <h5 className="text-xs sm:text-sm font-bold text-gray-900 mt-1.5 flex items-center gap-1.5">
-                            {goal.plantType && <PlantIcon type={goal.plantType} size="xs" />}
                             <span className="truncate">{goal.title}</span>
                           </h5>
                         </div>
@@ -1228,7 +1226,7 @@ export const AnnualGoalsProgressChart: React.FC<Props> = ({
               </p>
               {laggingGoal && laggingGoal.metrics.percent < 40 && (
                 <p className="text-gray-600 text-[11px]">
-                  💡 <span className="font-semibold text-amber-800">توصیه باغبانی:</span> برای هدف{' '}
+                  💡 <span className="font-semibold text-amber-800">پیشنهاد:</span> برای هدف{' '}
                   <span className="font-bold text-gray-900">«{laggingGoal.goal.title}»</span> تعریف ۲ تا ۳ وظیفه خرد هفتگی یا پیوند یک عادت روزانه موجب تسریع چشمگیر در روند رشد آن خواهد شد.
                 </p>
               )}

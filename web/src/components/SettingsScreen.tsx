@@ -776,7 +776,7 @@ export const SettingsScreen: React.FC<Props> = ({
       label: 'پروفایل کاربری',
       shortLabel: 'پروفایل',
       icon: User,
-      badge: currentProfile.name || 'باغبان',
+      badge: currentProfile.name || 'کاربر',
       colorClass: 'emerald'
     },
     {
@@ -797,7 +797,7 @@ export const SettingsScreen: React.FC<Props> = ({
     },
     {
       id: 'CATEGORIES' as SettingsTabId,
-      label: 'دسته‌ها و گیاهان',
+      label: 'دسته‌ها',
       shortLabel: 'دسته‌بندی‌ها',
       icon: Tag,
       badge: `${toPersianDigits(categories.length)} دسته`,
@@ -837,14 +837,14 @@ export const SettingsScreen: React.FC<Props> = ({
                 {currentProfile.avatarUrl && (currentProfile.avatarUrl.startsWith('data:image') || currentProfile.avatarUrl.startsWith('http')) ? (
                   <img src={currentProfile.avatarUrl} alt="پروفایل" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl select-none">{currentProfile.avatarUrl || '🌱'}</span>
+                  <span className="text-2xl select-none">{currentProfile.avatarUrl || '🙂'}</span>
                 )}
               </div>
 
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-base font-bold text-white flex items-center gap-2">
-                    <span>{currentProfile.name || 'باغبان جوانه'}</span>
+                    <span>{currentProfile.name || 'کاربر'}</span>
                   </h2>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 backdrop-blur-xs">
                     نسخه {APP_VERSION_INFO.currentVersion}
@@ -994,9 +994,9 @@ export const SettingsScreen: React.FC<Props> = ({
               <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
                 <User className="w-3.5 h-3.5" />
               </div>
-              <span>بخش اول: مدیریت پروفایل کاربری</span>
+              <span>پروفایل</span>
             </h3>
-            <span className="text-[11px] text-gray-400">شناسنامه و نماد شخصی باغبان</span>
+            <span className="text-[11px] text-gray-400">نام و عکس شما</span>
           </div>
 
           {/* Quick Profile Stats Highlight */}
@@ -1004,7 +1004,7 @@ export const SettingsScreen: React.FC<Props> = ({
             <div className="bg-emerald-50/70 border border-emerald-200/70 rounded-xl p-3 text-center">
               <span className="text-[10px] text-emerald-800 block">نام نمایشی</span>
               <span className="text-sm font-bold text-emerald-950 mt-0.5 block truncate">
-                {currentProfile.name || 'باغبان'}
+                {currentProfile.name || 'کاربر'}
               </span>
             </div>
             <div className="bg-teal-50/70 border border-teal-200/70 rounded-xl p-3 text-center">
@@ -1048,9 +1048,8 @@ export const SettingsScreen: React.FC<Props> = ({
               <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
                 <Bell className="w-3.5 h-3.5" />
               </div>
-              <span>بخش دوم: تنظیمات یادآور، آلارم و آوای ملایم</span>
+              <span>یادآور و آلارم</span>
             </h3>
-            <span className="text-[11px] text-gray-400">یادآوری‌های صوتی بدون اضطراب</span>
           </div>
 
           {onSaveReminderSettings && (
@@ -1074,10 +1073,10 @@ export const SettingsScreen: React.FC<Props> = ({
                 <div className="w-6 h-6 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center">
                   <Palette className="w-3.5 h-3.5" />
                 </div>
-                <span>بخش سوم: تم‌های رنگی و شخصی‌سازی ظاهر برنامه</span>
+                <span>ظاهر و رنگ</span>
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                رنگ‌بندی کلی برنامه، حالت روز/شب و افکت‌های بصری باغبانی را مطابق سلیقه خود تنظیم کنید.
+                رنگ برنامه و حالت روز/شب را تنظیم کنید.
               </p>
             </div>
 
@@ -1444,29 +1443,6 @@ export const SettingsScreen: React.FC<Props> = ({
 
             {/* Animation and Haptic Settings */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              {/* Plant Growth animations toggle */}
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-200/80 flex items-center justify-between gap-2">
-                <div>
-                  <span className="text-xs font-bold text-gray-800 block">انیمیشن رویش گیاهان</span>
-                  <span className="text-[10px] text-gray-500">جلوه‌های بصری شکوفایی</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleTogglePlantAnimations(!enablePlantAnimations)}
-                  className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
-                    enablePlantAnimations ? 'bg-emerald-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center text-[10px] ${
-                      enablePlantAnimations ? 'left-1' : 'right-1'
-                    }`}
-                  >
-                    🌱
-                  </span>
-                </button>
-              </div>
-
               {/* Haptic feedback toggle */}
               <div className="p-3 bg-gray-50 rounded-xl border border-gray-200/80 flex items-center justify-between gap-2">
                 <div>
@@ -1503,10 +1479,10 @@ export const SettingsScreen: React.FC<Props> = ({
             <div>
               <h3 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
                 <Tag className="w-4 h-4 text-emerald-600" />
-                <span>بخش چهارم: دسته‌بندی‌های اهداف و گیاهان اختصاصی</span>
+                <span>دسته‌بندی‌ها</span>
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                هر دسته‌بندی دارای رنگ و گیاه نمادین است که به زیرمجموعه‌ها، وظیفه‌ها و عادات ارث داده می‌شود.
+                هر دسته‌بندی یک رنگ دارد که به وظیفه‌ها و عادت‌ها منتقل می‌شود.
               </p>
             </div>
 
@@ -1584,7 +1560,7 @@ export const SettingsScreen: React.FC<Props> = ({
                         type="button"
                         onClick={() => openEditCategory(cat)}
                         className="p-1.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                        title="ویرایش دسته‌بندی و گیاه"
+                        title="ویرایش دسته‌بندی"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
@@ -1618,7 +1594,7 @@ export const SettingsScreen: React.FC<Props> = ({
                 <div className="w-6 h-6 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center">
                   <Database className="w-3.5 h-3.5" />
                 </div>
-                <span>بخش پنجم: مدیریت داده‌ها، پایگاه داده و پشتیبان‌گیری</span>
+                <span>داده‌ها و پشتیبان‌گیری</span>
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
                 تهیه نسخه پشتیبان شخصی به صورت فایل استاندارد JSON، کپی سریع، بازیابی داده‌ها و همگام‌سازی ذخیره‌سازی سه‌لایه.

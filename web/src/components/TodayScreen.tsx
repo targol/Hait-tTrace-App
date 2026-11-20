@@ -360,11 +360,9 @@ export const TodayScreen: React.FC<Props> = ({
       {/* Compact overall status for today */}
       {(() => {
         const pct = Math.max(0, Math.min(100, Math.round(plantState.progressPercent || 0)));
-        const emoji = pct >= 100 ? '🌸' : pct >= 60 ? '🌿' : pct > 0 ? '🌱' : '🪴';
         const msg = pct >= 100 ? 'عالی بود! همه‌چیز انجام شد' : pct >= 60 ? 'خیلی خوب پیش می‌روید' : pct > 0 ? 'شروع خوبی بود' : 'امروز را شروع کنید';
         return (
           <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-2xs">
-            <div className="text-3xl leading-none">{emoji}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-black text-gray-900">{msg}</span>
@@ -402,9 +400,6 @@ export const TodayScreen: React.FC<Props> = ({
               {holidayInfo.title}
             </span>
           </div>
-          <p className="text-[11px] text-rose-800 leading-relaxed">
-            💡 <strong>توجه به روز تعطیل:</strong> امروز فرصت مناسبی برای استراحت، تجدید انرژی، یا پیگیری بدون دغدغه وظیفه‌های آرامش‌بخش است. پیش از شروع ساعت شنی وظیفه‌ها یا پروژه‌های جدی کاری، تعطیلی رسمی در نظر گرفته می‌شود.
-          </p>
         </div>
       )}
 

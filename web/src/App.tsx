@@ -674,10 +674,12 @@ export const App: React.FC = () => {
           ...t,
           isCompleted: nextState,
           completedAt: nextState ? todayStr : null,
+          // finishing the task finishes all its steps; reopening it reopens them
+          subtasks: t.subtasks?.map(st => ({ ...st, done: nextState })),
         };
       }
       if (alsoComplete.includes(t.id)) {
-        return { ...t, isCompleted: true, completedAt: todayStr };
+        return { ...t, isCompleted: true, completedAt: todayStr, subtasks: t.subtasks?.map(st => ({ ...st, done: true })) };
       }
       return t;
     }));
@@ -704,6 +706,8 @@ export const App: React.FC = () => {
       if (t.id !== taskId) return t;
       const allDone = subtasks.length > 0 && subtasks.every(s => s.done);
       if (allDone && !t.isCompleted) return { ...t, subtasks, isCompleted: true, completedAt: todayStr };
+      // un-ticking any step reopens a task that was completed
+      if (!allDone && t.isCompleted) return { ...t, subtasks, isCompleted: false, completedAt: null };
       return { ...t, subtasks };
     }));
   }, [todayStr]);
@@ -1395,31 +1399,17 @@ export const App: React.FC = () => {
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
                 </svg>
-                {/* Dynamically Growing Plant Icon */}
-                <div className="w-5 h-5 flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
-                  <PlantIcon 
-                    type={userProfile?.avatarUrl || 'بونسای'} 
-                    stage={plantState.stage} 
-                    progressPercent={plantState.progressPercent}
-                    className="w-full h-full" 
-                  />
-                </div>
               </div>
 
               <div className="text-right">
                 <div className="text-[10px] font-bold text-emerald-950 flex items-center gap-1">
                   <span className="truncate max-w-[90px] sm:max-w-[140px]">
-                    {userProfile?.name ? `${userProfile.name}:` : 'رشد امروز:'}
+                    امروز
                   </span>
                   <span className={`font-mono font-black ${plantState.progressPercent >= 100 ? 'text-amber-600' : 'text-emerald-700'}`}>
                     %{toPersianDigits(plantState.progressPercent)}
                   </span>
                 </div>
-                {userProfile?.title && (
-                  <div className="text-[9px] text-emerald-700/80 font-medium truncate max-w-[110px] sm:max-w-[150px] hidden xs:block">
-                    {userProfile.title}
-                  </div>
-                )}
               </div>
             </div>
 

@@ -945,7 +945,7 @@ export const TaskModal: React.FC<Props> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                <span>وظیفه‌های فرعی (قدم‌ها)</span>
+                <span>قدم‌ها (با تکمیل همه، وظیفه تمام می‌شود)</span>
               </label>
               <div className="space-y-1 mb-1.5">
                 {subtasks.map(s => (

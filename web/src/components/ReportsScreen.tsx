@@ -870,10 +870,10 @@ export const ReportsScreen: React.FC<Props> = ({ tasks, habits, goals, categorie
           <div>
             <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
               <Award className="w-4 h-4 text-emerald-600" />
-              <span>رتبه‌بندی پایبندی به عادات و شادابی گیاهان باغچه</span>
+              <span>پایبندی به عادت‌ها</span>
             </h3>
             <p className="text-[11px] text-gray-500 mt-0.5">
-              پیوستگی ثبت روزانه به تفکیک گیاهان نمادین شما در بازه {timeframe === 'WEEK' ? 'هفتگی' : timeframe === 'MONTH' ? 'ماهانه' : timeframe === 'SEASON' ? 'فصلی' : 'سالانه'}
+              پیوستگی ثبت روزانه در بازه {timeframe === 'WEEK' ? 'هفتگی' : timeframe === 'MONTH' ? 'ماهانه' : timeframe === 'SEASON' ? 'فصلی' : 'سالانه'}
             </p>
           </div>
 

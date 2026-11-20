@@ -324,7 +324,6 @@ export const TasksScreen: React.FC<Props> = ({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900">مدیریت وظیفه‌ها</h2>
-            <p className="text-xs text-gray-500 mt-0.5">برنامه‌ریزی، اولویت‌بندی و بایگانی هوشمند وظایف</p>
           </div>
           <div className="flex items-center gap-2">
             {onOpenTasksBackup && (
@@ -555,71 +554,6 @@ export const TasksScreen: React.FC<Props> = ({
       </div>
 
       {/* Overview Banner on ALL tab */}
-      {activeTab === 'ALL' && (
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-3 sm:p-3.5 shadow-2xs space-y-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-            <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-              <span>نمای کلی تمام وظیفه‌ها</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-extrabold">
-                مجموع: {toPersianDigits(tasks.length)} وظیفه
-              </span>
-            </span>
-            <span className="text-[11px] text-gray-500">
-              نمایش همه وظیفه‌های سیستم (شامل جاری، آتی، معوقه، تکرارشونده و بایگانی)
-            </span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-1 text-[11px]">
-            <button
-              type="button"
-              onClick={() => setActiveTab('TODAY')}
-              className="p-2 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-900 text-center hover:bg-emerald-100/70 transition-colors cursor-pointer"
-            >
-              <div className="text-[10px] text-emerald-700">امروز / آماده</div>
-              <div className="text-sm font-black">{toPersianDigits(todayCount)}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('UPCOMING')}
-              className="p-2 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 text-center hover:bg-blue-100/70 transition-colors cursor-pointer"
-            >
-              <div className="text-[10px] text-blue-700">وظیفه‌های آتی</div>
-              <div className="text-sm font-black">{toPersianDigits(upcomingCount)}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('OVERDUE')}
-              className="p-2 rounded-xl bg-rose-50 border border-rose-100 text-rose-900 text-center hover:bg-rose-100/70 transition-colors cursor-pointer"
-            >
-              <div className="text-[10px] text-rose-700">معوقه</div>
-              <div className="text-sm font-black">{toPersianDigits(overdueCount)}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('RECURRING')}
-              className="p-2 rounded-xl bg-teal-50 border border-teal-100 text-teal-900 text-center hover:bg-teal-100/70 transition-colors cursor-pointer"
-            >
-              <div className="text-[10px] text-teal-700">تکرارشونده</div>
-              <div className="text-sm font-black">{toPersianDigits(recurringCount)}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('COMPLETED')}
-              className="p-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 text-center hover:bg-gray-100 transition-colors cursor-pointer"
-            >
-              <div className="text-[10px] text-gray-600">تکمیل‌شده</div>
-              <div className="text-sm font-black">{toPersianDigits(completedCount)}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('ARCHIVE')}
-              className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-center hover:bg-amber-100/70 transition-colors cursor-pointer"
-            >
-              <div className="text-[10px] text-amber-700">بایگانی (۳۰ روز+)</div>
-              <div className="text-sm font-black">{toPersianDigits(archivedCount)}</div>
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Info Banner on COMPLETED tab if there are archived tasks */}
       {activeTab === 'COMPLETED' && archivedCount > 0 && (

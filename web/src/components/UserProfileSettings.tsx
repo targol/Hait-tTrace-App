@@ -21,7 +21,7 @@ interface Props {
 }
 
 const BOTANICAL_AVATAR_PRESETS = [
-  { id: 'sprout', emoji: '🌱', label: 'جوانه امید' },
+  { id: 'sprout', emoji: '🙂', label: 'جوانه امید' },
   { id: 'flower', emoji: '🌸', label: 'شکوفه بهار' },
   { id: 'rose', emoji: '🌹', label: 'گل سرخ' },
   { id: 'cactus', emoji: '🌵', label: 'کاکتوس مقاوم' },
@@ -44,7 +44,7 @@ export const UserProfileSettings: React.FC<Props> = ({
 
   const [name, setName] = useState(currentProfile.name || '');
   const [title, setTitle] = useState(currentProfile.title || '');
-  const [avatarUrl, setAvatarUrl] = useState(currentProfile.avatarUrl || '🌱');
+  const [avatarUrl, setAvatarUrl] = useState(currentProfile.avatarUrl || '🙂');
   const [bio, setBio] = useState(currentProfile.bio || '');
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [autoSaveActive, setAutoSaveActive] = useState(false);
@@ -60,7 +60,7 @@ export const UserProfileSettings: React.FC<Props> = ({
     if (!isDirtyRef.current && userProfile) {
       setName(userProfile.name || '');
       setTitle(userProfile.title || '');
-      setAvatarUrl(userProfile.avatarUrl || '🌱');
+      setAvatarUrl(userProfile.avatarUrl || '🙂');
       setBio(userProfile.bio || '');
     }
   }, [userProfile?.name, userProfile?.title, userProfile?.avatarUrl, userProfile?.bio]);
@@ -70,9 +70,9 @@ export const UserProfileSettings: React.FC<Props> = ({
     nextFields?: Partial<{ name: string; title: string; avatarUrl: string; bio: string }>,
     showToast = false
   ) => {
-    const mergedName = (nextFields?.name !== undefined ? nextFields.name : name).trim() || 'باغبان جوانه';
+    const mergedName = (nextFields?.name !== undefined ? nextFields.name : name).trim() || 'کاربر';
     const mergedTitle = (nextFields?.title !== undefined ? nextFields.title : title).trim();
-    const mergedAvatar = (nextFields?.avatarUrl !== undefined ? nextFields.avatarUrl : avatarUrl) || '🌱';
+    const mergedAvatar = (nextFields?.avatarUrl !== undefined ? nextFields.avatarUrl : avatarUrl) || '🙂';
     const mergedBio = (nextFields?.bio !== undefined ? nextFields.bio : bio).trim();
 
     const updated: UserProfile = {
@@ -188,7 +188,7 @@ export const UserProfileSettings: React.FC<Props> = ({
                   />
                 ) : (
                   <span className="text-4xl select-none" role="img" aria-label="آواتار">
-                    {avatarUrl || '🌱'}
+                    {avatarUrl || '🙂'}
                   </span>
                 )}
               </div>
@@ -228,9 +228,9 @@ export const UserProfileSettings: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    setAvatarUrl('🌱');
+                    setAvatarUrl('🙂');
                     setImageSizeInfo(null);
-                    persistProfileNow({ avatarUrl: '🌱' }, true);
+                    persistProfileNow({ avatarUrl: '🙂' }, true);
                   }}
                   className="text-[11px] text-gray-500 hover:text-rose-600 p-1 rounded-lg transition-colors cursor-pointer"
                   title="حذف تصویر و انتخاب آواتار پیش‌فرض"
@@ -256,7 +256,7 @@ export const UserProfileSettings: React.FC<Props> = ({
           <div className="flex-1 w-full space-y-2">
             <span className="block text-[11px] font-semibold text-gray-700 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-emerald-600" />
-              <span>انتخاب سریع از آواتارهای گیاهی جوانه (با لمس هر نماد بلافاصله ذخیره می‌شود):</span>
+              <span>انتخاب نماد:</span>
             </span>
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5">
               {BOTANICAL_AVATAR_PRESETS.map((preset) => {
@@ -316,7 +316,7 @@ export const UserProfileSettings: React.FC<Props> = ({
             </label>
             <input
               type="text"
-              placeholder="مثلاً: باغبان متعهد اهداف، پژوهشگر"
+              placeholder="مثلاً: مدیر، پژوهشگر"
               value={title}
               onChange={(e) => {
                 isDirtyRef.current = true;

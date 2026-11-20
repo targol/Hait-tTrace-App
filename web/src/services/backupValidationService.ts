@@ -482,7 +482,7 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
       name:
         typeof rawProfile.name === 'string' && rawProfile.name.trim()
           ? rawProfile.name.trim()
-          : 'باغبان جوانه',
+          : 'کاربر',
       title: typeof rawProfile.title === 'string' ? rawProfile.title : '',
       avatarUrl: typeof rawProfile.avatarUrl === 'string' && rawProfile.avatarUrl ? rawProfile.avatarUrl : '🌱',
       bio: typeof rawProfile.bio === 'string' ? rawProfile.bio : '',

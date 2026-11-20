@@ -29,9 +29,9 @@ export interface AppDataPayload {
 }
 
 export const DEFAULT_USER_PROFILE: UserProfile = {
-  name: 'باغبان جوانه',
+  name: 'کاربر',
   title: 'در مسیر رشد و پویایی',
-  avatarUrl: '🌱',
+  avatarUrl: '🙂',
   bio: 'هر روز با مراقبت از عادت‌ها و وظایف کوچک، اهداف بزرگ سالانه‌ام را به بار می‌نشانم.',
 };
 

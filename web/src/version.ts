@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.11.1',
-  currentVersionCode: 311,
-  versionCode: 311,
+  currentVersion: '2.12.0',
+  currentVersionCode: 320,
+  versionCode: 320,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.12.0',
+    versionCode: 320,
+    releaseDate: '۱۴۰۵/۰۸/۲۹',
+    gregorianDate: '2026-11-20',
+    title: 'منطق قدم‌ها و ساده‌سازی بیشتر',
+    highlights: [
+      'با انجام همهٔ قدم‌ها وظیفه خودکار تمام می‌شود؛ با تکمیل وظیفه همهٔ قدم‌ها انجام‌شده می‌شود و با بازکردن یک قدم، وظیفه دوباره باز می‌شود',
+      'گیاه و نمادهای باغچه از بالای صفحه، کارت امروز، اهداف، گزارش‌ها و تنظیمات حذف شد',
+      'کارت‌های تکراری و متن‌های توضیحی اضافه در امروز، وظیفه‌ها و تنظیمات برداشته شد'
+    ],
+    changes: []
+  },
   {
     version: '2.11.1',
     versionCode: 311,

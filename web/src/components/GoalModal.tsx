@@ -410,7 +410,7 @@ export const GoalModal: React.FC<Props> = ({
               <div className="flex items-center justify-between">
                 <label className="font-bold text-gray-800 flex items-center gap-1.5">
                   <Target className="w-4 h-4 text-emerald-600" />
-                  <span>هدف بالادستی (ارث‌بری خودکار دسته و گیاه)</span>
+                  <span>هدف بالادستی (دسته از آن به ارث می‌رسد)</span>
                 </label>
                 {parentGoal && (
                   <span className="text-[10px] text-emerald-700 bg-emerald-100/70 border border-emerald-300 px-2 py-0.5 rounded-md font-semibold">

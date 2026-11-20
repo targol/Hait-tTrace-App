@@ -840,13 +840,6 @@ export const GoalsScreen: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* Annual Garden Overview Card */}
-          <YearGardenOverviewCard
-            goals={cleanGoals}
-            tasks={tasks}
-            habits={habits}
-            year={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
-          />
 
           {[0, 1, 2, 3].map((sIdx) => {
             const sConfig = SEASON_CONFIG[sIdx];
@@ -904,14 +897,6 @@ export const GoalsScreen: React.FC<Props> = ({
                   </div>
                 </div>
 
-                {/* Seasonal Garden Summary Card */}
-                <SeasonGardenCard
-                  seasonIndex={sIdx}
-                  year={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
-                  goals={cleanGoals}
-                  tasks={tasks}
-                  habits={habits}
-                />
 
                 {/* Season Goals List */}
                 {seasonGoals.length === 0 ? (
@@ -1175,13 +1160,6 @@ export const GoalsScreen: React.FC<Props> = ({
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Annual Garden Overview Card */}
-          <YearGardenOverviewCard
-            goals={cleanGoals}
-            tasks={tasks}
-            habits={habits}
-            year={typeof selectedYearFilter === 'number' ? selectedYearFilter : today.year}
-          />
 
           {filteredTopLevelGoals.map((annual) => {
             const { progress: effectiveProgress, isManual } = getEffectiveGoalProgress(annual);

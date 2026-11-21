@@ -892,6 +892,7 @@ export const TodayScreen: React.FC<Props> = ({
                         <div className="min-w-0">
                           <p className={`text-xs font-bold truncate ${isDoneToday ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                             {h.title}
+                            {priorityInfo(h.priority) && (<span className="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-white mr-1.5" style={{ background: priorityInfo(h.priority)!.color }}>{priorityInfo(h.priority)!.label}</span>)}
                           </p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[11px] text-gray-500">
                             {h.timerMinutes > 0 && (
@@ -1132,7 +1133,7 @@ export const TodayScreen: React.FC<Props> = ({
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-3">
                           <div>
-                            <h4 className="text-xs font-bold text-gray-900">{h.title}</h4>
+                            <h4 className="text-xs font-bold text-gray-900">{h.title}{priorityInfo(h.priority) && (<span className="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-white mr-1.5" style={{ background: priorityInfo(h.priority)!.color }}>{priorityInfo(h.priority)!.label}</span>)}</h4>
                             <div className="flex items-center gap-2 mt-0.5 text-[11px] text-gray-500">
                               <span className="px-2 py-0.5 rounded-md font-semibold text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200">
                                 هفتگی

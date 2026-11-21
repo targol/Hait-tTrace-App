@@ -51,7 +51,7 @@ export const TaskModal: React.FC<Props> = ({
   const task: AppTask | null | undefined = React.useMemo(() => habit ? ({
     id: habit.id, title: habit.title, notes: habit.notes || '', categoryId: habit.categoryId, goalId: habit.goalId || null,
     dueDate: '', time: habit.time || null, repeatType: habit.frequency === 'DAILY' ? 'DAILY' : 'WEEKLY',
-    repeatDaysOfWeek: habit.targetDaysOfWeek || [], timerSecondsTarget: (habit.timerMinutes || 0) * 60, timerSecondsElapsed: 0, isCompleted: false,
+    repeatDaysOfWeek: habit.targetDaysOfWeek || [], timerSecondsTarget: (habit.timerMinutes || 0) * 60, timerSecondsElapsed: 0, isCompleted: false, priority: habit.priority,
   } as AppTask) : taskProp, [habit, taskProp]);
   const isExistingTask = !!taskProp && allTasks.some(t => t.id === taskProp.id);
   const [showMore, setShowMore] = useState(false);
@@ -345,6 +345,7 @@ export const TaskModal: React.FC<Props> = ({
         exemptHolidays: base?.exemptHolidays ?? false,
         exemptWeekends: base?.exemptWeekends ?? false,
         plantType: base?.plantType || 'بونسای',
+        priority,
         completionHistory: base?.completionHistory || {},
         dailyProgressHistory: base?.dailyProgressHistory,
         dailyElapsedSeconds: base?.dailyElapsedSeconds,

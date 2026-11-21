@@ -1,3 +1,4 @@
+import { priorityInfo } from '../utils/priority';
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, Goal } from '../types';
 import { 
@@ -1002,6 +1003,7 @@ export const HabitsScreen: React.FC<Props> = ({
                       <div className="min-w-0">
                         <h3 className="text-sm font-bold text-gray-900 truncate leading-snug">
                           {h.title}
+                          {priorityInfo(h.priority) && (<span className="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-white mr-1.5" style={{ background: priorityInfo(h.priority)!.color }}>{priorityInfo(h.priority)!.label}</span>)}
                         </h3>
                         <div className="flex flex-wrap items-center gap-1.5 mt-1">
                           {h.isClosed && (

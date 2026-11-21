@@ -120,6 +120,7 @@ export interface Habit {
   exemptHolidays: boolean;
   exemptWeekends: boolean;
   plantType: string;
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW';
   completionHistory: Record<string, boolean>; // "1403/07/15": true
   dailyProgressHistory?: Record<string, number>; // "1403/07/15": 65 (درصد انجام شده از هدف ساعت شنی)
   dailyElapsedSeconds?: Record<string, number>; // "1403/07/15": 900 ثانیه

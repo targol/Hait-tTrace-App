@@ -853,9 +853,6 @@ export const SettingsScreen: React.FC<Props> = ({
                     تم: {activeTheme.name}
                   </span>
                 </div>
-                <p className="text-xs text-white/80 mt-0.5 line-clamp-1">
-                  {currentProfile.title || 'تنظیمات یکپارچه، مدیریت پروفایل، یادآورها، تم‌های رنگی و پایگاه داده'}
-                </p>
               </div>
             </div>
 
@@ -906,9 +903,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   نسخه {toPersianDigits(APP_VERSION_INFO.currentVersion)} (حفظ اطلاعات فعلی)
                 </span>
               </h4>
-              <p className="text-[11px] text-gray-600 mt-0.5 leading-relaxed">
-                بروزرسانی مستقیم Javaneh-App.apk (کد نسخه {toPersianDigits(APP_VERSION_INFO.currentVersionCode)}) روی نسخه فعلی گوشی بدون پاک شدن اطلاعات + رفع مشکل ذخیره پروفایل و صدای آلارم یادآورها
-              </p>
             </div>
           </div>
 
@@ -944,9 +938,6 @@ export const SettingsScreen: React.FC<Props> = ({
             <SlidersHorizontal className="w-4 h-4 text-emerald-600" />
             <span>منوی دسته‌بندی تنظیمات</span>
           </div>
-          <span className="text-[11px] text-gray-400">
-            برای پیمایش سریع و راحت روی گوشی، بخش مورد نظر را لمس کنید
-          </span>
         </div>
 
         {/* Scrollable Navigation Bar (Mobile-first ergonomics) */}
@@ -996,7 +987,6 @@ export const SettingsScreen: React.FC<Props> = ({
               </div>
               <span>پروفایل</span>
             </h3>
-            <span className="text-[11px] text-gray-400">نام و عکس شما</span>
           </div>
 
           {/* Quick Profile Stats Highlight */}
@@ -1075,9 +1065,6 @@ export const SettingsScreen: React.FC<Props> = ({
                 </div>
                 <span>ظاهر و رنگ</span>
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                رنگ برنامه و حالت روز/شب را تنظیم کنید.
-              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1110,9 +1097,6 @@ export const SettingsScreen: React.FC<Props> = ({
                         <h4 className="text-xs font-bold text-gray-900 flex items-center gap-1">
                           <span>{theme.name}</span>
                         </h4>
-                        <span className="text-[10px] text-gray-400 block line-clamp-1">
-                          {theme.subtitle}
-                        </span>
                       </div>
                     </div>
 
@@ -1135,9 +1119,6 @@ export const SettingsScreen: React.FC<Props> = ({
                       style={{ backgroundColor: theme.accentHex }}
                       title={`رنگ مکمل: ${theme.accentHex}`}
                     />
-                    <div className="flex-1 text-[10px] text-gray-500 line-clamp-1 mr-1">
-                      {theme.description}
-                    </div>
                   </div>
 
                   {/* Active Indicator Button */}
@@ -1161,48 +1142,6 @@ export const SettingsScreen: React.FC<Props> = ({
                 </div>
               );
             })}
-          </div>
-
-          {/* Live Preview Card */}
-          <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-200 space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-gray-700">
-              <span className="flex items-center gap-1.5">
-                <Eye className="w-4 h-4 text-purple-600" />
-                <span>پیش‌نمایش زنده تم انتخابی ({activeTheme.name})</span>
-              </span>
-              <span className="text-[10px] text-gray-400">نمونه عناصر برنامه</span>
-            </div>
-
-            <div className="p-3 bg-white rounded-xl border border-gray-200/80 shadow-2xs flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-xl text-white flex items-center justify-center shadow-xs text-lg"
-                  style={{ backgroundColor: activeTheme.primaryHex }}
-                >
-                  {activeTheme.emoji}
-                </div>
-                <div>
-                  <h5 className="text-xs font-bold text-gray-900">باغچه اهداف و عادات سالانه</h5>
-                  <p className="text-[11px] text-gray-500">پیشرفت ۷۵٪ در فصل جاری</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  style={{ backgroundColor: activeTheme.primaryHex }}
-                  className="px-3 py-1.5 text-white text-xs font-bold rounded-xl shadow-xs"
-                >
-                  دکمه اصلی
-                </button>
-                <span
-                  style={{ color: activeTheme.primaryHex, borderColor: `${activeTheme.primaryHex}40` }}
-                  className="px-2.5 py-1 text-xs font-bold rounded-xl border bg-gray-50"
-                >
-                  برچسب نمونه
-                </span>
-              </div>
-            </div>
           </div>
 
           {/* Display & Accessibility Options */}
@@ -1232,9 +1171,6 @@ export const SettingsScreen: React.FC<Props> = ({
                         {isDarkMode ? '🌙 تم شب فعال است' : '☀️ تم روز فعال است'}
                       </span>
                     </h4>
-                    <p className="text-xs text-gray-500">
-                      تنظیم خودکار تم تیره بر اساس نور محیط، ساعت شبانه‌روز یا تنظیمات دستگاه
-                    </p>
                   </div>
                 </div>
 
@@ -1274,7 +1210,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-900 block">همیشه روشن</span>
-                    <span className="text-[10px] text-gray-500">تم روز با نور استاندارد</span>
                   </div>
                 </button>
 
@@ -1296,7 +1231,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-900 block">همیشه تیره</span>
-                    <span className="text-[10px] text-gray-500">تم شب آرام برای چشم</span>
                   </div>
                 </button>
 
@@ -1318,7 +1252,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-900 block">تنظیمات سیستم</span>
-                    <span className="text-[10px] text-gray-500">هماهنگ با گوشی/ویندوز</span>
                   </div>
                 </button>
 
@@ -1340,7 +1273,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-900 block">بر اساس زمان</span>
-                    <span className="text-[10px] text-gray-500">ساعت غروب تا طلوع</span>
                   </div>
                 </button>
               </div>
@@ -1358,9 +1290,6 @@ export const SettingsScreen: React.FC<Props> = ({
                         {isSystemDark ? 'سیستم شما هم‌اکنون تیره (Dark) است 🌙' : 'سیستم شما هم‌اکنون روشن (Light) است ☀️'}
                       </span>
                     </div>
-                    <p className="text-blue-700 text-[11px] leading-relaxed">
-                      هنگامی که حالت دارک‌مود در گوشی اندروید یا سیستم شما فعال شود، تم برنامه به طور خودکار بدون نیاز به لمس دکمه تیره می‌شود.
-                    </p>
                   </div>
                 </div>
               )}
@@ -1447,7 +1376,6 @@ export const SettingsScreen: React.FC<Props> = ({
               <div className="p-3 bg-gray-50 rounded-xl border border-gray-200/80 flex items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-bold text-gray-800 block">ویبره و بازخورد لمسی</span>
-                  <span className="text-[10px] text-gray-500">لرزش ملایم هنگام تیک زدن</span>
                 </div>
                 <button
                   type="button"
@@ -1481,9 +1409,6 @@ export const SettingsScreen: React.FC<Props> = ({
                 <Tag className="w-4 h-4 text-emerald-600" />
                 <span>دسته‌بندی‌ها</span>
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                هر دسته‌بندی یک رنگ دارد که به وظیفه‌ها و عادت‌ها منتقل می‌شود.
-              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1596,9 +1521,6 @@ export const SettingsScreen: React.FC<Props> = ({
                 </div>
                 <span>داده‌ها و پشتیبان‌گیری</span>
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                تهیه نسخه پشتیبان شخصی به صورت فایل استاندارد JSON، کپی سریع، بازیابی داده‌ها و همگام‌سازی ذخیره‌سازی سه‌لایه.
-              </p>
             </div>
 
             {/* Current Entities Summary Badges */}
@@ -1640,9 +1562,6 @@ export const SettingsScreen: React.FC<Props> = ({
                     همگام با سرور، IndexedDB و LocalStorage
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">
-                  تمامی تغییرات شما بلافاصله ذخیره می‌شوند. در تهیه نسخه پشتیبان، ۱۰۰٪ اطلاعات برنامه (اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، عکس و پروفایل کاربری و تنظیمات یادآور) پشتیبانی می‌شود.
-                </p>
               </div>
             </div>
           </div>
@@ -1658,9 +1577,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
                   <span>تهیه نسخه پشتیبان کامل از کل برنامه (Export)</span>
                 </div>
-                <p className="text-[11px] text-gray-600 leading-relaxed">
-                  خروجی کامل از تمام بخش‌های برنامه شامل ساختار درختی اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل کاربری (به همراه عکس) و تنظیمات یادآور.
-                </p>
               </div>
 
               <div className="flex items-center gap-2 pt-1 flex-wrap">
@@ -1750,9 +1666,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   </div>
                   <span>آپلود و بازگردانی کامل اطلاعات (Restore / Import)</span>
                 </div>
-                <p className="text-[11px] text-gray-600 leading-relaxed">
-                  فایل پشتیبان خود را بارگذاری کنید تا تمام بخش‌ها (اهداف، وظیفه‌ها، عادت‌ها، رویدادهای تقویم، دسته‌بندی‌ها، پروفایل و تنظیمات) بازیابی شوند.
-                </p>
               </div>
 
               <div className="flex items-center gap-2 pt-1 flex-wrap">
@@ -1814,37 +1727,6 @@ export const SettingsScreen: React.FC<Props> = ({
           </div>
         </div>
       )}
-
-      {/* Philosophy of Javaneh Card */}
-      <div className="bg-white rounded-2xl border border-emerald-100/80 p-5 shadow-xs space-y-3">
-        <h3 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
-          <Info className="w-4 h-4 text-emerald-600" />
-          <span>درباره ساختار و فلسفه برنامه‌ریزی جوانه</span>
-        </h3>
-        <p className="text-xs text-gray-600 leading-relaxed">
-          جوانه یک سیستم برنامه‌ریزی متصل و سلسله‌مراتبی بر اساس تقویم جلالی است:
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-xs">
-          <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-3">
-            <span className="font-bold text-emerald-900 block mb-1">۱. درخت اهداف سالانه</span>
-            <span className="text-emerald-800/80 text-[11px] leading-normal">
-              چشم‌اندازهای کلان که با آغاز سال یا در میانه سال کاشته می‌شوند.
-            </span>
-          </div>
-          <div className="bg-teal-50/60 border border-teal-200/80 rounded-xl p-3">
-            <span className="font-bold text-teal-900 block mb-1">۲. شاخه‌های فصلی و ماهانه</span>
-            <span className="text-teal-800/80 text-[11px] leading-normal">
-              شکستن اهداف سالانه به فصل‌های باقیمانده و ماه‌های متناظر با ارث‌بری خودکار دسته و گیاه.
-            </span>
-          </div>
-          <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3">
-            <span className="font-bold text-amber-900 block mb-1">۳. برگ‌های وظیفه و عادت روزانه</span>
-            <span className="text-amber-800/80 text-[11px] leading-normal">
-              وظیفه‌ها و عادات هفتگی و روزانه که با هر تیک زدن، بذر را آبیاری کرده و به بار می‌نشانند.
-            </span>
-          </div>
-        </div>
-      </div>
 
       {/* Modal for Add / Edit Category */}
       {isCategoryModalOpen && (
@@ -2014,8 +1896,7 @@ export const SettingsScreen: React.FC<Props> = ({
                   <RotateCcw className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm sm:text-base text-gray-900">پیش‌نمایش و تایید بازگردانی کامل اطلاعات</h3>
-                  <p className="text-[11px] text-gray-500 mt-0.5">بررسی محتویات فایل پشتیبان پیش از اعمال در تمام بخش‌های برنامه</p>
+                  <h3 className="font-bold text-sm sm:text-base text-gray-900">بازگردانی اطلاعات</h3>
                 </div>
               </div>
               <button
@@ -2176,8 +2057,7 @@ export const SettingsScreen: React.FC<Props> = ({
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm sm:text-base text-gray-900">ورود متنی اطلاعات نسخه پشتیبان (JSON)</h3>
-                  <p className="text-[11px] text-gray-500 mt-0.5">الصاق مستقیم متن کپی شده از فایل پشتیبان جوانه</p>
+                  <h3 className="font-bold text-sm sm:text-base text-gray-900">ورود متنی پشتیبان (JSON)</h3>
                 </div>
               </div>
               <button
@@ -2227,9 +2107,6 @@ export const SettingsScreen: React.FC<Props> = ({
                   className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-mono text-xs text-gray-800 bg-gray-50/50"
                   required
                 />
-                <p className="text-[11px] text-gray-500 mt-1">
-                  می‌توانید کدی که قبلاً با دکمه «کپی کد JSON» ذخیره کرده بودید را در این کادر پیست کنید.
-                </p>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">

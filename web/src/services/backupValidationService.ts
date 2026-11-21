@@ -379,6 +379,7 @@ export function validateAndSanitizeBackupJson(rawJson: string): ValidatedBackupR
         exemptHolidays: Boolean(item.exemptHolidays),
         exemptWeekends: Boolean(item.exemptWeekends),
         plantType: typeof item.plantType === 'string' && item.plantType ? item.plantType : 'بونسای',
+        priority: ['HIGH','MEDIUM','LOW'].includes(item.priority) ? item.priority : undefined,
         completionHistory:
           item.completionHistory && typeof item.completionHistory === 'object'
             ? item.completionHistory

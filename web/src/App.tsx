@@ -1744,12 +1744,14 @@ export const App: React.FC = () => {
         onSave={handleSaveGoal}
       />
 
-      <AnnualGoalWizardModal
-        isOpen={isAnnualWizardOpen}
-        categories={categories}
-        onClose={() => setIsAnnualWizardOpen(false)}
-        onSaveComplete={handleGoalWizardSave}
-      />
+      {isAnnualWizardOpen && (
+        <AnnualGoalWizardModal
+          isOpen
+          categories={categories}
+          onClose={() => setIsAnnualWizardOpen(false)}
+          onSaveComplete={handleGoalWizardSave}
+        />
+      )}
 
       <GoalDetailHistoryModal
         isOpen={Boolean(selectedHistoryGoal)}

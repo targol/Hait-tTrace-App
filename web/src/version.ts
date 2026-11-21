@@ -13,9 +13,9 @@ export interface ReleaseNote {
 }
 
 export const APP_VERSION_INFO = {
-  currentVersion: '2.12.0',
-  currentVersionCode: 320,
-  versionCode: 320,
+  currentVersion: '2.12.1',
+  currentVersionCode: 321,
+  versionCode: 321,
   releaseDate: '۱۴۰۵/۰۸/۰۳',
   apkFileName: 'Javaneh-App.apk',
   apkPackageName: 'com.javaneh.smart',
@@ -25,6 +25,19 @@ export const APP_VERSION_INFO = {
 };
 
 export const RELEASE_HISTORY: ReleaseNote[] = [
+  {
+    version: '2.12.1',
+    versionCode: 321,
+    releaseDate: '۱۴۰۵/۰۸/۳۰',
+    gregorianDate: '2026-11-21',
+    title: 'اهمیت برای عادت‌ها و رفع باگ هدف جدید',
+    highlights: [
+      'درجه اهمیت (مهم، متوسط، عادی) برای عادت‌ها هم ذخیره و نمایش داده می‌شود',
+      'ساخت هدف جدید همیشه با فرم خالی شروع می‌شود',
+      'متن‌های توضیحی صفحهٔ تنظیمات حذف شد و فقط دکمه‌ها ماندند'
+    ],
+    changes: []
+  },
   {
     version: '2.12.0',
     versionCode: 320,
